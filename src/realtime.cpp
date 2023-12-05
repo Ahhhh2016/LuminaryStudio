@@ -188,63 +188,120 @@ void Realtime::sceneChanged()
     cylinder.updateParams(parameter1, parameter2, 1.0f, 1.0f);
     sphere.updateParams(parameter1, parameter2, 1.0f, 1.0f);
 
+    //generate phy shapes
+    ini_phy_shapes();
+
     if (settings.adaptive_detail)
         calculate_adaptive_param();
 
     update(); // asks for a PaintGL() call to occur
 }
 
+std::vector<float> Realtime::generate_vertex_data(RenderShapeData s)
+{
+    std::vector<float> temp;
+    if (s.primitive.type == PrimitiveType::PRIMITIVE_CUBE)
+    {
+        cube.updateParams(settings.shapeParameter1, 1.0f, 1.0f);
+        temp = cube.generateShape();
+    }
+    else if (s.primitive.type == PrimitiveType::PRIMITIVE_CONE)
+    {
+        cone.updateParams(settings.shapeParameter1, settings.shapeParameter2, 1.0f, 1.0f);
+        temp = cone.generateShape();
+    }
+    else if (s.primitive.type == PrimitiveType::PRIMITIVE_SPHERE)
+    {
+        sphere.updateParams(settings.shapeParameter1, settings.shapeParameter2, 1.0f, 1.0f);
+        temp = sphere.generateShape();
+    }
+    else if (s.primitive.type == PrimitiveType::PRIMITIVE_CYLINDER)
+    {
+        cylinder.updateParams(settings.shapeParameter1, settings.shapeParameter2, 1.0f, 1.0f);
+        temp = cylinder.generateShape();
+    }
+
+    for (int i = 0; i < temp.size() / 8; i++)
+    {
+        glm::vec3 world_pos = glm::vec3(s.ctm * glm::vec4(temp[i * 8], temp[i * 8 + 1], temp[i * 8 + 2], 1.0f));
+        temp[i * 8] = world_pos[0];
+        temp[i * 8 + 1] = world_pos[1];
+        temp[i * 8 + 2] = world_pos[2];
+        glm::vec3 world_normal = glm::normalize(glm::inverse(glm::transpose(glm::mat3(s.ctm))) * normalize(glm::vec3(temp[i * 8 + 3], temp[i * 8 + 4], temp[i * 8 + 5])));
+        temp[i * 8 + 3] = world_normal[0];
+        temp[i * 8 + 4] = world_normal[1];
+        temp[i * 8 + 5] = world_normal[2];
+    }
+
+    return temp;
+}
+
+void Realtime::ini_phy_shapes()
+{
+    for (auto &s : shapes)
+    {
+        if (s.primitive.type == PrimitiveType::PRIMITIVE_CYLINDER)
+        {
+            phy_shapes.push_back(physics_shape{true, glm::vec3(0.0f), glm::vec3(0.0f), 0.5f, generate_vertex_data(s), s});
+        }
+        else
+        {
+            phy_shapes.push_back(physics_shape{false, glm::vec3(0.0f), glm::vec3(0.0f), 0.0f, generate_vertex_data(s), s});
+        }
+    }
+}
+
 void Realtime::settingsChanged()
 {
-    if (settings.nearPlane != near_plane || settings.farPlane != far_plane)
-    {
-        near_plane = settings.nearPlane;
-        far_plane = settings.farPlane;
-        camera.update(near_plane, far_plane);
-    }
+//    if (settings.nearPlane != near_plane || settings.farPlane != far_plane)
+//    {
+//        near_plane = settings.nearPlane;
+//        far_plane = settings.farPlane;
+//        camera.update(near_plane, far_plane);
+//    }
 
-    if (settings.shapeParameter1 != parameter1 || settings.shapeParameter2 != parameter2 || (settings.adaptive_detail != adaptive_detail && !settings.adaptive_detail))
-    {
-        parameter1 = settings.shapeParameter1;
-        parameter2 = settings.shapeParameter2;
-        cone.updateParams(parameter1, parameter2, 1.0f, 1.0f);
-        cube.updateParams(parameter1, 1.0f, 1.0f);
-        cylinder.updateParams(parameter1, parameter2, 1.0f, 1.0f);
-        sphere.updateParams(parameter1, parameter2, 1.0f, 1.0f);
+//    if (settings.shapeParameter1 != parameter1 || settings.shapeParameter2 != parameter2 || (settings.adaptive_detail != adaptive_detail && !settings.adaptive_detail))
+//    {
+//        parameter1 = settings.shapeParameter1;
+//        parameter2 = settings.shapeParameter2;
+//        cone.updateParams(parameter1, parameter2, 1.0f, 1.0f);
+//        cube.updateParams(parameter1, 1.0f, 1.0f);
+//        cylinder.updateParams(parameter1, parameter2, 1.0f, 1.0f);
+//        sphere.updateParams(parameter1, parameter2, 1.0f, 1.0f);
 
-        adaptive_detail = settings.adaptive_detail;
-    }
+//        adaptive_detail = settings.adaptive_detail;
+//    }
 
-    if (settings.adaptive_detail != adaptive_detail && settings.adaptive_detail)
-    {
-        adaptive_detail = settings.adaptive_detail;
-        calculate_adaptive_param();
-    }
+//    if (settings.adaptive_detail != adaptive_detail && settings.adaptive_detail)
+//    {
+//        adaptive_detail = settings.adaptive_detail;
+//        calculate_adaptive_param();
+//    }
 
-    if (settings.sharpen_filter != sharpen_filter)
-    {
-        sharpen_filter = settings.sharpen_filter;
-    }
+//    if (settings.sharpen_filter != sharpen_filter)
+//    {
+//        sharpen_filter = settings.sharpen_filter;
+//    }
 
-    if (settings.invert_filter != invert_filter)
-    {
-        invert_filter = settings.invert_filter;
-    }
+//    if (settings.invert_filter != invert_filter)
+//    {
+//        invert_filter = settings.invert_filter;
+//    }
 
-    if (settings.grayscale_filter != grayscale_filter)
-    {
-        grayscale_filter = settings.grayscale_filter;
-    }
+//    if (settings.grayscale_filter != grayscale_filter)
+//    {
+//        grayscale_filter = settings.grayscale_filter;
+//    }
 
-    if (settings.blur_filter != blur_filter)
-    {
-        blur_filter = settings.blur_filter;
-    }
+//    if (settings.blur_filter != blur_filter)
+//    {
+//        blur_filter = settings.blur_filter;
+//    }
 
-    if (settings.use_texture != use_texture)
-    {
-        use_texture = settings.use_texture;
-    }
+//    if (settings.use_texture != use_texture)
+//    {
+//        use_texture = settings.use_texture;
+//    }
 
     update(); // asks for a PaintGL() call to occur
 }

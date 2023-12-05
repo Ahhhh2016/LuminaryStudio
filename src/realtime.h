@@ -23,6 +23,15 @@
 #include "shapes/Cylinder.h"
 #include "shapes/Sphere.h"
 
+struct physics_shape {
+    bool apply_physics;
+    glm::vec3 v;
+    glm::vec3 f;
+    float m;
+    std::vector<float> vertexData;
+    RenderShapeData shape;
+};
+
 class Realtime : public QOpenGLWidget
 {
 public:
@@ -118,4 +127,13 @@ private:
     QImage m_image;
     GLuint m_shape_texture;
     bool use_texture = false;
+
+    //lantern
+    std::vector<physics_shape> phy_shapes;
+    glm::vec3 wind = glm::vec3(-5.0f, 0.0f, -5.0f);
+    float b = 0.25;
+    float lift_force = 8.0f;
+    void ini_phy_shapes();
+    std::vector<float> generate_vertex_data(RenderShapeData s);
+    void update_phy_shape(float dt);
 };

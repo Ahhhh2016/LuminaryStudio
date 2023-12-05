@@ -51,9 +51,35 @@ void Realtime::mouseMoveEvent(QMouseEvent *event) {
     }
 }
 
+void Realtime::update_phy_shape(float dt)
+{
+    for (auto &s : phy_shapes)
+    {
+        if (s.apply_physics)
+        {
+            s.f = -b * s.v + wind + glm::vec3(0.0f, lift_force, 0.0f) + glm::vec3(0.0f, - 9.8f * s.m, 0.0f);
+            s.v = s.f * dt / s.m;
+            glm::vec3 ds = s.v * dt;
+            //printf("ds: %f, %f, %f\n", ds[0], ds[1], ds[2]);
+            for (int i = 0; i < s.vertexData.size() / 8; i++)
+            {
+                s.vertexData[i * 8 + 0] = s.vertexData[i * 8 + 0] + ds[0];
+                s.vertexData[i * 8 + 1] = s.vertexData[i * 8 + 1] + ds[1];
+                s.vertexData[i * 8 + 2] = s.vertexData[i * 8 + 2] + ds[2];
+                s.vertexData[i * 8 + 3] = s.vertexData[i * 8 + 3] + ds[0];
+                s.vertexData[i * 8 + 4] = s.vertexData[i * 8 + 4] + ds[1];
+                s.vertexData[i * 8 + 5] = s.vertexData[i * 8 + 5] + ds[2];
+            }
+        }
+    }
+}
+
 void Realtime::timerEvent(QTimerEvent *event) {
     int elapsedms   = m_elapsedTimer.elapsed();
     float deltaTime = elapsedms * 0.001f;
+
+    update_phy_shape(deltaTime);
+
     m_elapsedTimer.restart();
 
     glm::vec4 move_dir = glm::vec4(0.0f);

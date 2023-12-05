@@ -7,7 +7,6 @@
 #include "settings.h"
 #include "utils/shaderloader.h"
 
-#include "glm/gtx/transform.hpp"
 
 void Realtime::paint_shapes() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -53,13 +52,13 @@ void Realtime::paint_shapes() {
     glm::vec4 pos = camera.pos;
     glUniform4f(glGetUniformLocation(m_phong_shader, "camera_pos"), pos[0], pos[1], pos[2], pos[3]);
 
-    for (auto& s : shapes)
+    for (auto& p_s : phy_shapes)
     {
         // Task 5: Generate a VBO here and store it in m_vbo
         glGenBuffers(1, &m_vbo);
         glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 
-        std::vector<float> vbo_data = generate_vbo(s);
+        std::vector<float> vbo_data = p_s.vertexData;// generate_vbo(s);
 
         // Task 9: Pass the triangle vector into your VBO here
         glBufferData(GL_ARRAY_BUFFER, vbo_data.size() * sizeof(GLfloat), vbo_data.data(), GL_STATIC_DRAW);
@@ -78,10 +77,10 @@ void Realtime::paint_shapes() {
         glEnableVertexAttribArray(2);
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), reinterpret_cast<void*>(6 * sizeof(GLfloat)));
 
-        glUniformMatrix4fv(glGetUniformLocation(m_phong_shader, "model_matrix"), 1, GL_FALSE, &s.ctm[0][0]);
+        //glUniformMatrix4fv(glGetUniformLocation(m_phong_shader, "model_matrix"), 1, GL_FALSE, &s.ctm[0][0]);
 
         // -------------- material -----------------
-        auto material = s.primitive.material;
+        auto material = p_s.shape.primitive.material;
         glUniform4f(glGetUniformLocation(m_phong_shader, "material_ambient"), material.cAmbient[0], material.cAmbient[1], material.cAmbient[2], material.cAmbient[3]);
         glUniform4f(glGetUniformLocation(m_phong_shader, "material_diffuse"), material.cDiffuse[0], material.cDiffuse[1], material.cDiffuse[2], material.cDiffuse[3]);
         glUniform4f(glGetUniformLocation(m_phong_shader, "material_specular"), material.cSpecular[0], material.cSpecular[1], material.cSpecular[2], material.cSpecular[3]);
