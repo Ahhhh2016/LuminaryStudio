@@ -9,9 +9,6 @@
 
 void Realtime::paint_skybox()
 {
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     // draw skybox as last
     glDepthFunc(GL_LEQUAL);
     glUseProgram(m_skybox_shader);
@@ -30,8 +27,9 @@ void Realtime::paint_skybox()
 }
 
 
-void Realtime::paint_shapes() {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+void Realtime::paint_shapes(bool paint_all) {
+    // glClearColor(0.5f, 0.1f, 0.1f, 1.0f);
+    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glUseProgram(m_phong_shader);
 
     glUniformMatrix4fv(glGetUniformLocation(m_phong_shader, "view_matrix"), 1, GL_FALSE, &camera.view_mat[0][0]);
@@ -76,6 +74,8 @@ void Realtime::paint_shapes() {
 
     for (auto& p_s : phy_shapes)
     {
+        if (!paint_all && p_s.shape.primitive.type == PrimitiveType::PRIMITIVE_CUBE)
+            continue;
         // Task 5: Generate a VBO here and store it in m_vbo
         glGenBuffers(1, &m_vbo);
         glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
@@ -108,31 +108,41 @@ void Realtime::paint_shapes() {
         glUniform4f(glGetUniformLocation(m_phong_shader, "material_specular"), material.cSpecular[0], material.cSpecular[1], material.cSpecular[2], material.cSpecular[3]);
         glUniform1i(glGetUniformLocation(m_phong_shader, "shininess"), material.shininess);
 
-        // -------------- texture -----------------
-        auto texture_map = material.textureMap;
-        if (settings.use_texture && texture_map.isUsed)
+        // reflection
+        if (p_s.shape.primitive.type == PrimitiveType::PRIMITIVE_CUBE)
         {
-            QString texture_filepath = QString::fromStdString(texture_map.filename);
-            m_image = QImage(texture_filepath);
-            m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
-
-            glBindVertexArray(m_vao);
-            glGenTextures(1, &m_shape_texture);
-            glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, m_shape_texture);
-
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-            glUniform1i(glGetUniformLocation(m_phong_shader, "object_texture"), 1);
-            glUniform1f(glGetUniformLocation(m_phong_shader, "blend"), float(material.blend));
-            glUniform1i(glGetUniformLocation(m_phong_shader, "use_texture"), true);
+            glUniform1i(glGetUniformLocation(m_phong_shader, "is_water"), true);
         }
         else
         {
-            glUniform1i(glGetUniformLocation(m_phong_shader, "use_texture"), false);
+            glUniform1i(glGetUniformLocation(m_phong_shader, "is_water"), false);
         }
+
+        // // -------------- texture -----------------
+        // auto texture_map = material.textureMap;
+        // if (settings.use_texture && texture_map.isUsed)
+        // {
+        //     QString texture_filepath = QString::fromStdString(texture_map.filename);
+        //     m_image = QImage(texture_filepath);
+        //     m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
+
+        //     glBindVertexArray(m_vao);
+        //     glGenTextures(1, &m_shape_texture);
+        //     glActiveTexture(GL_TEXTURE1);
+        //     glBindTexture(GL_TEXTURE_2D, m_shape_texture);
+
+        //     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
+        //     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        //     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        //     glUniform1i(glGetUniformLocation(m_phong_shader, "object_texture"), 1);
+        //     glUniform1f(glGetUniformLocation(m_phong_shader, "blend"), float(material.blend));
+        //     glUniform1i(glGetUniformLocation(m_phong_shader, "use_texture"), true);
+        // }
+        // else
+        // {
+        //     glUniform1i(glGetUniformLocation(m_phong_shader, "use_texture"), false);
+        // }
 
 
         // Draw Command

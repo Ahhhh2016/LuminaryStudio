@@ -7,7 +7,7 @@
     "transparentCoeff": 0
   },
   "cameraData": {
-    "position": [-6.0, 4.0, 4.0],
+    "position": [-26.0, 14.0, 14.0],
     "up": [0.0, 1.0, 0.0],
     "focus": [0, 0, 0],
     "heightAngle": 30.0
@@ -162,8 +162,7 @@
           ]
         },
         {
-          "translate": [0.0, -0.6, 0.0],
-          "scale": [40.0, 10.0, 40.0],
+	  "scale": [10.0, 1.0, 10.0],
           "primitives": [
             {
               "type": "cube",

@@ -17,7 +17,7 @@
 // ================== Project 5: Lights, Camera
 
 Realtime::Realtime(QWidget *parent)
-    : QOpenGLWidget(parent), camera()
+    : QOpenGLWidget(parent), topCamera(), bottomCamera(), leftCamera(), rightCamera(), frontCamera(), backCamera(), camera()
 {
     m_prev_mouse_pos = glm::vec2(size().width()/2, size().height()/2);
     setMouseTracking(true);
@@ -76,6 +76,7 @@ GLuint loadCubemap(std::vector<std::string> faces)
             stbi_image_free(data);
         }
     }
+
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -83,6 +84,126 @@ GLuint loadCubemap(std::vector<std::string> faces)
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
     return textureID;
+}
+
+bool loadCubeMapSide(GLuint texture, GLenum side_target, std::string file_name) {
+    int x, y, n;
+    int force_channels = 4;
+    unsigned char*  image_data = stbi_load(
+        file_name.c_str(), &x, &y, &n, force_channels);
+    if (!image_data) {
+        std::cerr << "ERROR: could not load " << file_name << std::endl;
+        return false;
+    }
+    // non-power-of-2 dimensions check
+    if ((x & (x - 1)) != 0 || (y & (y - 1)) != 0) {
+        std::cerr << "WARNING: image " << file_name << " is not power-of-2 dimensions " << std::endl;
+    }
+
+    //this->cubemapSideLength = x;
+
+    // copy image data into 'target' side of cube map
+    glTexImage2D(
+        side_target,
+        0,
+        GL_RGBA,
+        x,
+        y,
+        0,
+        GL_RGBA,
+        GL_UNSIGNED_BYTE,
+        image_data);
+    free(image_data);
+    return true;
+}
+
+void Realtime::ini_skybox()
+{
+    for (float& i : skyboxVertices) {
+        i *= 100;
+    }
+
+    // skybox VAO
+    // skybox
+    glEnable(GL_DEPTH_TEST);
+    m_skybox_shader = ShaderLoader::createShaderProgram(":/resources/shaders/skybox.vert", ":/resources/shaders/skybox.frag");
+
+    glGenVertexArrays(1, &skyboxVAO);
+    glGenBuffers(1, &skyboxVBO);
+    glBindVertexArray(skyboxVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+    glBufferData(GL_ARRAY_BUFFER, skyboxVertices.size()*sizeof(GLfloat), skyboxVertices.data(), GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), reinterpret_cast<void*>(0 * sizeof(GLfloat)));
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
+    // load textures
+    // -------------
+    std::vector<std::string> faces
+        {
+            "./resources/skybox/right.jpg",
+            "./resources/skybox/left.jpg",
+            "./resources/skybox/top.jpg",
+            "./resources/skybox/bottom.jpg",
+            "./resources/skybox/front.jpg",
+            "./resources/skybox/back.jpg",
+        };
+
+    //cubemapTexture = loadCubemap(faces);
+    glGenTextures(1, &cubemapTexture);
+    // binding
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+
+    // load each image and copy into a side of the cube-map texture
+    loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, faces[4]);
+    loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_POSITIVE_Z, faces[5]);
+    loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_POSITIVE_Y, faces[2]);
+    loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, faces[3]);
+    loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_NEGATIVE_X, faces[1]);
+    loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_POSITIVE_X, faces[0]);
+    // format cube map texture
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    // unbinding
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+    // init dynamic cubemap
+    // depth buffer
+    glGenRenderbuffers(1, &fbo_rb_cube);
+    glBindRenderbuffer(GL_RENDERBUFFER, fbo_rb_cube);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 2048, 2048);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+    // texture
+    // create the cubemap
+    glGenTextures(1, &fbo_tex_cube);
+    glActiveTexture(GL_TEXTURE1); // texture slot 1
+    glBindTexture(GL_TEXTURE_CUBE_MAP, fbo_tex_cube);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BASE_LEVEL, 0);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, 0);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    for (int i = 0; i < 6; ++i) {
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, 2048, 2048, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+    }
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+    glGenFramebuffers(1, &fbo_cube);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo_cube);
+    // attach buffer & tex to fbo
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, fbo_rb_cube);
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, fbo_tex_cube, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
+
 }
 
 void Realtime::initializeGL() {
@@ -108,7 +229,7 @@ void Realtime::initializeGL() {
     glViewport(0, 0, size().width() * m_devicePixelRatio, size().height() * m_devicePixelRatio);
 
     // Students: anything requiring OpenGL calls when the program starts should be done here
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
     m_phong_shader = ShaderLoader::createShaderProgram(":/resources/shaders/phong.vert", ":/resources/shaders/phong.frag");
     m_postprocess_shader = ShaderLoader::createShaderProgram(":/resources/shaders/postprocess.vert", ":/resources/shaders/postprocess.frag");
 
@@ -119,48 +240,56 @@ void Realtime::initializeGL() {
     m_fbo_width = m_screen_width;
     m_fbo_height = m_screen_height;
 
-    // Task 10: Set the texture.frag uniform for our texture
-    glUseProgram(m_postprocess_shader);
-    glUniform1i(glGetUniformLocation(m_postprocess_shader, "u_texture"), 0);
-    glUseProgram(0);
+    // // Task 10: Set the texture.frag uniform for our texture
+    // glUseProgram(m_postprocess_shader);
+    // glUniform1i(glGetUniformLocation(m_postprocess_shader, "u_texture"), 0);
+    // glUseProgram(0);
 
-    // Task 13: Add UV coordinates
-    std::vector<GLfloat> fullscreen_quad_data =
-        { //     POSITIONS    //    UV   //
-            -1.0f,  1.0f, 0.0f,  0.0f,1.0f,
-            -1.0f, -1.0f, 0.0f,  0.0f,0.0f,
-            1.0f, -1.0f, 0.0f,  1.0f,0.0f,
-            1.0f,  1.0f, 0.0f,  1.0f,1.0f,
-            -1.0f,  1.0f, 0.0f,  0.0f,1.0f,
-            1.0f, -1.0f, 0.0f,  1.0f,0.0f
-        };
+    // // Task 13: Add UV coordinates
+    // std::vector<GLfloat> fullscreen_quad_data =
+    //     { //     POSITIONS    //    UV   //
+    //         -1.0f,  1.0f, 0.0f,  0.0f,1.0f,
+    //         -1.0f, -1.0f, 0.0f,  0.0f,0.0f,
+    //         1.0f, -1.0f, 0.0f,  1.0f,0.0f,
+    //         1.0f,  1.0f, 0.0f,  1.0f,1.0f,
+    //         -1.0f,  1.0f, 0.0f,  0.0f,1.0f,
+    //         1.0f, -1.0f, 0.0f,  1.0f,0.0f
+    //     };
 
-    // Generate and bind a VBO and a VAO for a fullscreen quad
-    glGenBuffers(1, &m_fullscreen_vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, m_fullscreen_vbo);
-    glBufferData(GL_ARRAY_BUFFER, fullscreen_quad_data.size()*sizeof(GLfloat), fullscreen_quad_data.data(), GL_STATIC_DRAW);
-    glGenVertexArrays(1, &m_fullscreen_vao);
-    glBindVertexArray(m_fullscreen_vao);
+    // // Generate and bind a VBO and a VAO for a fullscreen quad
+    // glGenBuffers(1, &m_fullscreen_vbo);
+    // glBindBuffer(GL_ARRAY_BUFFER, m_fullscreen_vbo);
+    // glBufferData(GL_ARRAY_BUFFER, fullscreen_quad_data.size()*sizeof(GLfloat), fullscreen_quad_data.data(), GL_STATIC_DRAW);
+    // glGenVertexArrays(1, &m_fullscreen_vao);
+    // glBindVertexArray(m_fullscreen_vao);
 
-    // Task 14: modify the code below to add a second attribute to the vertex attribute array
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), reinterpret_cast<void*>(0 * sizeof(GLfloat)));
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), reinterpret_cast<void*>(3 * sizeof(GLfloat)));
+    // // Task 14: modify the code below to add a second attribute to the vertex attribute array
+    // glEnableVertexAttribArray(0);
+    // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), reinterpret_cast<void*>(0 * sizeof(GLfloat)));
+    // glEnableVertexAttribArray(1);
+    // glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), reinterpret_cast<void*>(3 * sizeof(GLfloat)));
 
-    // Unbind the fullscreen quad's VBO and VAO
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+    // // Unbind the fullscreen quad's VBO and VAO
+    // glBindBuffer(GL_ARRAY_BUFFER, 0);
+    // glBindVertexArray(0);
 
-    makeFBO();
+    // glUseProgram(m_skybox_shader);
+    // glUniform1i(glGetUniformLocation(m_skybox_shader, "skybox"), 2);
+    // glUseProgram(0);
 
-    //==============project 6================
+    // glUseProgram(m_phong_shader);
+    // glUniform1i(glGetUniformLocation(m_phong_shader, "skybox"), 0);
+    // glUseProgram(0);
 
+    //ini_skybox();
+    for (float& i : skyboxVertices) {
+        i *= 100;
+    }
+
+    // skybox VAO
     // skybox
     glEnable(GL_DEPTH_TEST);
     m_skybox_shader = ShaderLoader::createShaderProgram(":/resources/shaders/skybox.vert", ":/resources/shaders/skybox.frag");
-
-    // skybox VAO
 
     glGenVertexArrays(1, &skyboxVAO);
     glGenBuffers(1, &skyboxVBO);
@@ -184,33 +313,249 @@ void Realtime::initializeGL() {
             "./resources/skybox/back.jpg",
         };
 
-    cubemapTexture = loadCubemap(faces);
+    //cubemapTexture = loadCubemap(faces);
+    glGenTextures(1, &cubemapTexture);
+    // binding
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
 
+    // load each image and copy into a side of the cube-map texture
+    loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, faces[4]);
+    loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_POSITIVE_Z, faces[5]);
+    loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_POSITIVE_Y, faces[2]);
+    loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, faces[3]);
+    loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_NEGATIVE_X, faces[1]);
+    loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_POSITIVE_X, faces[0]);
+    // format cube map texture
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    // unbinding
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+    // init dynamic cubemap
+    // depth buffer
+    glGenRenderbuffers(1, &fbo_rb_cube);
+    glBindRenderbuffer(GL_RENDERBUFFER, fbo_rb_cube);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 2048, 2048);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+    // texture
+    // create the cubemap
+    glGenTextures(1, &fbo_tex_cube);
+    glActiveTexture(GL_TEXTURE1); // texture slot 1
+    glBindTexture(GL_TEXTURE_CUBE_MAP, fbo_tex_cube);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BASE_LEVEL, 0);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, 0);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    for (int i = 0; i < 6; ++i) {
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, 2048, 2048, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+    }
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+    glGenFramebuffers(1, &fbo_cube);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo_cube);
+    // attach buffer & tex to fbo
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, fbo_rb_cube);
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, fbo_tex_cube, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
+
+    topCamera.initialize(SceneCameraData{   glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), glm::vec4(0.0f, 10.0f, 0.0f, 0.0f),  glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), 3.14f / 2.0f, 0.0f, 0.0f});
+    bottomCamera.initialize(SceneCameraData{glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), glm::vec4(0.0f, -10.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.0f, -1.0f, 0.0f), 3.14f / 2.0f, 0.0f, 0.0f});
+    leftCamera.initialize(SceneCameraData{  glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), glm::vec4(-10.0f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, -1.0f, 0.0f, 0.0f), 3.14f / 2.0f, 0.0f, 0.0f});
+    rightCamera.initialize(SceneCameraData{ glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), glm::vec4(10.0f, 0.0f, 0.0f, 0.0f),  glm::vec4(0.0f, -1.0f, 0.0f, 0.0f), 3.14f / 2.0f, 0.0f, 0.0f});
+    frontCamera.initialize(SceneCameraData{ glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), glm::vec4(0.0f, 0.0f, -10.0f, 0.0f), glm::vec4(0.0f, -1.0f, 0.0f, 0.0f), 3.14f / 2.0f, 0.0f, 0.0f});
+    backCamera.initialize(SceneCameraData{  glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), glm::vec4(0.0f, 0.0f, 10.0f, 0.0f),  glm::vec4(0.0f, -1.0f, 0.0f, 0.0f), 3.14f / 2.0f, 0.0f, 0.0f});
+
+    // //makeFBO();
+    // // fbo
+    // topCamera.initialize(SceneCameraData{   glm::vec4(5.0f, -5.0f, 1.0f, 1.0f), glm::vec4(0.0f, 10.0f, 0.0f, 0.0f),  glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), 3.14f / 2.0f, 0.0f, 0.0f});
+    // bottomCamera.initialize(SceneCameraData{glm::vec4(5.0f, -5.0f, 1.0f, 1.0f), glm::vec4(0.0f, -10.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.0f, -1.0f, 0.0f), 3.14f / 2.0f, 0.0f, 0.0f});
+    // leftCamera.initialize(SceneCameraData{  glm::vec4(5.0f, -5.0f, 1.0f, 1.0f), glm::vec4(-10.0f, 0.0f, 0.0f, 0.0f), glm::vec4(0.0f, -1.0f, 0.0f, 0.0f), 3.14f / 2.0f, 0.0f, 0.0f});
+    // rightCamera.initialize(SceneCameraData{ glm::vec4(5.0f, -5.0f, 1.0f, 1.0f), glm::vec4(10.0f, 0.0f, 0.0f, 0.0f),  glm::vec4(0.0f, -1.0f, 0.0f, 0.0f), 3.14f / 2.0f, 0.0f, 0.0f});
+    // frontCamera.initialize(SceneCameraData{ glm::vec4(5.0f, -5.0f, 1.0f, 1.0f), glm::vec4(0.0f, 0.0f, -10.0f, 0.0f), glm::vec4(0.0f, -1.0f, 0.0f, 0.0f), 3.14f / 2.0f, 0.0f, 0.0f});
+    // backCamera.initialize(SceneCameraData{  glm::vec4(5.0f, -5.0f, 1.0f, 1.0f), glm::vec4(0.0f, 0.0f, 10.0f, 0.0f),  glm::vec4(0.0f, -1.0f, 0.0f, 0.0f), 3.14f / 2.0f, 0.0f, 0.0f});
+
+    // glGenRenderbuffers(1, &fbo_rb_cube);
+    // glBindRenderbuffer(GL_RENDERBUFFER, fbo_rb_cube);
+    // glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 2048, 2048);
+    // glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+    // // texture
+    // glGenTextures(1, &fbo_tex_cube);
+    // glActiveTexture(GL_TEXTURE2); // texture slot 1
+    // glBindTexture(GL_TEXTURE_CUBE_MAP, fbo_tex_cube);
+    // glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BASE_LEVEL, 0);
+    // glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, 0);
+    // glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    // glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    // glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    // glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    // for (int i = 0; i < 6; ++i) {
+    //     glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, 2048, 2048, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+    // }
+    // glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+    // glGenFramebuffers(1, &fbo_cube);
+    // glBindFramebuffer(GL_FRAMEBUFFER, fbo_cube);
+    // // attach buffer & tex to fbo
+    // glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, this->fbo_rb_cube);
+    // glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,fbo_tex_cube, 0);
+    // glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
+
+    //==============project 6================
+
+}
+
+void Realtime::drawFboSide(Camera c)
+{
+    glClearColor(0.1f, 1.0f, 0.1f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glActiveTexture(GL_TEXTURE0);
+    int modelIndex = 0;
+    //--------------------------------------------------------------------
+    paint_shapes(false);
+    //---------------------------------------------------------------------
+    glBindVertexArray(0);
+
+    // CUBEMAP ---------------------------------------------------------
+    glDepthFunc(GL_LEQUAL);
     glUseProgram(m_skybox_shader);
-    glUniform1i(glGetUniformLocation(m_skybox_shader, "skybox"), 2);
+
+    c.update(settings.nearPlane, settings.farPlane);
+
+    glm::mat4 view = glm::mat4(glm::mat3(c.view_mat));
+    glUniformMatrix4fv(glGetUniformLocation(m_skybox_shader, "view"), 1, GL_FALSE, &view[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(m_skybox_shader, "projection"), 1, GL_FALSE, &c.proj_mat[0][0]);
+    glUniform1i(glGetUniformLocation(m_skybox_shader, "skybox"), 0);
+    // skybox cube
+    glBindVertexArray(skyboxVAO);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindVertexArray(0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
     glUseProgram(0);
+    glDepthFunc(GL_LESS); // set depth function back to default
+    // CUBEMAP ---------------------------------------------------------
 }
 
 void Realtime::paintGL() {
-    // Task 24: Bind our FBO
-    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-    // Task 28: Call glViewport
-    glViewport(0, 0, m_fbo_width, m_fbo_height);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    paint_shapes();
-
-    paint_skybox();
-
-    // Task 25: Bind the default framebuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo_cube);
+    glViewport(0, 0, 2048, 2048);
+    for (int i = 0; i < 6; i++)
+    {
+        switch (i)
+        {
+        case 0:
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, fbo_tex_cube, 0);
+            drawFboSide(rightCamera);
+            break;
+        case 1:
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, fbo_tex_cube, 0);
+            drawFboSide(leftCamera);
+            break;
+        case 2:
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, fbo_tex_cube, 0);
+            drawFboSide(topCamera);
+            break;
+        case 3:
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, fbo_tex_cube, 0);
+            drawFboSide(bottomCamera);
+            break;
+        case 4:
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, fbo_tex_cube, 0);
+            drawFboSide(backCamera);
+            break;
+        case 5:
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, fbo_tex_cube, 0);
+            drawFboSide(frontCamera);
+            break;
+        default:
+            std::cerr << "side does not exist" << std::endl;
+            break;
+        }
+    }
     glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
     glViewport(0, 0, m_screen_width * this->devicePixelRatio(), m_screen_height * this->devicePixelRatio());
+    // // Task 24: Bind our FBO
+    // glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+    // // Task 28: Call glViewport
+    // glViewport(0, 0, m_fbo_width, m_fbo_height);
+    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Task 26: Clear the color and depth buffers
+    glClearColor(0.5f, 0.1f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    // starting to paint the texture
+    // CUBEMAP ---------------------------------------------------------
+    glDepthFunc(GL_LEQUAL);
+    glUseProgram(m_skybox_shader);
+    glm::mat4 view = glm::mat4(glm::mat3(camera.view_mat));
+
+    glUniformMatrix4fv(glGetUniformLocation(m_skybox_shader, "view"), 1, GL_FALSE, &view[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(m_skybox_shader, "projection"), 1, GL_FALSE, &camera.proj_mat[0][0]);
+    glUniform1i(glGetUniformLocation(m_skybox_shader, "skybox"), 1);
+    // skybox cube
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, fbo_tex_cube);
+    glBindVertexArray(skyboxVAO);
+    //glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindVertexArray(0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+    glDepthFunc(GL_LESS); // set depth function back to default
+    glUseProgram(0);
+    // CUBEMAP ---------------------------------------------------------
+
+    glClearColor(0.1f, 1.0f, 0.1f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, fbo_tex_cube);
+
+    paint_shapes(true);
+
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+    glBindVertexArray(0);
+
+    // CUBEMAP ---------------------------------------------------------
+    glDepthFunc(GL_LEQUAL);
+    glUseProgram(m_skybox_shader);
+    glm::mat4 view1 = glm::mat4(glm::mat3(camera.view_mat));
+    glUniformMatrix4fv(glGetUniformLocation(m_skybox_shader, "view"), 1, GL_FALSE, &view1[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(m_skybox_shader, "projection"), 1, GL_FALSE, &camera.proj_mat[0][0]);
+    glUniform1i(glGetUniformLocation(m_skybox_shader, "skybox"), 0);
+    glBindVertexArray(skyboxVAO);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+    glBindVertexArray(0);
+    glUseProgram(0);
+    glDepthFunc(GL_LESS); // set depth function back to default
+    // CUBEMAP ---------------------------------------------------------
+
+
+    // Task 25: Bind the default framebuffer
+    // glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
+    // glViewport(0, 0, m_screen_width * this->devicePixelRatio(), m_screen_height * this->devicePixelRatio());
+
+    // Task 26: Clear the color and depth buffers
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     // Task 27: Call paintTexture to draw our FBO color attachment texture | Task 31: Set bool parameter to true
-    paintTexture(m_fbo_texture);
+    //paintTexture(m_fbo_texture);
 }
 
 void Realtime::resizeGL(int w, int h) {
@@ -221,6 +566,13 @@ void Realtime::resizeGL(int w, int h) {
     camera.aspect_ratio = float(w) / float(h);
     camera.update(settings.nearPlane, settings.farPlane);
 
+    topCamera.aspect_ratio = 1.0f;
+    bottomCamera.aspect_ratio = 1.0f;
+    leftCamera.aspect_ratio = 1.0f;
+    rightCamera.aspect_ratio = 1.0f;
+    frontCamera.aspect_ratio = 1.0f;
+    backCamera.aspect_ratio = 1.0f;
+
     //================project 6================
     m_screen_width = size().width() * m_devicePixelRatio;
     m_screen_height = size().height() * m_devicePixelRatio;
@@ -228,11 +580,11 @@ void Realtime::resizeGL(int w, int h) {
     m_fbo_height = m_screen_height;
 
     // Task 34: Regenerate your FBOs
-    glDeleteTextures(1, &m_fbo_texture);
-    glDeleteRenderbuffers(1, &m_fbo_renderbuffer);
-    glDeleteFramebuffers(1, &m_fbo);
+    // glDeleteTextures(1, &m_fbo_texture);
+    // glDeleteRenderbuffers(1, &m_fbo_renderbuffer);
+    // glDeleteFramebuffers(1, &m_fbo);
 
-    makeFBO();
+    //makeFBO();
     //================project 6================
 }
 
@@ -382,7 +734,8 @@ void Realtime::settingsChanged()
 
     if (settings.use_texture != use_texture)
     {
-        use_texture = settings.use_texture;
+        //use_texture = settings.use_texture;
+        stop = !stop;
     }
 
     update(); // asks for a PaintGL() call to occur

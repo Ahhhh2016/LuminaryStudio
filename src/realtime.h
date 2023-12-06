@@ -48,7 +48,7 @@ public:
     void makeFBO();
     void paintTexture(GLuint texture);
 
-    void paint_shapes();
+    void paint_shapes(bool paint_all);
     void paint_skybox();
 
 public slots:
@@ -129,6 +129,8 @@ private:
     GLuint m_shape_texture;
     bool use_texture = false;
 
+    bool stop = false;
+
     //lantern
     std::vector<physics_shape> phy_shapes;
     glm::vec3 wind = glm::vec3(-0.3f, 0.0f, -0.3f);
@@ -139,53 +141,64 @@ private:
     void update_phy_shape(float dt);
     float rand_float(float min_float, float max_float);
 
+    // dynamic environment mapping
+    Camera topCamera;
+    Camera bottomCamera;
+    Camera leftCamera;
+    Camera rightCamera;
+    Camera frontCamera;
+    Camera backCamera;
+    void drawFboSide(Camera c);
+    GLuint fbo_tex_cube, fbo_rb_cube, fbo_cube;
+
     // skybox
     GLuint m_skybox_shader;
     GLuint skyboxVAO, skyboxVBO;
     GLuint cubemapTexture;
+    void ini_skybox();
 
     std::vector<GLfloat> skyboxVertices = {
-        // Positions
-        -100.0f,  100.0f, -100.0f,
-        -100.0f, -100.0f, -100.0f,
-        100.0f, -100.0f, -100.0f,
-        100.0f, -100.0f, -100.0f,
-        100.0f,  100.0f, -100.0f,
-        -100.0f,  100.0f, -100.0f,
+        // positions
+        -10.0f,  10.0f, -10.0f,
+        -10.0f, -10.0f, -10.0f,
+        10.0f, -10.0f, -10.0f,
+        10.0f, -10.0f, -10.0f,
+        10.0f,  10.0f, -10.0f,
+        -10.0f,  10.0f, -10.0f,
 
-        -100.0f, -100.0f,  100.0f,
-        -100.0f, -100.0f, -100.0f,
-        -100.0f,  100.0f, -100.0f,
-        -100.0f,  100.0f, -100.0f,
-        -100.0f,  100.0f,  100.0f,
-        -100.0f, -100.0f,  100.0f,
+        -10.0f, -10.0f,  10.0f,
+        -10.0f, -10.0f, -10.0f,
+        -10.0f,  10.0f, -10.0f,
+        -10.0f,  10.0f, -10.0f,
+        -10.0f,  10.0f,  10.0f,
+        -10.0f, -10.0f,  10.0f,
 
-        100.0f, -100.0f, -100.0f,
-        100.0f, -100.0f,  100.0f,
-        100.0f,  100.0f,  100.0f,
-        100.0f,  100.0f,  100.0f,
-        100.0f,  100.0f, -100.0f,
-        100.0f, -100.0f, -100.0f,
+        10.0f, -10.0f, -10.0f,
+        10.0f, -10.0f,  10.0f,
+        10.0f,  10.0f,  10.0f,
+        10.0f,  10.0f,  10.0f,
+        10.0f,  10.0f, -10.0f,
+        10.0f, -10.0f, -10.0f,
 
-        -100.0f, -100.0f,  100.0f,
-        -100.0f,  100.0f,  100.0f,
-        100.0f,  100.0f,  100.0f,
-        100.0f,  100.0f,  100.0f,
-        100.0f, -100.0f,  100.0f,
-        -100.0f, -100.0f,  100.0f,
+        -10.0f, -10.0f,  10.0f,
+        -10.0f,  10.0f,  10.0f,
+        10.0f,  10.0f,  10.0f,
+        10.0f,  10.0f,  10.0f,
+        10.0f, -10.0f,  10.0f,
+        -10.0f, -10.0f,  10.0f,
 
-        -100.0f,  100.0f, -100.0f,
-        100.0f,  100.0f, -100.0f,
-        100.0f,  100.0f,  100.0f,
-        100.0f,  100.0f,  100.0f,
-        -100.0f,  100.0f,  100.0f,
-        -100.0f,  100.0f, -100.0f,
+        -10.0f,  10.0f, -10.0f,
+        10.0f,  10.0f, -10.0f,
+        10.0f,  10.0f,  10.0f,
+        10.0f,  10.0f,  10.0f,
+        -10.0f,  10.0f,  10.0f,
+        -10.0f,  10.0f, -10.0f,
 
-        -100.0f, -100.0f, -100.0f,
-        -100.0f, -100.0f,  100.0f,
-        100.0f, -100.0f, -100.0f,
-        100.0f, -100.0f, -100.0f,
-        -100.0f, -100.0f,  100.0f,
-        100.0f, -100.0f,  100.0f
+        -10.0f, -10.0f, -10.0f,
+        -10.0f, -10.0f,  10.0f,
+        10.0f, -10.0f, -10.0f,
+        10.0f, -10.0f, -10.0f,
+        -10.0f, -10.0f,  10.0f,
+        10.0f, -10.0f,  10.0f
     };
 };

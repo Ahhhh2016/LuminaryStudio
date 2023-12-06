@@ -40,6 +40,10 @@ uniform int shininess;
 // camera
 uniform vec4 camera_pos;
 
+// skybox
+uniform samplerCube skybox;
+uniform bool is_water;
+
 void main() {
     frag_color = vec4(0.0f);
 
@@ -97,4 +101,14 @@ void main() {
         }
 
     }
+
+    if (is_water)
+    {
+        vec3 I = normalize(world_position3d - vec3(camera_pos));
+        vec3 R = reflect(I, normalize(world_normal));
+        vec4 env_color = vec4(texture(skybox, R).rgb, 1.0f);
+
+        frag_color = mix(frag_color, env_color, 0.7);
+    }
+
 }
