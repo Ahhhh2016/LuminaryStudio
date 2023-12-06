@@ -49,6 +49,7 @@ public:
     void paintTexture(GLuint texture);
 
     void paint_shapes();
+    void paint_skybox();
 
 public slots:
     void tick(QTimerEvent* event);                      // Called once per tick of m_timer
@@ -130,10 +131,61 @@ private:
 
     //lantern
     std::vector<physics_shape> phy_shapes;
-    glm::vec3 wind = glm::vec3(-5.0f, 0.0f, -5.0f);
-    float b = 0.25;
-    float lift_force = 8.0f;
+    glm::vec3 wind = glm::vec3(-0.3f, 0.0f, -0.3f);
+    float b = 0.35;
+    float lift_force = 5.5f;
     void ini_phy_shapes();
     std::vector<float> generate_vertex_data(RenderShapeData s);
     void update_phy_shape(float dt);
+    float rand_float(float min_float, float max_float);
+
+    // skybox
+    GLuint m_skybox_shader;
+    GLuint skyboxVAO, skyboxVBO;
+    GLuint cubemapTexture;
+
+    std::vector<GLfloat> skyboxVertices = {
+        // Positions
+        -100.0f,  100.0f, -100.0f,
+        -100.0f, -100.0f, -100.0f,
+        100.0f, -100.0f, -100.0f,
+        100.0f, -100.0f, -100.0f,
+        100.0f,  100.0f, -100.0f,
+        -100.0f,  100.0f, -100.0f,
+
+        -100.0f, -100.0f,  100.0f,
+        -100.0f, -100.0f, -100.0f,
+        -100.0f,  100.0f, -100.0f,
+        -100.0f,  100.0f, -100.0f,
+        -100.0f,  100.0f,  100.0f,
+        -100.0f, -100.0f,  100.0f,
+
+        100.0f, -100.0f, -100.0f,
+        100.0f, -100.0f,  100.0f,
+        100.0f,  100.0f,  100.0f,
+        100.0f,  100.0f,  100.0f,
+        100.0f,  100.0f, -100.0f,
+        100.0f, -100.0f, -100.0f,
+
+        -100.0f, -100.0f,  100.0f,
+        -100.0f,  100.0f,  100.0f,
+        100.0f,  100.0f,  100.0f,
+        100.0f,  100.0f,  100.0f,
+        100.0f, -100.0f,  100.0f,
+        -100.0f, -100.0f,  100.0f,
+
+        -100.0f,  100.0f, -100.0f,
+        100.0f,  100.0f, -100.0f,
+        100.0f,  100.0f,  100.0f,
+        100.0f,  100.0f,  100.0f,
+        -100.0f,  100.0f,  100.0f,
+        -100.0f,  100.0f, -100.0f,
+
+        -100.0f, -100.0f, -100.0f,
+        -100.0f, -100.0f,  100.0f,
+        100.0f, -100.0f, -100.0f,
+        100.0f, -100.0f, -100.0f,
+        -100.0f, -100.0f,  100.0f,
+        100.0f, -100.0f,  100.0f
+    };
 };

@@ -42,9 +42,116 @@
     },
     {
       "groups": [
+{
+      "translate": [0, 5, 0],
+      "lights": [
         {
+          "type": "point",
+          "color": [1.0, 1.0, 1.0],
+          "attenuationCoeff": [0.8, 0.2, 0.0]
+        }
+      ]
+    },{
+      "translate": [0, 10, 0],
+      "lights": [
+        {
+          "type": "point",
+          "color": [1.0, 1.0, 0.0],
+          "attenuationCoeff": [0.8, 0.2, 0.0]
+        }
+      ]
+    },{
+      "translate": [22, -1, 0],
+      "lights": [
+        {
+          "type": "point",
+          "color": [1.0, 1.0, 1.0],
+          "attenuationCoeff": [0.1, 0.0, 0.0]
+        }
+      ]
+    },{
+      "translate": [-22, -1, 0],
+      "lights": [
+        {
+          "type": "point",
+          "color": [1.0, 1.0, 1.0],
+          "attenuationCoeff": [0.1, 0.0, 0.0]
+        }
+      ]
+    },{
+      "translate": [0, -1, 22],
+      "lights": [
+        {
+          "type": "point",
+          "color": [1.0, 1.0, 1.0],
+          "attenuationCoeff": [0.1, 0.0, 0.0]
+        }
+      ]
+    },{
+      "translate": [0, -1, -22],
+      "lights": [
+        {
+          "type": "point",
+          "color": [1.0, 1.0, 1.0],
+          "attenuationCoeff": [0.1, 0.0, 0.0]
+        }
+      ]
+    },{
+      "translate": [0, 15, 0],
+      "lights": [
+        {
+          "type": "point",
+          "color": [1.0, 1.0, 0.0],
+          "attenuationCoeff": [0.8, 0.2, 0.0]
+        }
+      ]
+    },
+        {
+          "translate": [5, 0.0, 9],
+          "primitives": [
+            {
+              "type": "cylinder",
+              "diffuse": [0.8, 0.6, 0.6],
+              "specular": [1.0, 1.0, 1.0],
+              "shininess": 15.0
+            }
+          ]
+        },
+ {
+          "translate": [4.0, 0.0, -6.5],
+          "primitives": [
+            {
+              "type": "cylinder",
+              "diffuse": [0.8, 0.6, 0.6],
+              "specular": [1.0, 1.0, 1.0],
+              "shininess": 15.0
+            }
+          ]
+        },
+ {
+          "translate": [-0.5, 0.0, 5.0],
+          "primitives": [
+            {
+              "type": "cylinder",
+              "diffuse": [0.8, 0.6, 0.6],
+              "specular": [1.0, 1.0, 1.0],
+              "shininess": 15.0
+            }
+          ]
+        },
+ {
           "translate": [-0.65, 0.0, 0.65],
-          "scale": [0.5, 0.5, 0.5],
+          "primitives": [
+            {
+              "type": "cylinder",
+              "diffuse": [0.8, 0.6, 0.6],
+              "specular": [1.0, 1.0, 1.0],
+              "shininess": 15.0
+            }
+          ]
+        },
+ {
+          "translate": [-2.0, 0.0, 0.65],
           "primitives": [
             {
               "type": "cylinder",
@@ -56,7 +163,7 @@
         },
         {
           "translate": [0.0, -0.6, 0.0],
-          "scale": [100.0, 0.1, 100.0],
+          "scale": [40.0, 10.0, 40.0],
           "primitives": [
             {
               "type": "cube",

@@ -56,6 +56,8 @@ add_executable(${PROJECT_NAME}
 
     src/cameramove.cpp
     src/utils/realtimeutils.cpp
+
+    src/stb_image.h
 )
 
 # GLM: this creates its library and allows you to `#include "glm/..."`
@@ -84,6 +86,14 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
         resources/shaders/phong.vert
         resources/shaders/postprocess.frag
         resources/shaders/postprocess.vert
+        resources/shaders/skybox.frag
+        resources/shaders/skybox.vert
+        resources/skybox/back.jpg
+        resources/skybox/bottom.jpg
+        resources/skybox/front.jpg
+        resources/skybox/left.jpg
+        resources/skybox/right.jpg
+        resources/skybox/top.jpg
 )
 
 # GLEW: this provides support for Windows (including 64-bit)

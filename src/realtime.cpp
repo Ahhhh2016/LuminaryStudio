@@ -6,6 +6,11 @@
 #include <iostream>
 #include "settings.h"
 #include "utils/shaderloader.h"
+#include <iostream>
+#include <random>
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 
 #include "glm/gtx/transform.hpp"
 
@@ -48,6 +53,36 @@ void Realtime::finish() {
     glDeleteBuffers(1, &m_defaultFBO);
 
     this->doneCurrent();
+}
+
+GLuint loadCubemap(std::vector<std::string> faces)
+{
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+    int width, height, nrComponents;
+    for (unsigned int i = 0; i < faces.size(); i++)
+    {
+        unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrComponents, 0);
+        if (data)
+        {
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            stbi_image_free(data);
+        }
+        else
+        {
+            std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+            stbi_image_free(data);
+        }
+    }
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    return textureID;
 }
 
 void Realtime::initializeGL() {
@@ -120,6 +155,40 @@ void Realtime::initializeGL() {
     makeFBO();
 
     //==============project 6================
+
+    // skybox
+    glEnable(GL_DEPTH_TEST);
+    m_skybox_shader = ShaderLoader::createShaderProgram(":/resources/shaders/skybox.vert", ":/resources/shaders/skybox.frag");
+
+    // skybox VAO
+
+    glGenVertexArrays(1, &skyboxVAO);
+    glGenBuffers(1, &skyboxVBO);
+    glBindVertexArray(skyboxVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+    glBufferData(GL_ARRAY_BUFFER, skyboxVertices.size()*sizeof(GLfloat), skyboxVertices.data(), GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), reinterpret_cast<void*>(0 * sizeof(GLfloat)));
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
+    // load textures
+    // -------------
+    std::vector<std::string> faces
+        {
+            "./resources/skybox/right.jpg",
+            "./resources/skybox/left.jpg",
+            "./resources/skybox/top.jpg",
+            "./resources/skybox/bottom.jpg",
+            "./resources/skybox/front.jpg",
+            "./resources/skybox/back.jpg",
+        };
+
+    cubemapTexture = loadCubemap(faces);
+
+    glUseProgram(m_skybox_shader);
+    glUniform1i(glGetUniformLocation(m_skybox_shader, "skybox"), 2);
+    glUseProgram(0);
 }
 
 void Realtime::paintGL() {
@@ -130,6 +199,8 @@ void Realtime::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     paint_shapes();
+
+    paint_skybox();
 
     // Task 25: Bind the default framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
@@ -236,72 +307,83 @@ std::vector<float> Realtime::generate_vertex_data(RenderShapeData s)
     return temp;
 }
 
+float Realtime::rand_float(float min_float, float max_float)
+{
+    std::random_device rd;  // Obtain a random number from hardware
+    std::mt19937 gen(rd()); // Seed the generator
+
+    std::uniform_real_distribution<> dis(min_float, max_float);
+
+    return dis(gen);
+}
+
 void Realtime::ini_phy_shapes()
 {
     for (auto &s : shapes)
     {
         if (s.primitive.type == PrimitiveType::PRIMITIVE_CYLINDER)
         {
-            phy_shapes.push_back(physics_shape{true, glm::vec3(0.0f), glm::vec3(0.0f), 0.5f, generate_vertex_data(s), s});
+            phy_shapes.push_back(physics_shape{true, glm::vec3(0.0f), glm::vec3(0.0f), rand_float(0.4f, 0.5f), generate_vertex_data(s), s});
         }
         else
         {
-            phy_shapes.push_back(physics_shape{false, glm::vec3(0.0f), glm::vec3(0.0f), 0.0f, generate_vertex_data(s), s});
+            phy_shapes.push_back(physics_shape{false, glm::vec3(0.0f), glm::vec3(0.0f), rand_float(0.4f, 0.5f), generate_vertex_data(s), s});
         }
     }
 }
 
 void Realtime::settingsChanged()
 {
-//    if (settings.nearPlane != near_plane || settings.farPlane != far_plane)
-//    {
-//        near_plane = settings.nearPlane;
-//        far_plane = settings.farPlane;
-//        camera.update(near_plane, far_plane);
-//    }
+    if (settings.nearPlane != near_plane || settings.farPlane != far_plane)
+    {
+        near_plane = settings.nearPlane;
+        far_plane = settings.farPlane;
+        camera.update(near_plane, far_plane);
+    }
 
-//    if (settings.shapeParameter1 != parameter1 || settings.shapeParameter2 != parameter2 || (settings.adaptive_detail != adaptive_detail && !settings.adaptive_detail))
-//    {
-//        parameter1 = settings.shapeParameter1;
-//        parameter2 = settings.shapeParameter2;
-//        cone.updateParams(parameter1, parameter2, 1.0f, 1.0f);
-//        cube.updateParams(parameter1, 1.0f, 1.0f);
-//        cylinder.updateParams(parameter1, parameter2, 1.0f, 1.0f);
-//        sphere.updateParams(parameter1, parameter2, 1.0f, 1.0f);
+    if (settings.shapeParameter1 != parameter1 || settings.shapeParameter2 != parameter2 || (settings.adaptive_detail != adaptive_detail && !settings.adaptive_detail))
+    {
+        parameter1 = settings.shapeParameter1;
+        parameter2 = settings.shapeParameter2;
+        cone.updateParams(parameter1, parameter2, 1.0f, 1.0f);
+        cube.updateParams(parameter1, 1.0f, 1.0f);
+        cylinder.updateParams(parameter1, parameter2, 1.0f, 1.0f);
+        sphere.updateParams(parameter1, parameter2, 1.0f, 1.0f);
 
-//        adaptive_detail = settings.adaptive_detail;
-//    }
+        adaptive_detail = settings.adaptive_detail;
+    }
 
-//    if (settings.adaptive_detail != adaptive_detail && settings.adaptive_detail)
-//    {
-//        adaptive_detail = settings.adaptive_detail;
-//        calculate_adaptive_param();
-//    }
+    if (settings.adaptive_detail != adaptive_detail && settings.adaptive_detail)
+    {
+        adaptive_detail = settings.adaptive_detail;
+        calculate_adaptive_param();
+    }
 
-//    if (settings.sharpen_filter != sharpen_filter)
-//    {
-//        sharpen_filter = settings.sharpen_filter;
-//    }
+    if (settings.sharpen_filter != sharpen_filter)
+    {
+        sharpen_filter = settings.sharpen_filter;
+    }
 
-//    if (settings.invert_filter != invert_filter)
-//    {
-//        invert_filter = settings.invert_filter;
-//    }
+    if (settings.invert_filter != invert_filter)
+    {
+        invert_filter = settings.invert_filter;
+    }
 
-//    if (settings.grayscale_filter != grayscale_filter)
-//    {
-//        grayscale_filter = settings.grayscale_filter;
-//    }
+    if (settings.grayscale_filter != grayscale_filter)
+    {
+        grayscale_filter = settings.grayscale_filter;
+    }
 
-//    if (settings.blur_filter != blur_filter)
-//    {
-//        blur_filter = settings.blur_filter;
-//    }
+    if (settings.blur_filter != blur_filter)
+    {
+        //blur_filter = settings.blur_filter;
+        wind = glm::vec3(0.3f, 0.0f, 0.3f);
+    }
 
-//    if (settings.use_texture != use_texture)
-//    {
-//        use_texture = settings.use_texture;
-//    }
+    if (settings.use_texture != use_texture)
+    {
+        use_texture = settings.use_texture;
+    }
 
     update(); // asks for a PaintGL() call to occur
 }
