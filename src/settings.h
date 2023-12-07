@@ -7,7 +7,7 @@ struct Settings {
     std::string sceneFilePath;
     int shapeParameter1 = 1;
     int shapeParameter2 = 1;
-    float nearPlane = 1;
+    float nearPlane = 1000;
     float farPlane = 1;
     bool invert_filter = false;
     bool sharpen_filter = false;

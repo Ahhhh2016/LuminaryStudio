@@ -43,7 +43,6 @@ public:
     void transfer_lights(std::vector<SceneLightData> lights);
     void transfer_data(RenderShapeData s);
     std::vector<float> generate_vbo(RenderShapeData s);
-    void calculate_adaptive_param();
 
     void makeFBO();
     void paintTexture(GLuint texture);
@@ -156,6 +155,9 @@ private:
     GLuint skyboxVAO, skyboxVBO;
     GLuint cubemapTexture;
     void ini_skybox();
+    GLuint loadCubemap(std::vector<std::string> faces);
+    int cubemap_size;
+    bool loadCubeMapSide(GLuint texture, GLenum side_target, std::string file_name);
 
     std::vector<GLfloat> skyboxVertices = {
         // positions

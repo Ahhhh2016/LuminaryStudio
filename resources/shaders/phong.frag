@@ -99,7 +99,6 @@ void main() {
         {
             frag_color += fatt * light.color * intensity * ks * material_specular * pow(temp, shininess);
         }
-
     }
 
     if (is_water)

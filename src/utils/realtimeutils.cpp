@@ -6,24 +6,160 @@
 #include <iostream>
 #include "settings.h"
 #include "utils/shaderloader.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
-void Realtime::paint_skybox()
+bool Realtime::loadCubeMapSide(GLuint texture, GLenum side_target, std::string file_name) {
+    int x, y, n;
+    int force_channels = 4;
+    unsigned char*  image_data = stbi_load(
+        file_name.c_str(), &x, &y, &n, force_channels);
+    if (!image_data) {
+        std::cerr << "ERROR: could not load " << file_name << std::endl;
+        return false;
+    }
+    // non-power-of-2 dimensions check
+    if ((x & (x - 1)) != 0 || (y & (y - 1)) != 0) {
+        std::cerr << "WARNING: image " << file_name << " is not power-of-2 dimensions " << std::endl;
+    }
+
+    //this->cubemapSideLength = x;
+
+    // copy image data into 'target' side of cube map
+    glTexImage2D(
+        side_target,
+        0,
+        GL_RGBA,
+        x,
+        y,
+        0,
+        GL_RGBA,
+        GL_UNSIGNED_BYTE,
+        image_data);
+    free(image_data);
+    return true;
+}
+
+void Realtime::ini_skybox()
 {
-    // draw skybox as last
-    glDepthFunc(GL_LEQUAL);
-    glUseProgram(m_skybox_shader);
-    glm::mat4 view = glm::mat4(glm::mat3(camera.view_mat));
+    for (float& i : skyboxVertices) {
+        i *= 100;
+    }
 
-    glUniformMatrix4fv(glGetUniformLocation(m_skybox_shader, "view"), 1, GL_FALSE, &view[0][0]);
-    glUniformMatrix4fv(glGetUniformLocation(m_skybox_shader, "projection"), 1, GL_FALSE, &camera.proj_mat[0][0]);
-    // skybox cube
+    // skybox VAO
+    // skybox
+    glEnable(GL_DEPTH_TEST);
+    m_skybox_shader = ShaderLoader::createShaderProgram(":/resources/shaders/skybox.vert", ":/resources/shaders/skybox.frag");
+
+    glGenVertexArrays(1, &skyboxVAO);
+    glGenBuffers(1, &skyboxVBO);
     glBindVertexArray(skyboxVAO);
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+    glBufferData(GL_ARRAY_BUFFER, skyboxVertices.size()*sizeof(GLfloat), skyboxVertices.data(), GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), reinterpret_cast<void*>(0 * sizeof(GLfloat)));
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-    glDepthFunc(GL_LESS); // set depth function back to default
-    glUseProgram(0);
+
+    // load textures
+    // -------------
+    std::vector<std::string> faces
+        {
+            "./resources/skybox/right.jpg",
+            "./resources/skybox/left.jpg",
+            "./resources/skybox/top.jpg",
+            "./resources/skybox/bottom.jpg",
+            "./resources/skybox/front.jpg",
+            "./resources/skybox/back.jpg",
+        };
+
+    //cubemapTexture = loadCubemap(faces);
+    glGenTextures(1, &cubemapTexture);
+    // binding
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+
+    // load each image and copy into a side of the cube-map texture
+    loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, faces[4]);
+    loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_POSITIVE_Z, faces[5]);
+    loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_POSITIVE_Y, faces[2]);
+    loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, faces[3]);
+    loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_NEGATIVE_X, faces[1]);
+    loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_POSITIVE_X, faces[0]);
+    // format cube map texture
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    // unbinding
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+    // init dynamic cubemap
+    // depth buffer
+    glGenRenderbuffers(1, &fbo_rb_cube);
+    glBindRenderbuffer(GL_RENDERBUFFER, fbo_rb_cube);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 2048, 2048);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+    // texture
+    // create the cubemap
+    glGenTextures(1, &fbo_tex_cube);
+    glActiveTexture(GL_TEXTURE1); // texture slot 1
+    glBindTexture(GL_TEXTURE_CUBE_MAP, fbo_tex_cube);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BASE_LEVEL, 0);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, 0);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    for (int i = 0; i < 6; ++i) {
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, 2048, 2048, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+    }
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+    glGenFramebuffers(1, &fbo_cube);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo_cube);
+    // attach buffer & tex to fbo
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, fbo_rb_cube);
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, fbo_tex_cube, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
+
+}
+
+GLuint Realtime::loadCubemap(std::vector<std::string> faces)
+{
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+    int width, height, nrComponents;
+    for (unsigned int i = 0; i < faces.size(); i++)
+    {
+        unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrComponents, 0);
+        if (data)
+        {
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            stbi_image_free(data);
+        }
+        else
+        {
+            std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+            stbi_image_free(data);
+        }
+    }
+
+    cubemap_size = width;
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    return textureID;
 }
 
 
@@ -109,7 +245,7 @@ void Realtime::paint_shapes(bool paint_all) {
         glUniform1i(glGetUniformLocation(m_phong_shader, "shininess"), material.shininess);
 
         // reflection
-        if (p_s.shape.primitive.type == PrimitiveType::PRIMITIVE_CUBE)
+        if (p_s.shape.primitive.type == PrimitiveType::PRIMITIVE_CUBE || p_s.shape.primitive.type == PrimitiveType::PRIMITIVE_SPHERE)
         {
             glUniform1i(glGetUniformLocation(m_phong_shader, "is_water"), true);
         }
@@ -162,23 +298,6 @@ void Realtime::paint_shapes(bool paint_all) {
 std::vector<float> Realtime::generate_vbo(RenderShapeData s)
 {
     auto texture = s.primitive.material.textureMap;
-    if (adaptive_detail)
-    {
-        glm::vec4 sample_point(0.0f, 0.0f, 0.0f, camera.pos[3]);
-        float dis = glm::distance(camera.pos, s.ctm * sample_point);
-
-        calculate_adaptive_param();
-        float level = distanceK * dis + distanceB;
-
-        if (s.primitive.type == PrimitiveType::PRIMITIVE_CUBE)
-            cube.updateParams(ceil(settings.shapeParameter1 * level), texture.repeatU, texture.repeatV);
-        else if (s.primitive.type == PrimitiveType::PRIMITIVE_CONE)
-            cone.updateParams(ceil(settings.shapeParameter1 * level), ceil(settings.shapeParameter2 * level), texture.repeatU, texture.repeatV);
-        else if (s.primitive.type == PrimitiveType::PRIMITIVE_SPHERE)
-            sphere.updateParams(ceil(settings.shapeParameter1 * level), ceil(settings.shapeParameter2 * level), texture.repeatU, texture.repeatV);
-        else if (s.primitive.type == PrimitiveType::PRIMITIVE_CYLINDER)
-            cylinder.updateParams(ceil(settings.shapeParameter1 * level), ceil(settings.shapeParameter2 * level), texture.repeatU, texture.repeatV);
-    }
 
     if (s.primitive.type == PrimitiveType::PRIMITIVE_CUBE)
     {
@@ -202,55 +321,6 @@ std::vector<float> Realtime::generate_vbo(RenderShapeData s)
     }
 
     return std::vector<float>{0.0f};
-}
-
-void Realtime::calculate_adaptive_param()
-{
-    float max_dis = -1.0f, min_dis = std::numeric_limits<float>::max();
-    for (auto &s : shapes)
-    {
-        glm::vec4 sample_point(0.0f, 0.0f, 0.0f, camera.pos[3]);
-        float dis = glm::distance(camera.pos, s.ctm * sample_point);
-
-        if (dis > max_dis)
-            max_dis = dis;
-        if (dis < min_dis)
-            min_dis = dis;
-    }
-    distanceK = 3.0f / (4.0f * (min_dis - max_dis));
-    distanceB = 1 - distanceK * min_dis;
-}
-
-void Realtime::makeFBO()
-{
-    // Task 19: Generate and bind an empty texture, set its min/mag filter interpolation, then unbind
-    glGenTextures(1, &m_fbo_texture);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_fbo_texture);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_fbo_width, m_fbo_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    // Task 20: Generate and bind a renderbuffer of the right size, set its format, then unbind
-    glGenRenderbuffers(1, &m_fbo_renderbuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, m_fbo_renderbuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8 , m_fbo_width, m_fbo_height);
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
-    // Task 18: Generate and bind an FBO
-    glGenFramebuffers(1, &m_fbo);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-
-    // Task 21: Add our texture as a color attachment, and our renderbuffer as a depth+stencil attachment, to our FBO
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_fbo_texture, 0);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_fbo_renderbuffer);
-
-    // Task 22: Unbind the FBO
-    glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
 }
 
 void Realtime::paintTexture(GLuint texture)

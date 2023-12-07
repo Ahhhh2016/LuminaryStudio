@@ -10,6 +10,8 @@ out vec3 world_position3d;
 out vec3 world_normal;
 out vec2 texture_uv_coordinate;
 
+uniform vec4 plane;
+
 // matrixs
 //uniform mat4 model_matrix;
 uniform mat4 view_matrix;
@@ -22,5 +24,8 @@ void main()
     world_position3d = object_position3d;
     world_normal = object_normal;
     texture_uv_coordinate = _texture_uv_coordinate;
+
+    //gl_ClipDistance[0] = dot(vec4(world_position3d, 1.0f), plane);
+
     gl_Position = projection_matrix * view_matrix * vec4(world_position3d, 1.0f);
 }
