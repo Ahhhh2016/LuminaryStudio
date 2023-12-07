@@ -17,6 +17,10 @@ uniform vec4 plane;
 uniform mat4 view_matrix;
 uniform mat4 projection_matrix;
 
+// normal gl_MaterialParameters
+uniform vec3 lightPosition;
+out vec3 fromLightVector;
+
 void main() 
 {
     //world_position3d = vec3(model_matrix * vec4(object_position3d, 1.0f));

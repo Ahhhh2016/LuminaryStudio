@@ -51,6 +51,13 @@ uniform sampler2D dudvMap;
 const float waveStrength = 0.15;
 uniform float moveFactor;
 
+// normalMap
+uniform sampler2D normalMap;
+const float shineDamper = 20.0f;
+const float reflectivity = 0.6f;
+const vec3 lightColour = vec3(1.0f, 1.0f, 0.8f);
+const vec3 lightPosition = vec3(-100.0, 100.0, 100.0);
+
 void main() {
     frag_color = vec4(0.0f);
 
@@ -113,15 +120,26 @@ void main() {
         // // // Calculate reflection vector with distorted normal
         vec3 I = normalize(world_position3d - vec3(camera_pos));
         vec3 R = reflect(I, normalize(world_normal));
-        // vec2 distortion1 = waveStrength * texture(dudvMap, vec2(texture_uv_coordinate[0] + moveFactor, texture_uv_coordinate[1])).rg;
-        // vec2 distortion2 = waveStrength * texture(dudvMap, vec2(-texture_uv_coordinate[0] + moveFactor, texture_uv_coordinate[1]  + moveFactor)).rg;
-        // vec2 totaldistortion = distortion1 + distortion2;
 
-        // R.xy += totaldistortion;
+        vec2 distortedTexCoords = texture(dudvMap, vec2(texture_uv_coordinate[0] + moveFactor, texture_uv_coordinate[1])).rg*0.1f;
+        distortedTexCoords = texture_uv_coordinate + vec2(distortedTexCoords[0], distortedTexCoords[1]+moveFactor);
+        vec2 totalDistortion = (texture(dudvMap, distortedTexCoords).rg * 2.0 - 1.0) * waveStrength;
+
+        R.xy += totalDistortion;
         vec4 env_color = vec4(texture(skybox, R).rgb, 1.0f);
 
+        vec4 normalmap_color = texture(normalMap, distortedTexCoords);
+        vec3 m_normal = vec3(normalmap_color.r * 2.0f - 1.0f, normalmap_color.b, normalmap_color.g * 2.0f - 1.0f);
+        m_normal = normalize(m_normal);
+
+        vec3 fromLightVector = world_position3d - lightPosition;
+        vec3 m_reflectedLight = reflect(normalize(fromLightVector), m_normal);
+        float m_specular = max(dot(m_reflectedLight, I), 0.0);
+        m_specular = pow(m_specular, shineDamper);
+        vec3 specularHighlights = lightColour * m_specular * reflectivity;
+
         frag_color = mix(frag_color, env_color, 0.5);
-        frag_color = mix(frag_color, vec4(0.0f, 0.3f, 0.5f, 1.0f), 0.2);
+        frag_color = mix(frag_color, vec4(0.0f, 0.3f, 0.5f, 1.0f), 0.2) + vec4(specularHighlights, 0.0f);
     }
 
 }

@@ -250,13 +250,28 @@ void Realtime::paint_shapes(bool paint_all) {
             glUniform1i(glGetUniformLocation(m_phong_shader, "is_water"), true);
             glUniform1f(glGetUniformLocation(m_phong_shader, "moveFactor"), d_time);
 
-
+            // dudvMap
             int wid, hei, nrComponents;
             unsigned char *data = stbi_load("./resources/waterDUDV.png", &wid, &hei, &nrComponents, 0);
-                        glBindVertexArray(m_vao);
+            glBindVertexArray(m_vao);
             glGenTextures(1, &m_shape_texture);
             glActiveTexture(GL_TEXTURE2);
             glBindTexture(GL_TEXTURE_2D, m_shape_texture);
+
+            //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, wid, hei, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+
+
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+            // nonrmalMap
+            unsigned char *data1 = stbi_load("./resources/normalMap.png", &wid, &hei, &nrComponents, 0);
+            glGenVertexArrays(1, &m_vao_normal);
+            glBindVertexArray(m_vao_normal);
+            glGenTextures(1, &m_normal_texture);
+            glActiveTexture(GL_TEXTURE3);
+            glBindTexture(GL_TEXTURE_2D, m_normal_texture);
 
             //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, wid, hei, 0, GL_RGB, GL_UNSIGNED_BYTE, data);

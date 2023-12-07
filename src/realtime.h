@@ -150,6 +150,9 @@ private:
     void drawFboSide(Camera c);
     GLuint fbo_tex_cube, fbo_rb_cube, fbo_cube;
 
+    // normal Map
+    GLuint m_vao_normal, m_normal_texture;
+
     float d_time = 0.0f;
 
     // skybox

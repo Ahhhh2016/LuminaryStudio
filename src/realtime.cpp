@@ -88,6 +88,7 @@ void Realtime::initializeGL() {
     glUseProgram(m_phong_shader);
     glUniform1i(glGetUniformLocation(m_phong_shader, "skybox"), 0);
     glUniform1i(glGetUniformLocation(m_phong_shader, "dudvMap"), 2);
+    glUniform1i(glGetUniformLocation(m_phong_shader, "normalMap"), 3);
     glUseProgram(0);
 
     //ini_skybox();
