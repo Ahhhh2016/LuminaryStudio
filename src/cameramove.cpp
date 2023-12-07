@@ -83,6 +83,11 @@ void Realtime::timerEvent(QTimerEvent *event) {
 
     m_elapsedTimer.restart();
 
+    float moveSpeed = 0.05f;
+    d_time += moveSpeed * deltaTime;
+    if (d_time > 1.0f)
+        d_time = 1.0f;
+
     glm::vec4 move_dir = glm::vec4(0.0f);
 
     // Use deltaTime and m_keyMap here to move around

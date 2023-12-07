@@ -150,6 +150,8 @@ private:
     void drawFboSide(Camera c);
     GLuint fbo_tex_cube, fbo_rb_cube, fbo_cube;
 
+    float d_time = 0.0f;
+
     // skybox
     GLuint m_skybox_shader;
     GLuint skyboxVAO, skyboxVBO;

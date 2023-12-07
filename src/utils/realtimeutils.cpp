@@ -248,6 +248,22 @@ void Realtime::paint_shapes(bool paint_all) {
         if (p_s.shape.primitive.type == PrimitiveType::PRIMITIVE_CUBE || p_s.shape.primitive.type == PrimitiveType::PRIMITIVE_SPHERE)
         {
             glUniform1i(glGetUniformLocation(m_phong_shader, "is_water"), true);
+            glUniform1f(glGetUniformLocation(m_phong_shader, "moveFactor"), d_time);
+
+
+            int wid, hei, nrComponents;
+            unsigned char *data = stbi_load("./resources/waterDUDV.png", &wid, &hei, &nrComponents, 0);
+                        glBindVertexArray(m_vao);
+            glGenTextures(1, &m_shape_texture);
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_2D, m_shape_texture);
+
+            //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, wid, hei, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+
+
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         }
         else
         {

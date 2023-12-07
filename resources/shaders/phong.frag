@@ -18,6 +18,8 @@ uniform vec4 material_ambient;
 uniform vec4 material_diffuse;
 uniform vec4 material_specular;
 
+uniform float time;
+
 // Texture
 in vec2 texture_uv_coordinate;
 uniform float blend;
@@ -43,6 +45,11 @@ uniform vec4 camera_pos;
 // skybox
 uniform samplerCube skybox;
 uniform bool is_water;
+
+// dudv
+uniform sampler2D dudvMap;
+const float waveStrength = 0.15;
+uniform float moveFactor;
 
 void main() {
     frag_color = vec4(0.0f);
@@ -103,11 +110,18 @@ void main() {
 
     if (is_water)
     {
+        // // // Calculate reflection vector with distorted normal
         vec3 I = normalize(world_position3d - vec3(camera_pos));
         vec3 R = reflect(I, normalize(world_normal));
+        // vec2 distortion1 = waveStrength * texture(dudvMap, vec2(texture_uv_coordinate[0] + moveFactor, texture_uv_coordinate[1])).rg;
+        // vec2 distortion2 = waveStrength * texture(dudvMap, vec2(-texture_uv_coordinate[0] + moveFactor, texture_uv_coordinate[1]  + moveFactor)).rg;
+        // vec2 totaldistortion = distortion1 + distortion2;
+
+        // R.xy += totaldistortion;
         vec4 env_color = vec4(texture(skybox, R).rgb, 1.0f);
 
-        frag_color = mix(frag_color, env_color, 0.7);
+        frag_color = mix(frag_color, env_color, 0.5);
+        frag_color = mix(frag_color, vec4(0.0f, 0.3f, 0.5f, 1.0f), 0.2);
     }
 
 }

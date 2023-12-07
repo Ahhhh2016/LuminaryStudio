@@ -87,6 +87,7 @@ void Realtime::initializeGL() {
 
     glUseProgram(m_phong_shader);
     glUniform1i(glGetUniformLocation(m_phong_shader, "skybox"), 0);
+    glUniform1i(glGetUniformLocation(m_phong_shader, "dudvMap"), 2);
     glUseProgram(0);
 
     //ini_skybox();
@@ -113,12 +114,13 @@ void Realtime::initializeGL() {
     // -------------
     std::vector<std::string> faces
         {
-            "./resources/skybox/right.jpg",
-            "./resources/skybox/left.jpg",
+        "./resources/skybox/right.jpg",
+        "./resources/skybox/left.jpg",
+
             "./resources/skybox/top.jpg",
             "./resources/skybox/bottom.jpg",
-            "./resources/skybox/front.jpg",
-            "./resources/skybox/back.jpg",
+        "./resources/skybox/back.jpg",
+         "./resources/skybox/front.jpg",
         };
 
     //cubemapTexture = loadCubemap(faces);
@@ -184,7 +186,7 @@ void Realtime::initializeGL() {
 
 
     // clipping plane
-    glEnable(GL_CLIP_DISTANCE0);
+    //glEnable(GL_CLIP_DISTANCE0);
 }
 
 void Realtime::drawFboSide(Camera c)
