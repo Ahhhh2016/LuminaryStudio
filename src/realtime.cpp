@@ -113,15 +113,9 @@ void Realtime::initializeGL() {
 
     // load textures
     // -------------
-    std::vector<std::string> faces
-        {
-        "./resources/skybox/right.jpg",
-        "./resources/skybox/left.jpg",
-        "./resources/skybox/top.jpg",
-        "./resources/skybox/bottom.jpg",
-        "./resources/skybox/back.jpg",
-         "./resources/skybox/front.jpg",
-        };
+
+    auto faces = all_skybox[skybox_index];
+
 
     //cubemapTexture = loadCubemap(faces);
     glGenTextures(1, &cubemapTexture);
@@ -150,7 +144,7 @@ void Realtime::initializeGL() {
     // depth buffer
     glGenRenderbuffers(1, &fbo_rb_cube);
     glBindRenderbuffer(GL_RENDERBUFFER, fbo_rb_cube);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 2048, 2048);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, skybox_width, skybox_height);
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
     // texture
@@ -166,7 +160,7 @@ void Realtime::initializeGL() {
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     for (int i = 0; i < 6; ++i) {
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, 2048, 2048, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, skybox_width, skybox_height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
     }
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
@@ -230,7 +224,7 @@ void Realtime::drawFboSide(Camera c)
 
 void Realtime::paintGL() {
     glBindFramebuffer(GL_FRAMEBUFFER, fbo_cube);
-    glViewport(0, 0, 2048, 2048);
+    glViewport(0, 0, skybox_width, skybox_height);
     for (int i = 0; i < 6; i++)
     {
         switch (i)

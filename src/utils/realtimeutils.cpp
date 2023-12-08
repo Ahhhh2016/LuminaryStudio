@@ -23,7 +23,8 @@ bool Realtime::loadCubeMapSide(GLuint texture, GLenum side_target, std::string f
         std::cerr << "WARNING: image " << file_name << " is not power-of-2 dimensions " << std::endl;
     }
 
-    //this->cubemapSideLength = x;
+    skybox_width = x;
+    skybox_height = y;
 
     // copy image data into 'target' side of cube map
     glTexImage2D(
@@ -40,127 +41,127 @@ bool Realtime::loadCubeMapSide(GLuint texture, GLenum side_target, std::string f
     return true;
 }
 
-void Realtime::ini_skybox()
-{
-    for (float& i : skyboxVertices) {
-        i *= 100;
-    }
+// void Realtime::ini_skybox()
+// {
+//     for (float& i : skyboxVertices) {
+//         i *= 100;
+//     }
 
-    // skybox VAO
-    // skybox
-    glEnable(GL_DEPTH_TEST);
-    m_skybox_shader = ShaderLoader::createShaderProgram(":/resources/shaders/skybox.vert", ":/resources/shaders/skybox.frag");
+//     // skybox VAO
+//     // skybox
+//     glEnable(GL_DEPTH_TEST);
+//     m_skybox_shader = ShaderLoader::createShaderProgram(":/resources/shaders/skybox.vert", ":/resources/shaders/skybox.frag");
 
-    glGenVertexArrays(1, &skyboxVAO);
-    glGenBuffers(1, &skyboxVBO);
-    glBindVertexArray(skyboxVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
-    glBufferData(GL_ARRAY_BUFFER, skyboxVertices.size()*sizeof(GLfloat), skyboxVertices.data(), GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), reinterpret_cast<void*>(0 * sizeof(GLfloat)));
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+//     glGenVertexArrays(1, &skyboxVAO);
+//     glGenBuffers(1, &skyboxVBO);
+//     glBindVertexArray(skyboxVAO);
+//     glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+//     glBufferData(GL_ARRAY_BUFFER, skyboxVertices.size()*sizeof(GLfloat), skyboxVertices.data(), GL_STATIC_DRAW);
+//     glEnableVertexAttribArray(0);
+//     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), reinterpret_cast<void*>(0 * sizeof(GLfloat)));
+//     glBindBuffer(GL_ARRAY_BUFFER, 0);
+//     glBindVertexArray(0);
 
-    // load textures
-    // -------------
-    std::vector<std::string> faces
-        {
-            "./resources/skybox/right.jpg",
-            "./resources/skybox/left.jpg",
-            "./resources/skybox/top.jpg",
-            "./resources/skybox/bottom.jpg",
-            "./resources/skybox/front.jpg",
-            "./resources/skybox/back.jpg",
-        };
+//     // load textures
+//     // -------------
+//     std::vector<std::string> faces
+//         {
+//             "./resources/skybox/right.jpg",
+//             "./resources/skybox/left.jpg",
+//             "./resources/skybox/top.jpg",
+//             "./resources/skybox/bottom.jpg",
+//             "./resources/skybox/front.jpg",
+//             "./resources/skybox/back.jpg",
+//         };
 
-    //cubemapTexture = loadCubemap(faces);
-    glGenTextures(1, &cubemapTexture);
-    // binding
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+//     //cubemapTexture = loadCubemap(faces);
+//     glGenTextures(1, &cubemapTexture);
+//     // binding
+//     glActiveTexture(GL_TEXTURE0);
+//     glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
 
-    // load each image and copy into a side of the cube-map texture
-    loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, faces[4]);
-    loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_POSITIVE_Z, faces[5]);
-    loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_POSITIVE_Y, faces[2]);
-    loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, faces[3]);
-    loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_NEGATIVE_X, faces[1]);
-    loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_POSITIVE_X, faces[0]);
-    // format cube map texture
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+//     // load each image and copy into a side of the cube-map texture
+//     loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, faces[4]);
+//     loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_POSITIVE_Z, faces[5]);
+//     loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_POSITIVE_Y, faces[2]);
+//     loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, faces[3]);
+//     loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_NEGATIVE_X, faces[1]);
+//     loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_POSITIVE_X, faces[0]);
+//     // format cube map texture
+//     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+//     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+//     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-    // unbinding
-    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+//     // unbinding
+//     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
-    // init dynamic cubemap
-    // depth buffer
-    glGenRenderbuffers(1, &fbo_rb_cube);
-    glBindRenderbuffer(GL_RENDERBUFFER, fbo_rb_cube);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 2048, 2048);
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+//     // init dynamic cubemap
+//     // depth buffer
+//     glGenRenderbuffers(1, &fbo_rb_cube);
+//     glBindRenderbuffer(GL_RENDERBUFFER, fbo_rb_cube);
+//     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, skybox_width, skybox_height);
+//     glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
-    // texture
-    // create the cubemap
-    glGenTextures(1, &fbo_tex_cube);
-    glActiveTexture(GL_TEXTURE1); // texture slot 1
-    glBindTexture(GL_TEXTURE_CUBE_MAP, fbo_tex_cube);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BASE_LEVEL, 0);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, 0);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    for (int i = 0; i < 6; ++i) {
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, 2048, 2048, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
-    }
-    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+//     // texture
+//     // create the cubemap
+//     glGenTextures(1, &fbo_tex_cube);
+//     glActiveTexture(GL_TEXTURE1); // texture slot 1
+//     glBindTexture(GL_TEXTURE_CUBE_MAP, fbo_tex_cube);
+//     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BASE_LEVEL, 0);
+//     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, 0);
+//     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+//     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+//     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+//     for (int i = 0; i < 6; ++i) {
+//         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, skybox_width, skybox_height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+//     }
+//     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
-    glGenFramebuffers(1, &fbo_cube);
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo_cube);
-    // attach buffer & tex to fbo
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, fbo_rb_cube);
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, fbo_tex_cube, 0);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
+//     glGenFramebuffers(1, &fbo_cube);
+//     glBindFramebuffer(GL_FRAMEBUFFER, fbo_cube);
+//     // attach buffer & tex to fbo
+//     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, fbo_rb_cube);
+//     glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, fbo_tex_cube, 0);
+//     glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
 
-}
+// }
 
-GLuint Realtime::loadCubemap(std::vector<std::string> faces)
-{
-    GLuint textureID;
-    glGenTextures(1, &textureID);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+// GLuint Realtime::loadCubemap(std::vector<std::string> faces)
+// {
+//     GLuint textureID;
+//     glGenTextures(1, &textureID);
+//     glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 
-    int width, height, nrComponents;
-    for (unsigned int i = 0; i < faces.size(); i++)
-    {
-        unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrComponents, 0);
-        if (data)
-        {
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-            stbi_image_free(data);
-        }
-        else
-        {
-            std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
-            stbi_image_free(data);
-        }
-    }
+//     int width, height, nrComponents;
+//     for (unsigned int i = 0; i < faces.size(); i++)
+//     {
+//         unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrComponents, 0);
+//         if (data)
+//         {
+//             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+//             stbi_image_free(data);
+//         }
+//         else
+//         {
+//             std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+//             stbi_image_free(data);
+//         }
+//     }
 
-    cubemap_size = width;
+//     cubemap_size = width;
 
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+//     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+//     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+//     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-    return textureID;
-}
+//     return textureID;
+// }
 
 
 void Realtime::paint_shapes(bool paint_all, Camera c) {
