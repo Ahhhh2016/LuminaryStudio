@@ -86,7 +86,7 @@ void Realtime::timerEvent(QTimerEvent *event) {
     float moveSpeed = 0.05f;
     d_time += moveSpeed * deltaTime;
     if (d_time > 1.0f)
-        d_time = 1.0f;
+        d_time = 0.0f;
 
     glm::vec4 move_dir = glm::vec4(0.0f);
 

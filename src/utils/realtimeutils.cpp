@@ -267,14 +267,14 @@ void Realtime::paint_shapes(bool paint_all) {
 
             // nonrmalMap
             unsigned char *data1 = stbi_load("./resources/normalMap.png", &wid, &hei, &nrComponents, 0);
-            glGenVertexArrays(1, &m_vao_normal);
-            glBindVertexArray(m_vao_normal);
+            //glGenVertexArrays(1, &m_vao_normal);
+            glBindVertexArray(m_vao);
             glGenTextures(1, &m_normal_texture);
             glActiveTexture(GL_TEXTURE3);
             glBindTexture(GL_TEXTURE_2D, m_normal_texture);
 
             //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, wid, hei, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, wid, hei, 0, GL_RGB, GL_UNSIGNED_BYTE, data1);
 
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
