@@ -55,8 +55,11 @@ uniform float moveFactor;
 uniform sampler2D normalMap;
 const float shineDamper = 20.0f;
 const float reflectivity = 0.6f;
-const vec3 lightColour = vec3(1.0f, 1.0f, 0.8f);
+const vec3 lightColour = vec3(1.0f, 0.7f, 0.3f);
 const vec3 lightPosition = vec3(-100.0, 100.0, 100.0);
+
+// refraction
+const float eta = 1.0f / 1.333f; // air to water
 
 void main() {
     frag_color = vec4(0.0f);
@@ -117,29 +120,43 @@ void main() {
 
     if (is_water)
     {
-        // // // Calculate reflection vector with distorted normal
-        vec3 I = normalize(world_position3d - vec3(camera_pos));
-        vec3 R = reflect(I, normalize(world_normal));
+        //reflection vector
+        vec3 I_reflection = normalize(world_position3d - vec3(camera_pos));
+        vec3 R_reflection = reflect(I_reflection, normalize(world_normal));
 
+        // refraction vector
+        vec3 newcamera_pos = vec3(camera_pos[0], camera_pos[1], camera_pos[2]);
+        vec3 I_refraction = normalize(world_position3d - vec3(newcamera_pos));
+        vec3 T = refract(I_refraction, normalize(world_normal), eta);
+        float cosTheta = dot(-I_refraction, normalize(world_normal));
+        float R0 = pow((1.0 - 1.333) / (1.0 + 1.333), 2.0);
+        float refractiveFactor = R0 + (1.0 - R0) * pow(1.0 - cosTheta, 5.0);
+
+        // distortion
         vec2 distortedTexCoords = texture(dudvMap, vec2(texture_uv_coordinate[0] + moveFactor, texture_uv_coordinate[1])).rg*0.1f;
         distortedTexCoords = texture_uv_coordinate + vec2(distortedTexCoords[0], distortedTexCoords[1]+moveFactor);
         vec2 totalDistortion = (texture(dudvMap, distortedTexCoords).rg * 2.0 - 1.0) * waveStrength;
 
-        R.xy += totalDistortion;
-        vec4 env_color = vec4(texture(skybox, R).rgb, 1.0f);
+        R_reflection.xy += totalDistortion;
+        T.xy += totalDistortion;
+        vec4 reflection_color = vec4(texture(skybox, R_reflection).rgb, 1.0f);
+        vec4 refraction_color = vec4(texture(skybox, T).rgb, 1.0f);
 
+        // normal map
         vec4 normalmap_color = texture(normalMap, distortedTexCoords);
         vec3 m_normal = vec3(normalmap_color.r * 2.0f - 1.0f, normalmap_color.b, normalmap_color.g * 2.0f - 1.0f);
         m_normal = normalize(m_normal);
 
+        // add a sun
         vec3 fromLightVector = world_position3d - lightPosition;
         vec3 m_reflectedLight = reflect(normalize(fromLightVector), m_normal);
-        float m_specular = max(dot(m_reflectedLight, I), 0.0);
+        float m_specular = max(dot(m_reflectedLight, I_reflection), 0.0);
         m_specular = pow(m_specular, shineDamper);
         vec3 specularHighlights = lightColour * m_specular * reflectivity;
 
-        frag_color = mix(frag_color, env_color, 0.5);
-        frag_color = mix(frag_color, vec4(0.0f, 0.3f, 0.5f, 1.0f), 0.2) + vec4(specularHighlights, 0.0f);
+        // final color
+        frag_color = mix(reflection_color, refraction_color, refractiveFactor);
+        frag_color = mix(frag_color, vec4(0.0f, 0.3f, 0.5f, 1.0f), 0.2) + vec4(specularHighlights * 1.2f, 0.0f);
     }
 
 }

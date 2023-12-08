@@ -117,9 +117,8 @@ void Realtime::initializeGL() {
         {
         "./resources/skybox/right.jpg",
         "./resources/skybox/left.jpg",
-
-            "./resources/skybox/top.jpg",
-            "./resources/skybox/bottom.jpg",
+        "./resources/skybox/top.jpg",
+        "./resources/skybox/bottom.jpg",
         "./resources/skybox/back.jpg",
          "./resources/skybox/front.jpg",
         };
@@ -192,8 +191,9 @@ void Realtime::initializeGL() {
 
 void Realtime::drawFboSide(Camera c)
 {
+
     glm::vec4 pos1 = camera.pos;
-    c.initialize(SceneCameraData{   glm::vec4(pos1[0], 10.0f - pos1[1], pos1[2], pos1[3]), glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),  glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), 3.1f / 2.0f, 0.0f, 0.0f});
+    c.initialize(SceneCameraData{   glm::vec4(pos1[0], -pos1[1], pos1[2], pos1[3]), c.look,  c.up, 3.1f / 2.0f, 0.0f, 0.0f});
     c.update(0.1f, 1000.0f);
     glClearColor(0.1f, 1.0f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -239,8 +239,8 @@ void Realtime::drawFboSide(Camera c)
         }
     }
     // --------------- camera ------------------
-    glm::vec4 pos = camera.pos;
-    glUniform4f(glGetUniformLocation(m_phong_shader, "camera_pos"), pos[0], 10.0f - pos[1], pos[2], pos[3]);
+    glm::vec4 pos = c.pos;
+    glUniform4f(glGetUniformLocation(m_phong_shader, "camera_pos"), pos[0], pos[1], pos[2], pos[3]);
 
     for (auto& p_s : phy_shapes)
     {

@@ -54,8 +54,8 @@ glm::vec2 Cube::calculate_uv(glm::vec3 pos)
     u = std::clamp(u, 0.0f, 1.0f);
     v = std::clamp(v, 0.0f, 1.0f);
 
-    // repeatU = 6;
-    // repeatV = 6;
+    // repeatU = 4;
+    // repeatV = 4;
 
     float u_prime = u * repeatU - floor(u * repeatU);
     float v_prime = v * repeatV - floor(v * repeatV);

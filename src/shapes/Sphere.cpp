@@ -38,10 +38,12 @@ glm::vec2 Sphere::calculate_uv(glm::vec3 pos)
     u = std::clamp(u, 0.0f, 1.0f);
     v = std::clamp(v, 0.0f, 1.0f);
 
-    float u_prime = u * repeatU - floor(u * repeatU);
-    float v_prime = v * repeatV - floor(v * repeatV);
+    return glm::vec2(u, v);
 
-    return glm::vec2(u_prime, v_prime);
+    // float u_prime = u * repeatU - floor(u * repeatU);
+    // float v_prime = v * repeatV - floor(v * repeatV);
+
+    // return glm::vec2(u_prime, v_prime);
 }
 
 void Sphere::makeTile(glm::vec3 topLeft, glm::vec3 topRight, glm::vec3 bottomLeft, glm::vec3 bottomRight)
@@ -58,7 +60,7 @@ void Sphere::makeTile(glm::vec3 topLeft, glm::vec3 topRight, glm::vec3 bottomLef
 void Sphere::makeWedge(float currentTheta, float nextTheta)
 {
     float r = 0.5f;
-
+    m_param1 = 20;
     for (int i = 0; i < m_param1; i++)
     {
         float phi2 = glm::radians(float(i) * 180.0f / float(m_param1));
@@ -75,6 +77,7 @@ void Sphere::makeWedge(float currentTheta, float nextTheta)
 
 void Sphere::setVertexData()
 {
+    m_param2 = 20;
     float thetaStep = glm::radians(360.f / m_param2);
     for (int i = 0; i < m_param2; i++)
     {

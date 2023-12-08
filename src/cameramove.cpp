@@ -83,7 +83,7 @@ void Realtime::timerEvent(QTimerEvent *event) {
 
     m_elapsedTimer.restart();
 
-    float moveSpeed = 0.05f;
+    float moveSpeed = 0.03f;
     d_time += moveSpeed * deltaTime;
     if (d_time > 1.0f)
         d_time = 0.0f;
