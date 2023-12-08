@@ -57,7 +57,7 @@ void Realtime::update_phy_shape(float dt)
     {
         if (s.apply_physics)
         {
-            s.f = -b * s.v + wind + glm::vec3(0.0f, rand_float(lift_force - 0.5f, lift_force), 0.0f) + glm::vec3(0.0f, - 9.8f * s.m, 0.0f);
+            s.f = -s.b * s.v + wind + glm::vec3(0.0f, rand_float(s.lift_force - 0.5f, s.lift_force), 0.0f) + glm::vec3(0.0f, - 9.8f * s.m, 0.0f);
             s.v = (s.f * dt + s.v * s.m) / s.m;
             glm::vec3 ds = s.v * dt;
             //printf("ds: %f, %f, %f\n", ds[0], ds[1], ds[2]);

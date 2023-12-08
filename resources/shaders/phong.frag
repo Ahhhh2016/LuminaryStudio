@@ -45,6 +45,7 @@ uniform vec4 camera_pos;
 // skybox
 uniform samplerCube skybox;
 uniform bool is_water;
+uniform bool apply_reflection;
 
 // dudv
 uniform sampler2D dudvMap;
@@ -157,6 +158,27 @@ void main() {
         // final color
         frag_color = mix(reflection_color, refraction_color, refractiveFactor);
         frag_color = mix(frag_color, vec4(0.0f, 0.3f, 0.5f, 1.0f), 0.2) + vec4(specularHighlights * 1.2f, 0.0f);
+    }
+    else if (apply_reflection)
+    {
+        //reflection vector
+        vec3 I_reflection = normalize(world_position3d - vec3(camera_pos));
+        vec3 R_reflection = reflect(I_reflection, normalize(world_normal));
+
+        // // refraction vector
+        // vec3 newcamera_pos = vec3(camera_pos[0], camera_pos[1], camera_pos[2]);
+        // vec3 I_refraction = normalize(world_position3d - vec3(newcamera_pos));
+        // vec3 T = refract(I_refraction, normalize(world_normal), eta);
+        // float cosTheta = dot(-I_refraction, normalize(world_normal));
+        // float R0 = pow((1.0 - 1.333) / (1.0 + 1.333), 2.0);
+        // float refractiveFactor = R0 + (1.0 - R0) * pow(1.0 - cosTheta, 5.0);
+
+        // tecxture color
+        vec4 reflection_color = vec4(texture(skybox, R_reflection).rgb, 1.0f);
+        //vec4 refraction_color = vec4(texture(skybox, T).rgb, 1.0f);
+
+        // final color
+        frag_color = mix(frag_color, reflection_color, 0.7f);
     }
 
 }

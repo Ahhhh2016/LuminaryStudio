@@ -163,13 +163,11 @@ GLuint Realtime::loadCubemap(std::vector<std::string> faces)
 }
 
 
-void Realtime::paint_shapes(bool paint_all) {
-    // glClearColor(0.5f, 0.1f, 0.1f, 1.0f);
-    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+void Realtime::paint_shapes(bool paint_all, Camera c) {
     glUseProgram(m_phong_shader);
 
-    glUniformMatrix4fv(glGetUniformLocation(m_phong_shader, "view_matrix"), 1, GL_FALSE, &camera.view_mat[0][0]);
-    glUniformMatrix4fv(glGetUniformLocation(m_phong_shader, "projection_matrix"), 1, GL_FALSE, &camera.proj_mat[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(m_phong_shader, "view_matrix"), 1, GL_FALSE, &c.view_mat[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(m_phong_shader, "projection_matrix"), 1, GL_FALSE, &c.proj_mat[0][0]);
     glUniform1f(glGetUniformLocation(m_phong_shader, "ka"), globalData.ka);
     glUniform1f(glGetUniformLocation(m_phong_shader, "kd"), globalData.kd);
     glUniform1f(glGetUniformLocation(m_phong_shader, "ks"), globalData.ks);
@@ -205,13 +203,22 @@ void Realtime::paint_shapes(bool paint_all) {
         }
     }
     // --------------- camera ------------------
-    glm::vec4 pos = camera.pos;
+    glm::vec4 pos = c.pos;
     glUniform4f(glGetUniformLocation(m_phong_shader, "camera_pos"), pos[0], pos[1], pos[2], pos[3]);
 
     for (auto& p_s : phy_shapes)
     {
-        if (!paint_all && p_s.shape.primitive.type == PrimitiveType::PRIMITIVE_CUBE)
+        if (!paint_all && p_s.apply_reflection)
             continue;
+
+        if (p_s.apply_reflection)
+        {
+            glUniform1i(glGetUniformLocation(m_phong_shader, "apply_reflection"), true);
+        }
+        else
+        {
+            glUniform1i(glGetUniformLocation(m_phong_shader, "apply_reflection"), false);
+        }
         // Task 5: Generate a VBO here and store it in m_vbo
         glGenBuffers(1, &m_vbo);
         glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
@@ -245,84 +252,61 @@ void Realtime::paint_shapes(bool paint_all) {
         glUniform1i(glGetUniformLocation(m_phong_shader, "shininess"), material.shininess);
 
         // reflection
-        if (p_s.shape.primitive.type == PrimitiveType::PRIMITIVE_CUBE || p_s.shape.primitive.type == PrimitiveType::PRIMITIVE_SPHERE)
+        if (p_s.is_water)
         {
             glUniform1i(glGetUniformLocation(m_phong_shader, "is_water"), true);
-            glUniform1f(glGetUniformLocation(m_phong_shader, "moveFactor"), d_time);
 
-            // dudvMap
-            int wid, hei, nrComponents;
-            unsigned char *data = stbi_load("./resources/waterDUDV.png", &wid, &hei, &nrComponents, 0);
-            glBindVertexArray(m_vao);
-            glGenTextures(1, &m_shape_texture);
-            glActiveTexture(GL_TEXTURE2);
-            glBindTexture(GL_TEXTURE_2D, m_shape_texture);
+            if (paint_all)
+            {
+                glUniform1f(glGetUniformLocation(m_phong_shader, "moveFactor"), d_time);
 
-            //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, wid, hei, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+                // dudvMap
+                int wid, hei, nrComponents;
+                unsigned char *data = stbi_load("./resources/waterDUDV.png", &wid, &hei, &nrComponents, 0);
+                glBindVertexArray(m_vao);
+                glGenTextures(1, &m_shape_texture);
+                glActiveTexture(GL_TEXTURE2);
+                glBindTexture(GL_TEXTURE_2D, m_shape_texture);
 
-
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-            // nonrmalMap
-            unsigned char *data1 = stbi_load("./resources/normalMap.png", &wid, &hei, &nrComponents, 0);
-            //glGenVertexArrays(1, &m_vao_normal);
-            glBindVertexArray(m_vao);
-            glGenTextures(1, &m_normal_texture);
-            glActiveTexture(GL_TEXTURE3);
-            glBindTexture(GL_TEXTURE_2D, m_normal_texture);
-
-            //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, wid, hei, 0, GL_RGB, GL_UNSIGNED_BYTE, data1);
+                //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, wid, hei, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 
 
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+                // nonrmalMap
+                unsigned char *data1 = stbi_load("./resources/normalMap.png", &wid, &hei, &nrComponents, 0);
+                //glGenVertexArrays(1, &m_vao_normal);
+                glBindVertexArray(m_vao);
+                glGenTextures(1, &m_normal_texture);
+                glActiveTexture(GL_TEXTURE3);
+                glBindTexture(GL_TEXTURE_2D, m_normal_texture);
+
+                //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, wid, hei, 0, GL_RGB, GL_UNSIGNED_BYTE, data1);
+
+
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            }
         }
         else
         {
             glUniform1i(glGetUniformLocation(m_phong_shader, "is_water"), false);
         }
 
-        // // -------------- texture -----------------
-        // auto texture_map = material.textureMap;
-        // if (settings.use_texture && texture_map.isUsed)
-        // {
-        //     QString texture_filepath = QString::fromStdString(texture_map.filename);
-        //     m_image = QImage(texture_filepath);
-        //     m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
-
-        //     glBindVertexArray(m_vao);
-        //     glGenTextures(1, &m_shape_texture);
-        //     glActiveTexture(GL_TEXTURE1);
-        //     glBindTexture(GL_TEXTURE_2D, m_shape_texture);
-
-        //     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
-        //     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        //     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        //     glUniform1i(glGetUniformLocation(m_phong_shader, "object_texture"), 1);
-        //     glUniform1f(glGetUniformLocation(m_phong_shader, "blend"), float(material.blend));
-        //     glUniform1i(glGetUniformLocation(m_phong_shader, "use_texture"), true);
-        // }
-        // else
-        // {
-        //     glUniform1i(glGetUniformLocation(m_phong_shader, "use_texture"), false);
-        // }
-
-
         // Draw Command
         glDrawArrays(GL_TRIANGLES, 0, vbo_data.size() / 8);
 
-        glDeleteBuffers(1, &m_vbo);
-        glDeleteVertexArrays(1, &m_vao);
+        // glDeleteBuffers(1, &m_vbo);
+        // glDeleteVertexArrays(1, &m_vao);
 
     }
 
-    glBindVertexArray(0);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    glBindVertexArray(0);
+    //glBindVertexArray(0);
+    // glBindTexture(GL_TEXTURE_2D, 0);
+    // glBindVertexArray(0);
     glUseProgram(0);
 }
 

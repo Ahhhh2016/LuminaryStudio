@@ -191,115 +191,19 @@ void Realtime::initializeGL() {
 
 void Realtime::drawFboSide(Camera c)
 {
-
     glm::vec4 pos1 = camera.pos;
-    c.initialize(SceneCameraData{   glm::vec4(pos1[0], -pos1[1], pos1[2], pos1[3]), c.look,  c.up, 3.1f / 2.0f, 0.0f, 0.0f});
+    if (!phy_shapes.empty() && phy_shapes[5].shape.primitive.type == PrimitiveType::PRIMITIVE_SPHERE)
+        c.initialize(SceneCameraData{   glm::vec4(0.0f, 0.1f, 0.0f, 0.0f), c.look,  c.up, 3.1f / 2.0f, 0.0f, 0.0f});//glm::vec4(pos1[0], -pos1[1], pos1[2], pos1[3]), c.look,  c.up, 3.1f / 2.0f, 0.0f, 0.0f});
+    else
+        c.initialize(SceneCameraData{   glm::vec4(pos1[0], -pos1[1], pos1[2], pos1[3]), c.look,  c.up, 3.1f / 2.0f, 0.0f, 0.0f});
     c.update(0.1f, 1000.0f);
     glClearColor(0.1f, 1.0f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glActiveTexture(GL_TEXTURE0);
+    bool paint_all = false;
     //--------------------------------------------------------------------
-    glUseProgram(m_phong_shader);
-
-    glUniformMatrix4fv(glGetUniformLocation(m_phong_shader, "view_matrix"), 1, GL_FALSE, &c.view_mat[0][0]);
-    glUniformMatrix4fv(glGetUniformLocation(m_phong_shader, "projection_matrix"), 1, GL_FALSE, &c.proj_mat[0][0]);
-    glUniform1f(glGetUniformLocation(m_phong_shader, "ka"), globalData.ka);
-    glUniform1f(glGetUniformLocation(m_phong_shader, "kd"), globalData.kd);
-    glUniform1f(glGetUniformLocation(m_phong_shader, "ks"), globalData.ks);
-    glUniform1i(glGetUniformLocation(m_phong_shader, "num_lights"), lights.size());
-    for (int i = 0; i < lights.size(); ++i) {
-
-        SceneLightData light = lights[i];
-
-        glUniform3fv(glGetUniformLocation(m_phong_shader, ("lights[" + std::to_string(i) + "].function").c_str()), 1, &light.function[0]);
-        glUniform4fv(glGetUniformLocation(m_phong_shader, ("lights[" + std::to_string(i) + "].color").c_str()), 1, &light.color[0]);
-
-        GLuint type = glGetUniformLocation(m_phong_shader, ("lights[" + std::to_string(i) + "].type").c_str());
-        if (light.type != LightType::LIGHT_DIRECTIONAL)
-        {
-            glUniform4fv(glGetUniformLocation(m_phong_shader, ("lights[" + std::to_string(i) + "].pos").c_str()), 1, &light.pos[0]);
-
-            if (lights[i].type == LightType::LIGHT_SPOT)
-            {
-                glUniform1i(type, 3);
-                glUniform1f(glGetUniformLocation(m_phong_shader, ("lights[" + std::to_string(i) + "].angle").c_str()), light.angle);
-                glUniform1f(glGetUniformLocation(m_phong_shader, ("lights[" + std::to_string(i) + "].penumbra").c_str()), light.penumbra);
-                glUniform4fv(glGetUniformLocation(m_phong_shader, ("lights[" + std::to_string(i) + "].direction").c_str()), 1, &light.dir[0]);
-            }
-            else
-            {
-                glUniform1i(type, 2);
-            }
-        }
-        else
-        {
-            glUniform1i(type, 1);
-            glUniform4fv(glGetUniformLocation(m_phong_shader, ("lights[" + std::to_string(i) + "].direction").c_str()), 1, &light.dir[0]);
-        }
-    }
-    // --------------- camera ------------------
-    glm::vec4 pos = c.pos;
-    glUniform4f(glGetUniformLocation(m_phong_shader, "camera_pos"), pos[0], pos[1], pos[2], pos[3]);
-
-    for (auto& p_s : phy_shapes)
-    {
-        if (p_s.shape.primitive.type == PrimitiveType::PRIMITIVE_CUBE || p_s.shape.primitive.type == PrimitiveType::PRIMITIVE_SPHERE)
-            continue;
-        // Task 5: Generate a VBO here and store it in m_vbo
-        glGenBuffers(1, &m_vbo);
-        glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-
-        std::vector<float> vbo_data = p_s.vertexData;// generate_vbo(s);
-
-        // Task 9: Pass the triangle vector into your VBO here
-        glBufferData(GL_ARRAY_BUFFER, vbo_data.size() * sizeof(GLfloat), vbo_data.data(), GL_STATIC_DRAW);
-
-        // ================== Vertex Array Objects
-
-        // Task 11: Generate a VAO here and store it in m_vao
-        glGenVertexArrays(1, &m_vao);
-        glBindVertexArray(m_vao);
-
-        // Task 13: Add position and color attributes to your VAO here
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), reinterpret_cast<void*>(0 * sizeof(GLfloat)));
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), reinterpret_cast<void*>(3 * sizeof(GLfloat)));
-        glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), reinterpret_cast<void*>(6 * sizeof(GLfloat)));
-
-        //glUniformMatrix4fv(glGetUniformLocation(m_phong_shader, "model_matrix"), 1, GL_FALSE, &s.ctm[0][0]);
-
-        // -------------- material -----------------
-        auto material = p_s.shape.primitive.material;
-        glUniform4f(glGetUniformLocation(m_phong_shader, "material_ambient"), material.cAmbient[0], material.cAmbient[1], material.cAmbient[2], material.cAmbient[3]);
-        glUniform4f(glGetUniformLocation(m_phong_shader, "material_diffuse"), material.cDiffuse[0], material.cDiffuse[1], material.cDiffuse[2], material.cDiffuse[3]);
-        glUniform4f(glGetUniformLocation(m_phong_shader, "material_specular"), material.cSpecular[0], material.cSpecular[1], material.cSpecular[2], material.cSpecular[3]);
-        glUniform1i(glGetUniformLocation(m_phong_shader, "shininess"), material.shininess);
-
-        // reflection
-        if (p_s.shape.primitive.type == PrimitiveType::PRIMITIVE_CUBE || p_s.shape.primitive.type == PrimitiveType::PRIMITIVE_SPHERE)
-        {
-            glUniform1i(glGetUniformLocation(m_phong_shader, "is_water"), true);
-        }
-        else
-        {
-            glUniform1i(glGetUniformLocation(m_phong_shader, "is_water"), false);
-        }
-
-        // Draw Command
-        glDrawArrays(GL_TRIANGLES, 0, vbo_data.size() / 8);
-
-        // glDeleteBuffers(1, &m_vbo);
-        // glDeleteVertexArrays(1, &m_vao);
-
-    }
-
-    //glBindVertexArray(0);
-    // glBindTexture(GL_TEXTURE_2D, 0);
-    // glBindVertexArray(0);
-    glUseProgram(0);
+    paint_shapes(false, c);
     //---------------------------------------------------------------------
     glBindVertexArray(0);
 
@@ -399,7 +303,7 @@ void Realtime::paintGL() {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, fbo_tex_cube);
 
-    paint_shapes(true);
+    paint_shapes(true, camera);
 
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
     glBindVertexArray(0);
@@ -468,6 +372,8 @@ void Realtime::sceneChanged()
     //camera.initialize(SceneCameraData{   glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), glm::vec4(0.0f, 10.0f, 0.0f, 0.0f),  glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), 3.1f / 2.0f, 0.0f, 0.0f});
 
     //update shapes
+    settings.shapeParameter1 = 20;
+    settings.shapeParameter2 = 20;
     parameter1 = settings.shapeParameter1;
     parameter2 = settings.shapeParameter2;
     use_texture = settings.use_texture;
@@ -488,6 +394,8 @@ void Realtime::sceneChanged()
 
 std::vector<float> Realtime::generate_vertex_data(RenderShapeData s)
 {
+    settings.shapeParameter1 = 20;
+    settings.shapeParameter2 = 20;
     std::vector<float> temp;
     if (s.primitive.type == PrimitiveType::PRIMITIVE_CUBE)
     {
@@ -535,18 +443,38 @@ float Realtime::rand_float(float min_float, float max_float)
     return dis(gen);
 }
 
+// struct physics_shape {
+//     bool apply_physics;
+//     bool apply_reflection;
+//     bool is_water;
+//     float b = 0.35;
+//     float lift_force = 5.5f;
+//     glm::vec3 v;
+//     glm::vec3 f;
+//     float m;
+//     std::vector<float> vertexData;
+//     RenderShapeData shape;
+// };
+
 void Realtime::ini_phy_shapes()
 {
+    phy_shapes.clear();
+    int index = 0;
     for (auto &s : shapes)
     {
-        if (s.primitive.type == PrimitiveType::PRIMITIVE_CYLINDER)
+        if (s.primitive.type == PrimitiveType::PRIMITIVE_CUBE)//(index == 5)
         {
-            phy_shapes.push_back(physics_shape{true, glm::vec3(0.0f), glm::vec3(0.0f), rand_float(0.4f, 0.5f), generate_vertex_data(s), s});
+            phy_shapes.push_back(physics_shape{false, true, true, 0.0f, 0.0f, glm::vec3(0.0f), glm::vec3(0.0f), 0.0f, generate_vertex_data(s), s});
+        }
+        else if (s.primitive.type == PrimitiveType::PRIMITIVE_SPHERE) //(index == 6)
+        {
+            phy_shapes.push_back(physics_shape{false, true, false, 0.0f, 0.0f, glm::vec3(0.0f), glm::vec3(0.0f), 0.0f, generate_vertex_data(s), s});
         }
         else
         {
-            phy_shapes.push_back(physics_shape{false, glm::vec3(0.0f), glm::vec3(0.0f), rand_float(0.4f, 0.5f), generate_vertex_data(s), s});
+            phy_shapes.push_back(physics_shape{true, false, false, 0.35f, 5.5f, glm::vec3(0.0f), glm::vec3(0.0f), rand_float(0.4f, 0.5f), generate_vertex_data(s), s});
         }
+        index++;
     }
 }
 
@@ -554,21 +482,21 @@ void Realtime::settingsChanged()
 {
     if (settings.nearPlane != near_plane || settings.farPlane != far_plane)
     {
-        near_plane = settings.nearPlane;
+        near_plane = 0.1f;
         far_plane = 1000.0f;
         camera.update(near_plane, far_plane);
     }
 
     if (settings.shapeParameter1 != parameter1 || settings.shapeParameter2 != parameter2 || (settings.adaptive_detail != adaptive_detail && !settings.adaptive_detail))
     {
-        parameter1 = settings.shapeParameter1;
-        parameter2 = settings.shapeParameter2;
+        parameter1 = 20;
+        parameter2 = 20;
         cone.updateParams(parameter1, parameter2, 1.0f, 1.0f);
         cube.updateParams(parameter1, 1.0f, 1.0f);
         cylinder.updateParams(parameter1, parameter2, 1.0f, 1.0f);
         sphere.updateParams(parameter1, parameter2, 1.0f, 1.0f);
 
-        adaptive_detail = settings.adaptive_detail;
+        //adaptive_detail = settings.adaptive_detail;
     }
 
 

@@ -25,6 +25,10 @@
 
 struct physics_shape {
     bool apply_physics;
+    bool apply_reflection;
+    bool is_water;
+    float b = 0.35;
+    float lift_force = 5.5f;
     glm::vec3 v;
     glm::vec3 f;
     float m;
@@ -47,7 +51,7 @@ public:
     void makeFBO();
     void paintTexture(GLuint texture);
 
-    void paint_shapes(bool paint_all);
+    void paint_shapes(bool paint_all, Camera c);
     void paint_skybox();
 
 public slots:
@@ -133,8 +137,6 @@ private:
     //lantern
     std::vector<physics_shape> phy_shapes;
     glm::vec3 wind = glm::vec3(-0.3f, 0.0f, -0.3f);
-    float b = 0.35;
-    float lift_force = 5.5f;
     void ini_phy_shapes();
     std::vector<float> generate_vertex_data(RenderShapeData s);
     void update_phy_shape(float dt);
