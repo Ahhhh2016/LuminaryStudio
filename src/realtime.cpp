@@ -4,10 +4,15 @@
 #include <QMouseEvent>
 #include <QKeyEvent>
 #include <iostream>
+#include <ctime>
 #include "settings.h"
 #include "utils/shaderloader.h"
 
 #include "glm/gtx/transform.hpp"
+
+GLfloat deltaTime = 0.0f;
+GLfloat lastFrame = 0.0f;
+GLfloat lastX = 400,lastY = 300;
 
 // ================== Project 5: Lights, Camera
 
@@ -55,6 +60,10 @@ void Realtime::initializeGL() {
 
     m_timer = startTimer(1000/60);
     m_elapsedTimer.start();
+
+//    Floor m_floor;
+
+
 
     // Initializing GL.
     // GLEW (GL Extension Wrangler) provides access to OpenGL functions.
@@ -120,16 +129,35 @@ void Realtime::initializeGL() {
     makeFBO();
 
     //==============project 6================
+
+    m_floor.initialize();
+    // fountain.initialize();
+
 }
 
 void Realtime::paintGL() {
+//    printf("es");
     // Task 24: Bind our FBO
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
     // Task 28: Call glViewport
     glViewport(0, 0, m_fbo_width, m_fbo_height);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    paint_shapes();
+    // paint_shapes();
+
+    // Floor m_floor;
+    m_floor.render(camera);
+
+    glm::mat4 model = glm::mat4(1.0f);
+    flame.initialize();
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)m_screen_width/(float)m_screen_height,0.1f,2000.f);
+    flame.Render(deltaTime,model,camera.view_mat,projection);
+
+    //    GLfloat currentFrame = glfwGetTime();
+    GLfloat currentFrame = (GLfloat)clock() / CLOCKS_PER_SEC;
+//    std::cout << currentFrame << endl;
+    deltaTime = currentFrame - lastFrame;
+    lastFrame = currentFrame;
 
     // Task 25: Bind the default framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);

@@ -23,6 +23,10 @@
 #include "shapes/Cylinder.h"
 #include "shapes/Sphere.h"
 
+#include "floor.h"
+#include "fountain.h"
+#include "mflame.h"
+
 class Realtime : public QOpenGLWidget
 {
 public:
@@ -118,4 +122,8 @@ private:
     QImage m_image;
     GLuint m_shape_texture;
     bool use_texture = false;
+
+    Floor m_floor;
+    Fountain::Fountain fountain;
+    Flame::Flame flame;
 };

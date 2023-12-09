@@ -56,6 +56,19 @@ add_executable(${PROJECT_NAME}
 
     src/cameramove.cpp
     src/utils/realtimeutils.cpp
+
+    src/floor.cpp
+    src/floor.h
+    src/fountain.cpp
+    src/fountain.h
+    src/texture.cpp
+    src/texture.h
+    src/shader.cpp
+    src/shader.h
+    src/stb_image.c
+    src/stb_image.h
+    src/mflame.cpp
+    src/mflame.h
 )
 
 # GLM: this creates its library and allows you to `#include "glm/..."`
@@ -64,6 +77,8 @@ add_subdirectory(glm)
 # GLEW: this creates its library and allows you to `#include "GL/glew.h"`
 add_library(StaticGLEW STATIC glew/src/glew.c)
 include_directories(${PROJECT_NAME} PRIVATE glew/include)
+
+
 
 # Specifies libraries to be linked (Qt components, glew, etc)
 target_link_libraries(${PROJECT_NAME} PRIVATE
@@ -84,6 +99,24 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
         resources/shaders/phong.vert
         resources/shaders/postprocess.frag
         resources/shaders/postprocess.vert
+        resources/shaders/floor.frag
+        resources/shaders/floor.vert
+        resources/shaders/Update.vs
+        resources/shaders/Update.fs
+        resources/shaders/Update.gs
+        resources/shaders/Render.vs
+        resources/shaders/Render.fs
+        resources/water.bmp
+
+        resources/shaders/FlameUpdate.vs
+        resources/shaders/FlameUpdate.fs
+        resources/shaders/FlameUpdate.gs
+        resources/shaders/FlameRender.vs
+        resources/shaders/FlameRender.fs
+        resources/flame.bmp
+        resources/particle.bmp
+
+
 )
 
 # GLEW: this provides support for Windows (including 64-bit)
