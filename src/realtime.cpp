@@ -10,6 +10,12 @@
 #include <random>
 #include "glm/gtx/transform.hpp"
 
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <string>
+
+
 // ================== Project 5: Lights, Camera
 
 Realtime::Realtime(QWidget *parent)
@@ -386,6 +392,59 @@ void Realtime::sceneChanged()
     update(); // asks for a PaintGL() call to occur
 }
 
+std::vector<float> generateMeshVertexData(const std::string& filePath) {
+    std::string line;
+    std::ifstream objFile(filePath); // Adjust the path as needed
+
+    std::vector<float> vertices, uvs, normals, vertexData;
+
+    if (objFile.is_open()) {
+        while (getline(objFile, line)) {
+            std::stringstream ss(line);
+            std::string lineType;
+            ss >> lineType;
+
+            if (lineType == "v") {
+                float x, y, z;
+                ss >> x >> y >> z;
+                vertices.insert(vertices.end(), {x, y, z});
+            }
+            else if (lineType == "vt") {
+                float u, v;
+                ss >> u >> v;
+                uvs.insert(uvs.end(), {u, v});
+            }
+            else if (lineType == "vn") {
+                float nx, ny, nz;
+                ss >> nx >> ny >> nz;
+                normals.insert(normals.end(), {nx, ny, nz});
+            }
+            else if (lineType == "f") {
+                int vIdx[4], uvIdx[4], nIdx[4];
+                char slash;
+
+                // Assuming the format is v/vt/vn
+                for (int i = 0; i < 4; ++i) {
+                    ss >> vIdx[i] >> slash >> uvIdx[i] >> slash >> nIdx[i];
+                    vIdx[i]--; uvIdx[i]--; nIdx[i]--;  // Adjust for 0-based indexing
+                }
+
+                // Convert quad to two triangles
+                int quadToTri[6] = {0, 1, 2, 0, 2, 3}; // Indices to form two triangles from a quad
+                for (int i = 0; i < 6; ++i) {
+                    int idx = quadToTri[i];
+                    vertexData.insert(vertexData.end(), {vertices[vIdx[idx] * 3], vertices[vIdx[idx] * 3 + 1], vertices[vIdx[idx] * 3 + 2]});
+                    vertexData.insert(vertexData.end(), {normals[nIdx[idx] * 3], normals[nIdx[idx] * 3 + 1], normals[nIdx[idx] * 3 + 2]});
+                    vertexData.insert(vertexData.end(), {uvs[uvIdx[idx] * 2], uvs[uvIdx[idx] * 2 + 1]});
+                }
+            }
+        }
+        objFile.close();
+    }
+
+    return vertexData;
+}
+
 std::vector<float> Realtime::generate_vertex_data(RenderShapeData s)
 {
     settings.shapeParameter1 = 20;
@@ -410,6 +469,10 @@ std::vector<float> Realtime::generate_vertex_data(RenderShapeData s)
     {
         cylinder.updateParams(settings.shapeParameter1, settings.shapeParameter2, 1.0f, 1.0f);
         temp = cylinder.generateShape();
+    }
+    else if (s.primitive.type == PrimitiveType::PRIMITIVE_MESH)
+    {
+        temp = generateMeshVertexData(s.primitive.meshfile);
     }
 
     for (int i = 0; i < temp.size() / 8; i++)
@@ -464,9 +527,13 @@ void Realtime::ini_phy_shapes()
         {
             phy_shapes.push_back(physics_shape{false, true, false, 0.0f, 0.0f, glm::vec3(0.0f), glm::vec3(0.0f), 0.0f, generate_vertex_data(s), s});
         }
-        else
+        else if (s.primitive.type == PrimitiveType::PRIMITIVE_MESH)
         {
             phy_shapes.push_back(physics_shape{true, false, false, 0.35f, 5.5f, glm::vec3(0.0f), glm::vec3(0.0f), rand_float(0.4f, 0.5f), generate_vertex_data(s), s});
+        }
+        else
+        {
+            phy_shapes.push_back(physics_shape{false, false, false, 0.0f, 0.0f, glm::vec3(0.0f), glm::vec3(0.0f), 0.0f, generate_vertex_data(s), s});
         }
         index++;
     }

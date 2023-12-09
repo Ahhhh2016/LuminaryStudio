@@ -57,7 +57,7 @@ uniform sampler2D normalMap;
 const float shineDamper = 20.0f;
 const float reflectivity = 0.6f;
 const vec3 lightColour = vec3(1.0f, 0.7f, 0.3f);
-const vec3 lightPosition = vec3(-100.0, 100.0, 100.0);
+const vec3 lightPosition = vec3(-100.0, 100.0, -100.0);
 
 // refraction
 const float eta = 1.0f / 1.333f; // air to water

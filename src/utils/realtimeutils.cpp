@@ -311,33 +311,33 @@ void Realtime::paint_shapes(bool paint_all, Camera c) {
     glUseProgram(0);
 }
 
-std::vector<float> Realtime::generate_vbo(RenderShapeData s)
-{
-    auto texture = s.primitive.material.textureMap;
+// std::vector<float> Realtime::generate_vbo(RenderShapeData s)
+// {
+//     auto texture = s.primitive.material.textureMap;
 
-    if (s.primitive.type == PrimitiveType::PRIMITIVE_CUBE)
-    {
-        cube.updateParams(settings.shapeParameter1, texture.repeatU, texture.repeatV);
-        return cube.generateShape();
-    }
-    else if (s.primitive.type == PrimitiveType::PRIMITIVE_CONE)
-    {
-        cone.updateParams(settings.shapeParameter1, settings.shapeParameter2, texture.repeatU, texture.repeatV);
-        return cone.generateShape();
-    }
-    else if (s.primitive.type == PrimitiveType::PRIMITIVE_SPHERE)
-    {
-        sphere.updateParams(settings.shapeParameter1, settings.shapeParameter2, texture.repeatU, texture.repeatV);
-        return sphere.generateShape();
-    }
-    else if (s.primitive.type == PrimitiveType::PRIMITIVE_CYLINDER)
-    {
-        cylinder.updateParams(settings.shapeParameter1, settings.shapeParameter2, texture.repeatU, texture.repeatV);
-        return cylinder.generateShape();
-    }
+//     if (s.primitive.type == PrimitiveType::PRIMITIVE_CUBE)
+//     {
+//         cube.updateParams(settings.shapeParameter1, texture.repeatU, texture.repeatV);
+//         return cube.generateShape();
+//     }
+//     else if (s.primitive.type == PrimitiveType::PRIMITIVE_CONE)
+//     {
+//         cone.updateParams(settings.shapeParameter1, settings.shapeParameter2, texture.repeatU, texture.repeatV);
+//         return cone.generateShape();
+//     }
+//     else if (s.primitive.type == PrimitiveType::PRIMITIVE_SPHERE)
+//     {
+//         sphere.updateParams(settings.shapeParameter1, settings.shapeParameter2, texture.repeatU, texture.repeatV);
+//         return sphere.generateShape();
+//     }
+//     else if (s.primitive.type == PrimitiveType::PRIMITIVE_CYLINDER)
+//     {
+//         cylinder.updateParams(settings.shapeParameter1, settings.shapeParameter2, texture.repeatU, texture.repeatV);
+//         return cylinder.generateShape();
+//     }
 
-    return std::vector<float>{0.0f};
-}
+//     return std::vector<float>{0.0f};
+// }
 
 void Realtime::paintTexture(GLuint texture)
 {
