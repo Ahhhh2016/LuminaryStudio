@@ -42,6 +42,8 @@ void Realtime::finish() {
     // Students: anything requiring OpenGL calls when the program exits should be done here
     glDeleteBuffers(1, &m_vbo);
     glDeleteVertexArrays(1, &m_vao);
+    glDeleteBuffers(1, &m_fullscreen_vbo);
+    glDeleteVertexArrays(1, &m_fullscreen_vao);
     glDeleteProgram(m_phong_shader);
 
     // project 6
@@ -53,6 +55,26 @@ void Realtime::finish() {
     glDeleteVertexArrays(1, &m_fullscreen_vao);
     glDeleteBuffers(1, &m_fullscreen_vbo);
     glDeleteBuffers(1, &m_defaultFBO);
+
+    glDeleteProgram(m_phong_shader);
+    glDeleteProgram(m_skybox_shader);
+    glDeleteFramebuffers(1, &m_fbo_texture);
+
+    //texture
+    glDeleteTextures(1, &m_shape_texture);
+
+    // dynamic environment mapping
+    glDeleteFramebuffers(1, &fbo_cube);
+    glDeleteTextures(1, &fbo_tex_cube);
+    glDeleteRenderbuffers(1, &fbo_rb_cube);
+
+    // normal Map
+    glDeleteVertexArrays(1, &m_vao_normal);
+    glDeleteTextures(1, &m_normal_texture);
+
+    // skybox
+    glDeleteBuffers(1, &skyboxVBO);
+    glDeleteVertexArrays(1, &skyboxVAO);
 
     this->doneCurrent();
 }
@@ -97,10 +119,10 @@ void Realtime::initializeGL() {
     glUniform1i(glGetUniformLocation(m_phong_shader, "normalMap"), 3);
     glUseProgram(0);
 
-    //ini_skybox();
-    for (float& i : skyboxVertices) {
-        i *= 100;
-    }
+    // //ini_skybox();
+    // for (float& i : skyboxVertices) {
+    //     i *= 100;
+    // }
 
     // skybox VAO
     // skybox
@@ -267,31 +289,6 @@ void Realtime::paintGL() {
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
     glViewport(0, 0, m_screen_width * this->devicePixelRatio(), m_screen_height * this->devicePixelRatio());
-
-
-    glClearColor(0.5f, 0.1f, 1.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    // starting to paint the texture
-    // CUBEMAP ---------------------------------------------------------
-    glDepthFunc(GL_LEQUAL);
-    glUseProgram(m_skybox_shader);
-    glm::mat4 view = glm::mat4(glm::mat3(camera.view_mat));
-
-    glUniformMatrix4fv(glGetUniformLocation(m_skybox_shader, "view"), 1, GL_FALSE, &view[0][0]);
-    glUniformMatrix4fv(glGetUniformLocation(m_skybox_shader, "projection"), 1, GL_FALSE, &camera.proj_mat[0][0]);
-    glUniform1i(glGetUniformLocation(m_skybox_shader, "skybox"), 1);
-    // skybox cube
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, fbo_tex_cube);
-    glBindVertexArray(skyboxVAO);
-    //glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-    glBindVertexArray(0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-    glDepthFunc(GL_LESS); // set depth function back to default
-    glUseProgram(0);
-    // CUBEMAP ---------------------------------------------------------
 
     glClearColor(0.1f, 1.0f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

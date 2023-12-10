@@ -209,7 +209,7 @@ void Realtime::init_shapes()
 
     int wid, hei, nrComponents;
     unsigned char *data = stbi_load("./resources/waterDUDV.png", &wid, &hei, &nrComponents, 0);
-    glBindVertexArray(m_vao);
+    //glBindVertexArray(m_vao);
     glGenTextures(1, &m_shape_texture);
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, m_shape_texture);
@@ -224,7 +224,7 @@ void Realtime::init_shapes()
     // nonrmalMap
     unsigned char *data1 = stbi_load("./resources/normalMap.png", &wid, &hei, &nrComponents, 0);
     //glGenVertexArrays(1, &m_vao_normal);
-    glBindVertexArray(m_vao);
+    //glBindVertexArray(m_vao);
     glGenTextures(1, &m_normal_texture);
     glActiveTexture(GL_TEXTURE3);
     glBindTexture(GL_TEXTURE_2D, m_normal_texture);
@@ -241,7 +241,7 @@ void Realtime::init_shapes()
 
     //unsigned char *data = stbi_load(("./resources/lanternTextures/Flame_BottomPNG/Flame_Bottom." + ss.str() + ".png").c_str(), &wid, &hei, &nrComponents, 0);
     unsigned char *data2 = stbi_load(("./resources/paper.png"), &wid, &hei, &nrComponents, 0);
-    glBindVertexArray(m_vao);
+    //glBindVertexArray(m_vao);
     glGenTextures(1, &m_shape_texture);
     glActiveTexture(GL_TEXTURE4);
     glBindTexture(GL_TEXTURE_2D, m_shape_texture);
@@ -350,16 +350,16 @@ void Realtime::paint_shapes(bool paint_all, Camera c) {
             // Draw Command
             glDrawArrays(GL_TRIANGLES, 0, vbo_data.size() / 8);
 
-            // glDeleteBuffers(1, &m_vbo);
-            // glDeleteVertexArrays(1, &m_vao);
+            glDeleteBuffers(1, &m_vbo);
+            glDeleteVertexArrays(1, &m_vao);
 
         }
     }
 
 
-    //glBindVertexArray(0);
-    // glBindTexture(GL_TEXTURE_2D, 0);
-    // glBindVertexArray(0);
+    glBindVertexArray(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindVertexArray(0);
     glUseProgram(0);
 }
 
