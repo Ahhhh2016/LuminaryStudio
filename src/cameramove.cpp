@@ -115,6 +115,8 @@ void Realtime::timerEvent(QTimerEvent *event) {
     {
         cameraData.pos += glm::normalize(move_dir) * deltaTime * 10.0f;
         camera.initialize(cameraData);
+
+        std::cout << camera.pos[0] << " " << camera.pos[1] << " " << camera.pos[2] << " " << camera.pos[3] << std::endl;
     }
 
     update(); // asks for a PaintGL() call to occur

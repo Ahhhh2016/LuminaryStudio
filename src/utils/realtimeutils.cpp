@@ -167,20 +167,11 @@ void Realtime::init_shapes()
 {
     glUseProgram(m_phong_shader);
 
-    glUseProgram(0);
-}
-
-
-void Realtime::paint_shapes(bool paint_all, Camera c) {
-
-    glUseProgram(m_phong_shader);
-
-    glUniformMatrix4fv(glGetUniformLocation(m_phong_shader, "view_matrix"), 1, GL_FALSE, &c.view_mat[0][0]);
-    glUniformMatrix4fv(glGetUniformLocation(m_phong_shader, "projection_matrix"), 1, GL_FALSE, &c.proj_mat[0][0]);
     glUniform1f(glGetUniformLocation(m_phong_shader, "ka"), globalData.ka);
     glUniform1f(glGetUniformLocation(m_phong_shader, "kd"), globalData.kd);
     glUniform1f(glGetUniformLocation(m_phong_shader, "ks"), globalData.ks);
     glUniform1i(glGetUniformLocation(m_phong_shader, "num_lights"), lights.size());
+
     for (int i = 0; i < lights.size(); ++i) {
 
         SceneLightData light = lights[i];
@@ -211,6 +202,68 @@ void Realtime::paint_shapes(bool paint_all, Camera c) {
             glUniform4fv(glGetUniformLocation(m_phong_shader, ("lights[" + std::to_string(i) + "].direction").c_str()), 1, &light.dir[0]);
         }
     }
+
+    glUseProgram(0);
+
+    makeCurrent();
+
+    int wid, hei, nrComponents;
+    unsigned char *data = stbi_load("./resources/waterDUDV.png", &wid, &hei, &nrComponents, 0);
+    glBindVertexArray(m_vao);
+    glGenTextures(1, &m_shape_texture);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, m_shape_texture);
+
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, wid, hei, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // nonrmalMap
+    unsigned char *data1 = stbi_load("./resources/normalMap.png", &wid, &hei, &nrComponents, 0);
+    //glGenVertexArrays(1, &m_vao_normal);
+    glBindVertexArray(m_vao);
+    glGenTextures(1, &m_normal_texture);
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, m_normal_texture);
+
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, wid, hei, 0, GL_RGB, GL_UNSIGNED_BYTE, data1);
+
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // fire texture
+    int wid2, hei2, nrComponents2;
+
+    //unsigned char *data = stbi_load(("./resources/lanternTextures/Flame_BottomPNG/Flame_Bottom." + ss.str() + ".png").c_str(), &wid, &hei, &nrComponents, 0);
+    unsigned char *data2 = stbi_load(("./resources/paper.png"), &wid, &hei, &nrComponents, 0);
+    glBindVertexArray(m_vao);
+    glGenTextures(1, &m_shape_texture);
+    glActiveTexture(GL_TEXTURE4);
+    glBindTexture(GL_TEXTURE_2D, m_shape_texture);
+
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, wid, hei, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    doneCurrent();
+}
+
+
+
+void Realtime::paint_shapes(bool paint_all, Camera c) {
+
+    glUseProgram(m_phong_shader);
+
+    glUniformMatrix4fv(glGetUniformLocation(m_phong_shader, "view_matrix"), 1, GL_FALSE, &c.view_mat[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(m_phong_shader, "projection_matrix"), 1, GL_FALSE, &c.proj_mat[0][0]);
+
     // --------------- camera ------------------
     glm::vec4 pos = c.pos;
     glUniform4f(glGetUniformLocation(m_phong_shader, "camera_pos"), pos[0], pos[1], pos[2], pos[3]);
@@ -265,24 +318,8 @@ void Realtime::paint_shapes(bool paint_all, Camera c) {
             // -------------- texture -----------------
             if (p_s.shape[0].primitive.type == PrimitiveType::PRIMITIVE_MESH && i == 0)
             {
-                std::stringstream ss;
-                ss << std::setw(5) << std::setfill('0') << fire_image_num;
-
-                // fire texture
-                int wid, hei, nrComponents;
-
-                //unsigned char *data = stbi_load(("./resources/lanternTextures/Flame_BottomPNG/Flame_Bottom." + ss.str() + ".png").c_str(), &wid, &hei, &nrComponents, 0);
-                unsigned char *data = stbi_load(("./resources/paper.png"), &wid, &hei, &nrComponents, 0);
-                glBindVertexArray(m_vao);
-                glGenTextures(1, &m_shape_texture);
-                glActiveTexture(GL_TEXTURE4);
-                glBindTexture(GL_TEXTURE_2D, m_shape_texture);
-
-                //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, wid, hei, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                //std::stringstream ss;
+                //ss << std::setw(5) << std::setfill('0') << fire_image_num;
 
                 glUniform1i(glGetUniformLocation(m_phong_shader, "object_texture"), 4);
                 glUniform1f(glGetUniformLocation(m_phong_shader, "blend"), 1.0);
@@ -301,37 +338,7 @@ void Realtime::paint_shapes(bool paint_all, Camera c) {
                 if (paint_all)
                 {
                     glUniform1f(glGetUniformLocation(m_phong_shader, "moveFactor"), d_time);
-
                     // dudvMap
-                    int wid, hei, nrComponents;
-                    unsigned char *data = stbi_load("./resources/waterDUDV.png", &wid, &hei, &nrComponents, 0);
-                    glBindVertexArray(m_vao);
-                    glGenTextures(1, &m_shape_texture);
-                    glActiveTexture(GL_TEXTURE2);
-                    glBindTexture(GL_TEXTURE_2D, m_shape_texture);
-
-                    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
-                    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, wid, hei, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-
-
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-                    // nonrmalMap
-                    unsigned char *data1 = stbi_load("./resources/normalMap.png", &wid, &hei, &nrComponents, 0);
-                    //glGenVertexArrays(1, &m_vao_normal);
-                    glBindVertexArray(m_vao);
-                    glGenTextures(1, &m_normal_texture);
-                    glActiveTexture(GL_TEXTURE3);
-                    glBindTexture(GL_TEXTURE_2D, m_normal_texture);
-
-                    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
-                    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, wid, hei, 0, GL_RGB, GL_UNSIGNED_BYTE, data1);
-
-
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
 
                 }
             }

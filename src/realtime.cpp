@@ -385,6 +385,9 @@ void Realtime::sceneChanged()
     //generate phy shapes
     ini_phy_shapes();
 
+
+    init_shapes();
+
     update(); // asks for a PaintGL() call to occur
 }
 
@@ -529,6 +532,29 @@ float Realtime::rand_float(float min_float, float max_float)
 //     RenderShapeData shape;
 // };
 
+std::vector<std::vector<float>> Realtime::generate_random_vertex_data(std::vector<std::vector<float>> vbos)
+{
+    float rndx = rand_float(-10.0f, 50.0f);
+    float rndy = rand_float(-50.0f, 10.0f);
+    float rndz = rand_float(-10.0f, 50.0f);
+    std::vector<float> res;
+    for (std::vector<float>& vbo : vbos)
+    {
+        for (int i = 0; i < vbo.size() / 8; i++)
+        {
+            res.push_back(vbo[i * 8 + 0] + rndx);
+            res.push_back(vbo[i * 8 + 1] + rndy);
+            res.push_back(vbo[i * 8 + 2] + rndz);
+            res.push_back(vbo[i * 8 + 3] + rndx);
+            res.push_back(vbo[i * 8 + 4] + rndy);
+            res.push_back(vbo[i * 8 + 5] + rndz);
+            res.push_back(vbo[i * 8 + 6]);
+            res.push_back(vbo[i * 8 + 7]);
+        }
+    }
+    return std::vector<std::vector<float>> {res};
+}
+
 void Realtime::ini_phy_shapes()
 {
     phy_shapes.clear();
@@ -546,6 +572,10 @@ void Realtime::ini_phy_shapes()
         else if (s.primitive.type == PrimitiveType::PRIMITIVE_MESH)
         {
             phy_shapes.push_back(physics_shape{open_physics, false, false, 0.35f, 5.5f, glm::vec3(0.0f), glm::vec3(0.0f), rand_float(0.4f, 0.5f), generate_vertex_data(s), std::vector<RenderShapeData>{s}});
+            for (int i = 0; i < new_rand_num; i++)
+            {
+                phy_shapes.push_back(physics_shape{open_physics, false, false, 0.35f, 5.5f, glm::vec3(0.0f), glm::vec3(0.0f), rand_float(0.4f, 0.5f), generate_random_vertex_data(generate_vertex_data(s)), std::vector<RenderShapeData>{s}});
+            }
         }
         else
         {

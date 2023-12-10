@@ -75,7 +75,11 @@ private:
     void mouseMoveEvent(QMouseEvent *event) override;
     void timerEvent(QTimerEvent *event) override;
 
-    bool open_physics = true;
+
+    // control parameters
+    bool open_physics = true; // open physics for lantern
+    int skybox_index = 3; // skybox index
+    int new_rand_num = 10; // newly random added lanterns
 
     // Tick Related Variables
     int m_timer;                                        // Stores timer which attempts to run ~60 times per second
@@ -143,7 +147,7 @@ private:
 
     //lantern
     std::vector<physics_shape> phy_shapes;
-    glm::vec3 wind = glm::vec3(-0.3f, 0.0f, -0.3f);
+    glm::vec3 wind = glm::vec3(0.3f, 0.0f, 0.4f);
     void ini_phy_shapes();
     std::vector<std::vector<float>> generate_vertex_data(RenderShapeData s);
     void update_phy_shape(float dt);
@@ -174,7 +178,9 @@ private:
     int cubemap_size;
     bool loadCubeMapSide(GLuint texture, GLenum side_target, std::string file_name);
     int skybox_width, skybox_height;
-    int skybox_index = 3;
+
+
+    std::vector<std::vector<float>> generate_random_vertex_data(std::vector<std::vector<float>> shapes);
 
     std::vector<GLfloat> skyboxVertices = {
         // positions
