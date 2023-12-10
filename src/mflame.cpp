@@ -104,7 +104,7 @@ void Flame::UpdateParticles(float frametimeMills)
     glUniform1f(glGetUniformLocation(mUpdateShader, "MAX_LIFE"), MAX_LIFE);
     glUniform1f(glGetUniformLocation(mUpdateShader, "MIN_LIFE"), MIN_LIFE);
     glUniform3fv(glGetUniformLocation(mUpdateShader, "MAX_VELOC"), 1, &MAX_VELOC[0]);
-    glUniform3fv(glGetUniformLocation(mUpdateShader, "MIN_VELOC"), 1, &MAX_VELOC[0]);
+    glUniform3fv(glGetUniformLocation(mUpdateShader, "MIN_VELOC"), 1, &MIN_VELOC[0]);
 
     //绑定纹理
     glActiveTexture(GL_TEXTURE0);
@@ -175,17 +175,29 @@ void Flame::RenderParticles(glm::mat4& worldMatrix,
     glBindBuffer(GL_ARRAY_BUFFER, mParticleBuffers[mCurTransformFeedbackIndex]);
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
+    glEnableVertexAttribArray(3);
+    glEnableVertexAttribArray(4);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(FlameParticle),
                           (void*)offsetof(FlameParticle, position));
     glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(FlameParticle),
-                          (void*)offsetof(FlameParticle, size));
+                          (void*)offsetof(FlameParticle, alpha));
+    glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(FlameParticle), (void*)offsetof(FlameParticle, size));
+    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(FlameParticle), (void*)offsetof(FlameParticle, lifetimeMills));
+    glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(FlameParticle), (void*)offsetof(FlameParticle, life));
+
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, mSparkTexture.textureID);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, mStartTexture.textureID);
     glDrawTransformFeedback(GL_POINTS, mTransformFeedbacks[mCurTransformFeedbackIndex]);
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
-    glDisable(GL_BLEND);
+    glDisableVertexAttribArray(2);
+    glDisableVertexAttribArray(3);
+    glDisableVertexAttribArray(4);
+    glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glUseProgram(0);
 }

@@ -25,7 +25,7 @@ namespace Fountain{
         mRenderShader = ShaderLoader::createShaderProgram(":/resources/shaders/Render.vs", ":/resources/shaders/Render.fs");
         //ÉèÖÃËæ»úÎÆÀí
         InitRandomTexture(512);
-        mSparkTexture.loadTexture("./resources/water.bmp");
+        mSparkTexture.loadTexture("./resources/particle.bmp");
 
         glUseProgram(mRenderShader);
         // mRenderShader->use();
