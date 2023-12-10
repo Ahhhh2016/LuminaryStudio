@@ -15,17 +15,17 @@ namespace Fountain{
         mCurTransformFeedbackIndex = 1;
         mFirst = true;
         mTimer = 0;
-        const GLchar* varyings[5] = { "Type1","Position1",
-            "Velocity1","Age1","Size1"
+        const GLchar* varyings[6] = { "Type1","Position1",
+            "Velocity1","Age1","Size1", "Alpha1"
         };//设置TransformFeedback要捕获的输出变量
         mUpdateShader = ShaderLoader::createShaderProgram(":/resources/shaders/Update.vs", ":/resources/shaders/Update.fs",
-                                                          ":/resources/shaders/Update.gs", varyings, 5);
+                                                          ":/resources/shaders/Update.gs", varyings, 6);
         //设置TransformFeedback缓存能够记录的顶点的数据类型
 
         mRenderShader = ShaderLoader::createShaderProgram(":/resources/shaders/Render.vs", ":/resources/shaders/Render.fs");
         //设置随机纹理
         InitRandomTexture(512);
-        mSparkTexture.loadTexture("./resources/flame.bmp");
+        mSparkTexture.loadTexture("./resources/particle.bmp");
 
         glUseProgram(mRenderShader);
         // mRenderShader->use();
@@ -120,11 +120,13 @@ namespace Fountain{
         glEnableVertexAttribArray(2);//velocity
         glEnableVertexAttribArray(3);//lifetime
         glEnableVertexAttribArray(4);//size
+        glEnableVertexAttribArray(5);//alpha
         glVertexAttribPointer(0, 1, GL_FLOAT, GL_FALSE, sizeof(WaterParticle), (void*)offsetof(WaterParticle, type));
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(WaterParticle), (void*)offsetof(WaterParticle, position));
         glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(WaterParticle), (void*)offsetof(WaterParticle, velocity));
         glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(WaterParticle), (void*)offsetof(WaterParticle, lifetimeMills));
         glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(WaterParticle), (void*)offsetof(WaterParticle, size));
+        glVertexAttribPointer(5, 1, GL_FLOAT, GL_FALSE, sizeof(WaterParticle), (void*)offsetof(WaterParticle, alpha));
         glBeginTransformFeedback(GL_POINTS);
         if (mFirst)
         {
@@ -140,6 +142,7 @@ namespace Fountain{
         glDisableVertexAttribArray(2);
         glDisableVertexAttribArray(3);
         glDisableVertexAttribArray(4);
+        glDisableVertexAttribArray(5);
         glDisable(GL_RASTERIZER_DISCARD);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -167,16 +170,17 @@ namespace Fountain{
         glBindBuffer(GL_ARRAY_BUFFER, mParticleBuffers[mCurTransformFeedbackIndex]);
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(WaterParticle),
-            (void*)offsetof(WaterParticle, position));
-        glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(WaterParticle),
-            (void*)offsetof(WaterParticle, size));
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(WaterParticle), (void*)offsetof(WaterParticle, position));
+        glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(WaterParticle), (void*)offsetof(WaterParticle, size));
+        glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(WaterParticle), (void*)offsetof(WaterParticle, alpha));
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, mSparkTexture.textureID);
         glDrawTransformFeedback(GL_POINTS, mTransformFeedbacks[mCurTransformFeedbackIndex]);
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
+        glDisableVertexAttribArray(2);
         glDisable(GL_BLEND);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glUseProgram(0);
@@ -238,7 +242,7 @@ namespace Fountain{
             particles[x].type = PARTICLE_TYPE_LAUNCHER;
             particles[x].position = record;
             particles[x].velocity = DEL_VELOC*(float(rand()) / float(RAND_MAX)) + MIN_VELOC;//在最大最小速度之间随机选择
-            // particles[x].alpha = 1.0f;
+            particles[x].alpha = 1.0f;
             particles[x].size = INIT_SIZE;//发射器粒子大小
                 //在最短最长寿命之间随机选择
             particles[x].lifetimeMills = (MAX_LAUNCH - MIN_LAUNCH)*(float(rand()) / float(RAND_MAX)) + MIN_LAUNCH;

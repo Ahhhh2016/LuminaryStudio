@@ -21,9 +21,9 @@ namespace Fountain {
     //最大最小速度差距
     #define DEL_VELOC glm::vec3(0.0,1.0,0.0)
 		//发射粒子最大周期
-    #define MAX_LAUNCH 1.0f*1000.0f
+    #define MAX_LAUNCH 0.3f*1000.0f
 		//发射粒子最小周期
-    #define MIN_LAUNCH 0.1f*1000.0f
+    #define MIN_LAUNCH 0.05f*1000.0f
 		//初始点精灵大小
     #define INIT_SIZE 30.0f
 	#define MAX_SIZE 8.0f
@@ -45,6 +45,7 @@ namespace Fountain {
 		glm::vec3 velocity;
 		float lifetimeMills;//年龄
 		float size;//粒子点精灵大小
+        float alpha;
 	};
 
 	class Fountain

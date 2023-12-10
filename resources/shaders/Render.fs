@@ -1,6 +1,7 @@
 #version 330 
 
 in vec3 pos;
+in float alpha;
 out vec4 color;
 uniform sampler2D water;
 
@@ -10,5 +11,5 @@ void main()
     if(texColor.r < 0.3)discard;
     //color = vec4(0.89f,0.09f,0.051f,texColor.a);
     // color = vec4(1.00f,1.00f,1.00f,0.5);
-    color = vec4(0.5f,0.3,0.1, 1.0)*texColor;
+    color = vec4(0.5f,0.3,0.1,alpha)*texColor;
 }
