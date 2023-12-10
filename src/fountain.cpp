@@ -25,7 +25,7 @@ namespace Fountain{
         mRenderShader = ShaderLoader::createShaderProgram(":/resources/shaders/Render.vs", ":/resources/shaders/Render.fs");
         //设置随机纹理
         InitRandomTexture(512);
-        mSparkTexture.loadTexture("./resources/water.bmp");
+        mSparkTexture.loadTexture("./resources/flame.bmp");
 
         glUseProgram(mRenderShader);
         // mRenderShader->use();
@@ -94,10 +94,13 @@ namespace Fountain{
         glUniform1f(glGetUniformLocation(mUpdateShader, "gTime"), mTimer);
         glUniform1f(glGetUniformLocation(mUpdateShader, "MAX_SIZE"), MAX_SIZE);
         glUniform1f(glGetUniformLocation(mUpdateShader, "MIN_SIZE"), MIN_SIZE);
+        glUniform3fv(glGetUniformLocation(mUpdateShader, "MAX_VELOC"), 1, &MAX_VELOC[0]);
+        glUniform3fv(glGetUniformLocation(mUpdateShader, "MIN_VELOC"), 1, &MIN_VELOC[0]);
         glUniform1f(glGetUniformLocation(mUpdateShader, "MAX_LAUNCH"), MAX_LAUNCH);
         glUniform1f(glGetUniformLocation(mUpdateShader, "MIN_LAUNCH"), MIN_LAUNCH);
         glUniform1f(glGetUniformLocation(mUpdateShader, "angle"), ANGLE);
         glUniform1f(glGetUniformLocation(mUpdateShader, "R"), radius);
+
 
         glm::vec3 normal = glm::vec3(0.f, 1.f, 0.f);
         glUniform3fv(glGetUniformLocation(mUpdateShader, "NORMAL"), 1, &normal[0]);
@@ -223,13 +226,15 @@ namespace Fountain{
         // float radius = 0.7f;//火焰地区半径
         for (int x = 0; x < nums; x++) {
             glm::vec3 record(0.0f);
+            record.y = center.y;
             for (int y = 0; y < n; y++) {//生成高斯分布的粒子，中心多，外边少
                 record.x += (2.0f*float(rand()) / float(RAND_MAX) - 1.0f);
                 record.z += (2.0f*float(rand()) / float(RAND_MAX) - 1.0f);
+                record.y += (2.0f*float(rand()) / float(RAND_MAX) - 1.0f);
             }
             record.x *= radius;
             record.z *= radius;
-            record.y = center.y;
+            record.y *= radius;
             particles[x].type = PARTICLE_TYPE_LAUNCHER;
             particles[x].position = record;
             particles[x].velocity = DEL_VELOC*(float(rand()) / float(RAND_MAX)) + MIN_VELOC;//在最大最小速度之间随机选择

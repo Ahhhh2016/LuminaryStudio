@@ -15,15 +15,15 @@ namespace Fountain {
 	#define PARTICLE_TYPE_LAUNCHER 0.0f
 	#define PARTICLE_TYPE_SHELL 1.0f
 		//最大速度
-    #define MAX_VELOC glm::vec3(0.0,10.0,0.0)
+    #define MAX_VELOC glm::vec3(0.0,2.0,0.0)
 		//最小速度
-    #define MIN_VELOC glm::vec3(0.0,7.0,0.0)
+    #define MIN_VELOC glm::vec3(0.0,1.0,0.0)
     //最大最小速度差距
-    #define DEL_VELOC glm::vec3(0.0,3.0,0.0)
+    #define DEL_VELOC glm::vec3(0.0,1.0,0.0)
 		//发射粒子最大周期
-    #define MAX_LAUNCH 3.0f*1000.0f
+    #define MAX_LAUNCH 1.0f*1000.0f
 		//发射粒子最小周期
-    #define MIN_LAUNCH 1.0f*1000.0f
+    #define MIN_LAUNCH 0.1f*1000.0f
 		//初始点精灵大小
     #define INIT_SIZE 30.0f
 	#define MAX_SIZE 8.0f
@@ -36,7 +36,7 @@ namespace Fountain {
     const int INIT_PARTICLES = 10000;
 	//落雪中心
 	const glm::vec3 center(0.0f);
-    const float radius = 0.1f;
+    const float radius = 0.3f;
 
 	struct WaterParticle
 	{

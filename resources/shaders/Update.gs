@@ -142,7 +142,7 @@ void main()
             float DeltaTimeSecs = gDeltaTimeMillis/1000.0f;
                         //求位置的变化量，这里未考虑重力加速度
             vec3 DeltaP = Velocity0[0]*DeltaTimeSecs;
-                        vec3 DeltaV = DeltaTimeSecs*vec3(0.0,1.0,0.0);
+                        vec3 DeltaV = DeltaTimeSecs*vec3(0.0,3.0,0.0);
             Type1 = PARTICLE_TYPE_SHELL;
             Position1 = Position0[0] + DeltaP;
             Velocity1 = Velocity0[0] + DeltaV;
