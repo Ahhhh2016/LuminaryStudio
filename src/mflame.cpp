@@ -21,8 +21,8 @@ void Flame::initialize() {
         "Alpha1","Size1",
         "Life1"
     };//设置TransformFeedback要捕获的输出变量
-    mUpdateShader = ShaderLoader::createShaderProgram(":/resources/shaders/FlameUpdate.vs", ":/resources/shaders/FlameUpdate.fs",
-                                                      ":/resources/shaders/FlameUpdate.gs", varyings, 7);
+    mUpdateShader = ShaderLoader::createShaderProgram(":/resources/shaders/Update.vs", ":/resources/shaders/Update.fs",
+                                                      ":/resources/shaders/Update.gs", varyings, 7);
     //设置TransformFeedback缓存能够记录的顶点的数据类型
 
     mRenderShader = ShaderLoader::createShaderProgram(":/resources/shaders/FlameRender.vs", ":/resources/shaders/FlameRender.fs");    //设置随机纹理

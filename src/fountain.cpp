@@ -25,7 +25,7 @@ namespace Fountain{
         mRenderShader = ShaderLoader::createShaderProgram(":/resources/shaders/Render.vs", ":/resources/shaders/Render.fs");
         //设置随机纹理
         InitRandomTexture(512);
-        mSparkTexture.loadTexture("./resources/particle.bmp");
+        mSparkTexture.loadTexture("./resources/water.bmp");
 
         glUseProgram(mRenderShader);
         // mRenderShader->use();
@@ -200,21 +200,47 @@ namespace Fountain{
     }
 
     void Fountain::GenInitLocation(WaterParticle particles[], int nums) {
+//        srand(time(NULL));
+//        for (int x = 0; x < nums; x++) {
+//            glm::vec3 record(0.0f);
+//            record.x = (2.0f*float(rand()) / float(RAND_MAX) - 1.0f)*radius;
+//            record.z = (2.0f*float(rand()) / float(RAND_MAX) - 1.0f)*radius;
+//            while (sqrt(record.x*record.x + record.z*record.z)>radius) {
+//                record.x = (2.0f*float(rand()) / float(RAND_MAX) - 1.0f)*radius;
+//                record.z = (2.0f*float(rand()) / float(RAND_MAX) - 1.0f)*radius;
+//            }
+//            record.y = 0.0f;
+//            particles[x].type = PARTICLE_TYPE_LAUNCHER;
+//            particles[x].position = record;
+//            particles[x].velocity = glm::vec3(0.0f);
+//            particles[x].size = INIT_SIZE;//发射器粒子大小
+//            particles[x].lifetimeMills = (MAX_LAUNCH-MIN_LAUNCH)*(float(rand()) / float(RAND_MAX)) + MIN_LAUNCH;
+//        }
+
         srand(time(NULL));
+        int n = 10;
+        float Adj_value = 0.05f;
+        // float radius = 0.7f;//火焰地区半径
         for (int x = 0; x < nums; x++) {
             glm::vec3 record(0.0f);
-            record.x = (2.0f*float(rand()) / float(RAND_MAX) - 1.0f)*radius;
-            record.z = (2.0f*float(rand()) / float(RAND_MAX) - 1.0f)*radius;
-            while (sqrt(record.x*record.x + record.z*record.z)>radius) {
-                record.x = (2.0f*float(rand()) / float(RAND_MAX) - 1.0f)*radius;
-                record.z = (2.0f*float(rand()) / float(RAND_MAX) - 1.0f)*radius;
+            for (int y = 0; y < n; y++) {//生成高斯分布的粒子，中心多，外边少
+                record.x += (2.0f*float(rand()) / float(RAND_MAX) - 1.0f);
+                record.z += (2.0f*float(rand()) / float(RAND_MAX) - 1.0f);
             }
-            record.y = 0.0f;
+            record.x *= radius;
+            record.z *= radius;
+            record.y = center.y;
             particles[x].type = PARTICLE_TYPE_LAUNCHER;
             particles[x].position = record;
-            particles[x].velocity = glm::vec3(0.0f);
+            particles[x].velocity = DEL_VELOC*(float(rand()) / float(RAND_MAX)) + MIN_VELOC;//在最大最小速度之间随机选择
+            // particles[x].alpha = 1.0f;
             particles[x].size = INIT_SIZE;//发射器粒子大小
-            particles[x].lifetimeMills = (MAX_LAUNCH-MIN_LAUNCH)*(float(rand()) / float(RAND_MAX)) + MIN_LAUNCH;
+                //在最短最长寿命之间随机选择
+            particles[x].lifetimeMills = (MAX_LAUNCH - MIN_LAUNCH)*(float(rand()) / float(RAND_MAX)) + MIN_LAUNCH;
+            float dist = sqrt(record.x*record.x + record.z*record.z);
+            // particles[x].life = particles[x].lifetimeMills;
         }
     }
+
+
 }

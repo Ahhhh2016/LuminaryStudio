@@ -132,7 +132,7 @@ void Realtime::initializeGL() {
 
     m_floor.initialize();
      fountain.initialize();
-    // flame.initialize();
+//     flame.initialize();
 }
 
 void Realtime::paintGL() {
