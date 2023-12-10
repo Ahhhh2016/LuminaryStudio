@@ -36,8 +36,8 @@ struct physics_shape {
     glm::vec3 v;
     glm::vec3 f;
     float m;
-    std::vector<float> vertexData;
-    RenderShapeData shape;
+    std::vector<std::vector<float>> vertexData;
+    std::vector<RenderShapeData> shape;
 };
 
 class Realtime : public QOpenGLWidget
@@ -65,6 +65,7 @@ protected:
     void initializeGL() override;                       // Called once at the start of the program
     void paintGL() override;                            // Called whenever the OpenGL context changes or by an update() request
     void resizeGL(int width, int height) override;      // Called when window size changes
+    void init_shapes();
 
 private:
     void keyPressEvent(QKeyEvent *event) override;
@@ -73,6 +74,8 @@ private:
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void timerEvent(QTimerEvent *event) override;
+
+    bool open_physics = true;
 
     // Tick Related Variables
     int m_timer;                                        // Stores timer which attempts to run ~60 times per second
@@ -142,9 +145,10 @@ private:
     std::vector<physics_shape> phy_shapes;
     glm::vec3 wind = glm::vec3(-0.3f, 0.0f, -0.3f);
     void ini_phy_shapes();
-    std::vector<float> generate_vertex_data(RenderShapeData s);
+    std::vector<std::vector<float>> generate_vertex_data(RenderShapeData s);
     void update_phy_shape(float dt);
     float rand_float(float min_float, float max_float);
+    int fire_image_num = 0;
 
     // dynamic environment mapping
     Camera topCamera;
@@ -170,7 +174,7 @@ private:
     int cubemap_size;
     bool loadCubeMapSide(GLuint texture, GLenum side_target, std::string file_name);
     int skybox_width, skybox_height;
-    int skybox_index = 1;
+    int skybox_index = 3;
 
     std::vector<GLfloat> skyboxVertices = {
         // positions

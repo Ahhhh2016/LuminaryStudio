@@ -60,15 +60,18 @@ void Realtime::update_phy_shape(float dt)
             s.f = -s.b * s.v + wind + glm::vec3(0.0f, rand_float(s.lift_force - 0.5f, s.lift_force), 0.0f) + glm::vec3(0.0f, - 9.8f * s.m, 0.0f);
             s.v = (s.f * dt + s.v * s.m) / s.m;
             glm::vec3 ds = s.v * dt;
-            //printf("ds: %f, %f, %f\n", ds[0], ds[1], ds[2]);
-            for (int i = 0; i < s.vertexData.size() / 8; i++)
+            for (int j=0; j < s.shape.size(); j++)
             {
-                s.vertexData[i * 8 + 0] = s.vertexData[i * 8 + 0] + ds[0];
-                s.vertexData[i * 8 + 1] = s.vertexData[i * 8 + 1] + ds[1];
-                s.vertexData[i * 8 + 2] = s.vertexData[i * 8 + 2] + ds[2];
-                s.vertexData[i * 8 + 3] = s.vertexData[i * 8 + 3] + ds[0];
-                s.vertexData[i * 8 + 4] = s.vertexData[i * 8 + 4] + ds[1];
-                s.vertexData[i * 8 + 5] = s.vertexData[i * 8 + 5] + ds[2];
+                //printf("ds: %f, %f, %f\n", ds[0], ds[1], ds[2]);
+                for (int i = 0; i < s.vertexData[j].size() / 8; i++)
+                {
+                    s.vertexData[j][i * 8 + 0] = s.vertexData[j][i * 8 + 0] + ds[0];
+                    s.vertexData[j][i * 8 + 1] = s.vertexData[j][i * 8 + 1] + ds[1];
+                    s.vertexData[j][i * 8 + 2] = s.vertexData[j][i * 8 + 2] + ds[2];
+                    s.vertexData[j][i * 8 + 3] = s.vertexData[j][i * 8 + 3] + ds[0];
+                    s.vertexData[j][i * 8 + 4] = s.vertexData[j][i * 8 + 4] + ds[1];
+                    s.vertexData[j][i * 8 + 5] = s.vertexData[j][i * 8 + 5] + ds[2];
+                }
             }
         }
     }
@@ -87,6 +90,10 @@ void Realtime::timerEvent(QTimerEvent *event) {
     d_time += moveSpeed * deltaTime;
     if (d_time > 1.0f)
         d_time = 0.0f;
+
+    fire_image_num += 1;
+    if (fire_image_num > 234)
+        fire_image_num = 0;
 
     glm::vec4 move_dir = glm::vec4(0.0f);
 

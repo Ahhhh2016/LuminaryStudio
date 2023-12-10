@@ -192,7 +192,7 @@ void Realtime::initializeGL() {
 void Realtime::drawFboSide(Camera c)
 {
     glm::vec4 pos1 = camera.pos;
-    if (!phy_shapes.empty() && phy_shapes[5].shape.primitive.type == PrimitiveType::PRIMITIVE_SPHERE)
+    if (phy_shapes.size() > 5 && phy_shapes[5].shape[0].primitive.type == PrimitiveType::PRIMITIVE_SPHERE)
         c.initialize(SceneCameraData{   glm::vec4(0.0f, 0.1f, 0.0f, 0.0f), c.look,  c.up, 3.1f / 2.0f, 0.0f, 0.0f});//glm::vec4(pos1[0], -pos1[1], pos1[2], pos1[3]), c.look,  c.up, 3.1f / 2.0f, 0.0f, 0.0f});
     else
         c.initialize(SceneCameraData{   glm::vec4(pos1[0], -pos1[1], pos1[2], pos1[3]), c.look,  c.up, 3.1f / 2.0f, 0.0f, 0.0f});
@@ -267,11 +267,7 @@ void Realtime::paintGL() {
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
     glViewport(0, 0, m_screen_width * this->devicePixelRatio(), m_screen_height * this->devicePixelRatio());
-    // // Task 24: Bind our FBO
-    // glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-    // // Task 28: Call glViewport
-    // glViewport(0, 0, m_fbo_width, m_fbo_height);
-    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 
     glClearColor(0.5f, 0.1f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -372,8 +368,8 @@ void Realtime::sceneChanged()
     //camera.initialize(SceneCameraData{   glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), glm::vec4(0.0f, 10.0f, 0.0f, 0.0f),  glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), 3.1f / 2.0f, 0.0f, 0.0f});
 
     //update shapes
-    settings.shapeParameter1 = 20;
-    settings.shapeParameter2 = 20;
+    settings.shapeParameter1 = 10;
+    settings.shapeParameter2 = 10;
     parameter1 = settings.shapeParameter1;
     parameter2 = settings.shapeParameter2;
     use_texture = settings.use_texture;
@@ -429,14 +425,29 @@ std::vector<float> generateMeshVertexData(const std::string& filePath) {
                     vIdx[i]--; uvIdx[i]--; nIdx[i]--;  // Adjust for 0-based indexing
                 }
 
-                // Convert quad to two triangles
-                int quadToTri[6] = {0, 1, 2, 0, 2, 3}; // Indices to form two triangles from a quad
-                for (int i = 0; i < 6; ++i) {
-                    int idx = quadToTri[i];
-                    vertexData.insert(vertexData.end(), {vertices[vIdx[idx] * 3], vertices[vIdx[idx] * 3 + 1], vertices[vIdx[idx] * 3 + 2]});
-                    vertexData.insert(vertexData.end(), {normals[nIdx[idx] * 3], normals[nIdx[idx] * 3 + 1], normals[nIdx[idx] * 3 + 2]});
-                    vertexData.insert(vertexData.end(), {uvs[uvIdx[idx] * 2], uvs[uvIdx[idx] * 2 + 1]});
+                if (vIdx[3] == -1)
+                {
+                    // Convert quad to two triangles
+                    int quadToTri[3] = {0, 1, 2}; // Indices to form two triangles from a quad
+                    for (int i = 0; i < 3; ++i) {
+                        int idx = quadToTri[i];
+                        vertexData.insert(vertexData.end(), {vertices[vIdx[idx] * 3], vertices[vIdx[idx] * 3 + 1], vertices[vIdx[idx] * 3 + 2]});
+                        vertexData.insert(vertexData.end(), {normals[nIdx[idx] * 3], normals[nIdx[idx] * 3 + 1], normals[nIdx[idx] * 3 + 2]});
+                        vertexData.insert(vertexData.end(), {uvs[uvIdx[idx] * 2], uvs[uvIdx[idx] * 2 + 1]});
+                    }
                 }
+                else
+                {
+                    // Convert quad to two triangles
+                    int quadToTri[6] = {0, 1, 2, 0, 2, 3}; // Indices to form two triangles from a quad
+                    for (int i = 0; i < 6; ++i) {
+                        int idx = quadToTri[i];
+                        vertexData.insert(vertexData.end(), {vertices[vIdx[idx] * 3], vertices[vIdx[idx] * 3 + 1], vertices[vIdx[idx] * 3 + 2]});
+                        vertexData.insert(vertexData.end(), {normals[nIdx[idx] * 3], normals[nIdx[idx] * 3 + 1], normals[nIdx[idx] * 3 + 2]});
+                        vertexData.insert(vertexData.end(), {uvs[uvIdx[idx] * 2], uvs[uvIdx[idx] * 2 + 1]});
+                    }
+                }
+
             }
         }
         objFile.close();
@@ -445,47 +456,52 @@ std::vector<float> generateMeshVertexData(const std::string& filePath) {
     return vertexData;
 }
 
-std::vector<float> Realtime::generate_vertex_data(RenderShapeData s)
+std::vector<std::vector<float>> Realtime::generate_vertex_data(RenderShapeData s)
 {
-    settings.shapeParameter1 = 20;
-    settings.shapeParameter2 = 20;
-    std::vector<float> temp;
+    settings.shapeParameter1 = 10;
+    settings.shapeParameter2 = 10;
+    std::vector<std::vector<float>> temp;
     if (s.primitive.type == PrimitiveType::PRIMITIVE_CUBE)
     {
         cube.updateParams(settings.shapeParameter1, 1.0f, 1.0f);
-        temp = cube.generateShape();
+        temp.push_back(cube.generateShape());
     }
     else if (s.primitive.type == PrimitiveType::PRIMITIVE_CONE)
     {
         cone.updateParams(settings.shapeParameter1, settings.shapeParameter2, 1.0f, 1.0f);
-        temp = cone.generateShape();
+        temp.push_back(cone.generateShape());
     }
     else if (s.primitive.type == PrimitiveType::PRIMITIVE_SPHERE)
     {
         sphere.updateParams(settings.shapeParameter1, settings.shapeParameter2, 1.0f, 1.0f);
-        temp = sphere.generateShape();
+        temp.push_back(sphere.generateShape());
     }
     else if (s.primitive.type == PrimitiveType::PRIMITIVE_CYLINDER)
     {
         cylinder.updateParams(settings.shapeParameter1, settings.shapeParameter2, 1.0f, 1.0f);
-        temp = cylinder.generateShape();
+        temp.push_back(cylinder.generateShape());
     }
     else if (s.primitive.type == PrimitiveType::PRIMITIVE_MESH)
     {
-        temp = generateMeshVertexData(s.primitive.meshfile);
+        temp.push_back(generateMeshVertexData(s.primitive.meshfile + "_main"));
+        temp.push_back(generateMeshVertexData(s.primitive.meshfile + "_bottom"));
     }
 
-    for (int i = 0; i < temp.size() / 8; i++)
+    for (int j=0; j<temp.size(); j++)
     {
-        glm::vec3 world_pos = glm::vec3(s.ctm * glm::vec4(temp[i * 8], temp[i * 8 + 1], temp[i * 8 + 2], 1.0f));
-        temp[i * 8] = world_pos[0];
-        temp[i * 8 + 1] = world_pos[1];
-        temp[i * 8 + 2] = world_pos[2];
-        glm::vec3 world_normal = glm::normalize(glm::inverse(glm::transpose(glm::mat3(s.ctm))) * normalize(glm::vec3(temp[i * 8 + 3], temp[i * 8 + 4], temp[i * 8 + 5])));
-        temp[i * 8 + 3] = world_normal[0];
-        temp[i * 8 + 4] = world_normal[1];
-        temp[i * 8 + 5] = world_normal[2];
+        for (int i = 0; i < temp[j].size() / 8; i++)
+        {
+            glm::vec3 world_pos = glm::vec3(s.ctm * glm::vec4(temp[j][i * 8], temp[j][i * 8 + 1], temp[j][i * 8 + 2], 1.0f));
+            temp[j][i * 8] = world_pos[0];
+            temp[j][i * 8 + 1] = world_pos[1];
+            temp[j][i * 8 + 2] = world_pos[2];
+            glm::vec3 world_normal = glm::normalize(glm::inverse(glm::transpose(glm::mat3(s.ctm))) * normalize(glm::vec3(temp[j][i * 8 + 3], temp[j][i * 8 + 4], temp[j][i * 8 + 5])));
+            temp[j][i * 8 + 3] = world_normal[0];
+            temp[j][i * 8 + 4] = world_normal[1];
+            temp[j][i * 8 + 5] = world_normal[2];
+        }
     }
+
 
     return temp;
 }
@@ -521,19 +537,19 @@ void Realtime::ini_phy_shapes()
     {
         if (s.primitive.type == PrimitiveType::PRIMITIVE_CUBE)//(index == 5)
         {
-            phy_shapes.push_back(physics_shape{false, true, true, 0.0f, 0.0f, glm::vec3(0.0f), glm::vec3(0.0f), 0.0f, generate_vertex_data(s), s});
+            phy_shapes.push_back(physics_shape{false, true, true, 0.0f, 0.0f, glm::vec3(0.0f), glm::vec3(0.0f), 0.0f, generate_vertex_data(s), std::vector<RenderShapeData>{s}});
         }
         else if (s.primitive.type == PrimitiveType::PRIMITIVE_SPHERE) //(index == 6)
         {
-            phy_shapes.push_back(physics_shape{false, true, false, 0.0f, 0.0f, glm::vec3(0.0f), glm::vec3(0.0f), 0.0f, generate_vertex_data(s), s});
+            phy_shapes.push_back(physics_shape{false, true, false, 0.0f, 0.0f, glm::vec3(0.0f), glm::vec3(0.0f), 0.0f, generate_vertex_data(s), std::vector<RenderShapeData>{s}});
         }
         else if (s.primitive.type == PrimitiveType::PRIMITIVE_MESH)
         {
-            phy_shapes.push_back(physics_shape{true, false, false, 0.35f, 5.5f, glm::vec3(0.0f), glm::vec3(0.0f), rand_float(0.4f, 0.5f), generate_vertex_data(s), s});
+            phy_shapes.push_back(physics_shape{open_physics, false, false, 0.35f, 5.5f, glm::vec3(0.0f), glm::vec3(0.0f), rand_float(0.4f, 0.5f), generate_vertex_data(s), std::vector<RenderShapeData>{s}});
         }
         else
         {
-            phy_shapes.push_back(physics_shape{false, false, false, 0.0f, 0.0f, glm::vec3(0.0f), glm::vec3(0.0f), 0.0f, generate_vertex_data(s), s});
+            phy_shapes.push_back(physics_shape{false, false, false, 0.0f, 0.0f, glm::vec3(0.0f), glm::vec3(0.0f), 0.0f, generate_vertex_data(s), std::vector<RenderShapeData>{s}});
         }
         index++;
     }
@@ -550,8 +566,8 @@ void Realtime::settingsChanged()
 
     if (settings.shapeParameter1 != parameter1 || settings.shapeParameter2 != parameter2 || (settings.adaptive_detail != adaptive_detail && !settings.adaptive_detail))
     {
-        parameter1 = 20;
-        parameter2 = 20;
+        parameter1 = 10;
+        parameter2 = 10;
         cone.updateParams(parameter1, parameter2, 1.0f, 1.0f);
         cube.updateParams(parameter1, 1.0f, 1.0f);
         cylinder.updateParams(parameter1, parameter2, 1.0f, 1.0f);
