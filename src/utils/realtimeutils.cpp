@@ -568,3 +568,69 @@ void Realtime::makePhongFBO() {
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
+
+void Realtime::paintBlur() {
+    bool first_iteration = true;
+    // Amount of time to bounce the blur
+    int amount = 6;
+    glUseProgram(m_blur_shader);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glViewport(0, 0, m_screen_width , m_screen_height);
+    //    glEnable(GL_DEPTH_TEST | GL_CULL_FACE);
+    glClearColor(0.0, 1.0, 1.0, 1.0);
+    for (unsigned int i = 0; i < amount; i++)
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[horizontal]);
+        glViewport(0, 0, m_screen_width , m_screen_height);
+        glUniform1i(glGetUniformLocation(m_blur_shader, "horizontal"), horizontal);
+
+        // In the first bounc we want to get the data from the bloomTexture
+        if (first_iteration)
+        {
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, bloomTexture);
+            first_iteration = false;
+        }
+        // Move the data between the pingPong textures
+        else
+        {
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, pingpongTexture[!horizontal]);
+        }
+
+        // Render the image
+        glBindVertexArray(m_fullscreen_vao);
+        glDisable(GL_DEPTH_TEST);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        // Switch between vertical and horizontal blurring
+        horizontal = !horizontal;
+    }
+    glUseProgram(0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);//both 0 / m_defaultFBO work
+}
+
+void Realtime::paintPost() {
+    //    makeCurrent();
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
+    glViewport(0, 0, m_screen_width , m_screen_height);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_DEPTH_TEST | GL_CULL_FACE);
+    glClearColor(1.0, 0.0, 0.0, 1.0);
+
+    glUseProgram(m_postprocess_shader);
+    glBindVertexArray(m_fullscreen_vao);
+    glActiveTexture(GL_TEXTURE5);
+    glBindTexture(GL_TEXTURE_2D, basicTexture);
+    glActiveTexture(GL_TEXTURE6);
+    glBindTexture(GL_TEXTURE_2D, pingpongTexture[!horizontal]);
+    glDrawArrays(GL_TRIANGLES, 0, 6);// modify here
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindVertexArray(0);
+    glUseProgram(0);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0); //!!!!!!!!must be 0, if it's m_default_fbo, show nothing
+    //    doneCurrent();
+}

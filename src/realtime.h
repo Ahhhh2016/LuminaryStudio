@@ -303,6 +303,12 @@ private:
 
     //add for blurring, keep the blur result
     GLuint pingpongFBO[2], pingpongTexture[2];
+    void paintBlur();
+    bool horizontal;
     //add for store phong result
     GLuint m_phong_fbo, basicTexture, bloomTexture, m_phong_renderbuffer;
+    void paintPost();
+
+
+
 };

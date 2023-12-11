@@ -121,7 +121,7 @@ void Realtime::initializeGL() {
     m_blur_shader = ShaderLoader::createShaderProgram(":/resources/shaders/postprocess.vert", ":/resources/shaders/blur.frag");
 
     //==============project 6================
-    m_defaultFBO = 4;//2;
+    m_defaultFBO = 5;//2;
     m_screen_width = size().width() * m_devicePixelRatio;
     m_screen_height = size().height() * m_devicePixelRatio;
     m_fbo_width = m_screen_width;
@@ -232,8 +232,8 @@ void Realtime::initializeGL() {
     glUseProgram(0);
     //add texture for final postprocess
     glUseProgram(m_postprocess_shader);
-    glUniform1i(glGetUniformLocation(m_postprocess_shader, "basic_Texture"), 0); //
-    glUniform1i(glGetUniformLocation(m_postprocess_shader, "bloom_Texture"), 1); //
+    glUniform1i(glGetUniformLocation(m_postprocess_shader, "basic_Texture"), 5); //
+    glUniform1i(glGetUniformLocation(m_postprocess_shader, "bloom_Texture"), 6); //
     glUseProgram(0);
     //add postprocessing FBO and texture
     makeFullscreenVAO();
@@ -317,7 +317,8 @@ void Realtime::paintGL() {
         }
     }
 
-    glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
+//    glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_phong_fbo);
     glViewport(0, 0, m_screen_width * this->devicePixelRatio(), m_screen_height * this->devicePixelRatio());
 
     glClearColor(0.1f, 1.0f, 0.1f, 1.0f);
@@ -347,6 +348,13 @@ void Realtime::paintGL() {
     glUseProgram(0);
     glDepthFunc(GL_LESS); // set depth function back to default
     // CUBEMAP ---------------------------------------------------------
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0); //set here or before skybox shader
+
+    paintBlur();
+    paintPost();
+
+
 }
 
 void Realtime::resizeGL(int w, int h) {

@@ -98,6 +98,7 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
 
         resources/waterDUDV.png
         resources/paper3.jpg
+        resources/shaders/blur.frag
 )
 
 # GLEW: this provides support for Windows (including 64-bit)

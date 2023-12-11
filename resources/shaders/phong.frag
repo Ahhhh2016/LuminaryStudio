@@ -27,8 +27,8 @@ uniform sampler2D object_texture;
 uniform bool use_texture;
 
 // output
-out vec4 frag_color;
-
+layout(location = 0) out vec4 frag_color;
+layout(location = 1) out vec4 bloom_color;
 // global
 uniform float ka;
 uniform float kd;
@@ -180,5 +180,9 @@ void main() {
         // final color
         frag_color = mix(frag_color, reflection_color, 0.7f);
     }
-
+    float brightness = dot(frag_color.rgb, vec3(0.2126, 0.7152, 0.0722));
+    if(brightness > 0.5)
+        bloom_color = frag_color;//vec4(fragColor.rgb, 1.0);
+    else
+        bloom_color = vec4(0.0, 0.0, 0.0, 1.0);
 }
