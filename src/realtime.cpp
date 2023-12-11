@@ -568,10 +568,11 @@ void Realtime::ini_phy_shapes()
         }
         else if (s.primitive.type == PrimitiveType::PRIMITIVE_MESH)
         {
-            phy_shapes.push_back(physics_shape{open_physics, false, false, 0.35f, 5.5f, glm::vec3(0.0f), glm::vec3(0.0f), rand_float(0.4f, 0.5f), generate_vertex_data(s), std::vector<RenderShapeData>{s}});
+            //phy_shapes.push_back(physics_shape{open_physics, false, false, 0.35f, 5.5f, glm::vec3(0.0f), glm::vec3(0.0f), rand_float(0.4f, 0.5f), generate_vertex_data(s), std::vector<RenderShapeData>{s}});
             for (int i = 0; i < new_rand_num; i++)
             {
-                phy_shapes.push_back(physics_shape{open_physics, false, false, 0.35f, 5.5f, glm::vec3(0.0f), glm::vec3(0.0f), rand_float(0.4f, 0.5f), generate_random_vertex_data(generate_vertex_data(s)), std::vector<RenderShapeData>{s}});
+                auto ini_vertex_data = generate_vertex_data(s);
+                phy_shapes.push_back(physics_shape{open_physics, false, false, 0.35f, 5.5f, glm::vec3(0.0f), glm::vec3(0.0f), rand_float(0.4f, 0.5f), generate_random_vertex_data(ini_vertex_data), std::vector<RenderShapeData>{s}});
             }
         }
         else
