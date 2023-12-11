@@ -23,9 +23,9 @@
 #include "shapes/Cylinder.h"
 #include "shapes/Sphere.h"
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
+//#include <assimp/Importer.hpp>
+//#include <assimp/scene.h>
+//#include <assimp/postprocess.h>
 
 struct physics_shape {
     bool apply_physics;
