@@ -2,6 +2,9 @@
 # CS 1230 gitignore
 # ------------------------------------
 
+# Unused Resources
+unusedresources/
+
 # User Build Files
 Users*
 

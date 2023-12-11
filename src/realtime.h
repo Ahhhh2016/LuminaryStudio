@@ -23,10 +23,6 @@
 #include "shapes/Cylinder.h"
 #include "shapes/Sphere.h"
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-
 struct physics_shape {
     bool apply_physics;
     bool apply_reflection;
@@ -78,7 +74,7 @@ private:
     // control parameters
     bool open_physics = true; // open physics for lantern
     int skybox_index = 3; // skybox index
-    int new_rand_num = 30; // newly random added lanterns
+    int new_rand_num = 20; // newly random added lanterns
 
     // Tick Related Variables
     int m_timer;                                        // Stores timer which attempts to run ~60 times per second

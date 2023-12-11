@@ -516,24 +516,11 @@ float Realtime::rand_float(float min_float, float max_float)
     return dis(gen);
 }
 
-// struct physics_shape {
-//     bool apply_physics;
-//     bool apply_reflection;
-//     bool is_water;
-//     float b = 0.35;
-//     float lift_force = 5.5f;
-//     glm::vec3 v;
-//     glm::vec3 f;
-//     float m;
-//     std::vector<float> vertexData;
-//     RenderShapeData shape;
-// };
-
 std::vector<std::vector<float>> Realtime::generate_random_vertex_data(std::vector<std::vector<float>> vbos)
 {
-    float rndx = rand_float(-200.0f, 200.0f);
+    float rndx = rand_float(-150.0f, 150.0f);
     float rndy = rand_float(-100.0f, 0.0f);
-    float rndz = rand_float(-200.0f, 200.0f);
+    float rndz = rand_float(-150.0f, 150.0f);
     std::vector<float> res;
     for (std::vector<float>& vbo : vbos)
     {
