@@ -370,7 +370,7 @@ void Realtime::paint_shapes(bool paint_all, Camera c) {
 
         glm::vec3 delta(0.1f);
         m_fountain[0].Render(deltaTime,model,camera.view_mat, projection, delta);
-        m_fountain[1].changeCenter(glm::vec3(15.0f));
+//        m_fountain[1].changeCenter(glm::vec3(15.0f));
         m_fountain[1].Render(deltaTime,model,camera.view_mat, projection, delta);
 
         //    GLfloat currentFrame = glfwGetTime();
