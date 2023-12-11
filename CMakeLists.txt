@@ -96,6 +96,7 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
         resources/skybox/top.jpg
 
         resources/waterDUDV.png
+        resources/SelectedPaper/paper1.jpg
 )
 
 # GLEW: this provides support for Windows (including 64-bit)

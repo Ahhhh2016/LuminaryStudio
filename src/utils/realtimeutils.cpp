@@ -240,14 +240,18 @@ void Realtime::init_shapes()
     int wid2, hei2, nrComponents2;
 
     //unsigned char *data = stbi_load(("./resources/lanternTextures/Flame_BottomPNG/Flame_Bottom." + ss.str() + ".png").c_str(), &wid, &hei, &nrComponents, 0);
-    unsigned char *data2 = stbi_load(("./resources/paper.png"), &wid, &hei, &nrComponents, 0);
+//    unsigned char *data2 = stbi_load(("./resources/SelectedPaper/paper1.jpg"), &wid, &hei, &nrComponents, 0);
+    QString paper_filepath = QString(":/resources/SelectedPaper/paper1.jpg");
+    m_image = QImage(paper_filepath);
+    m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
     //glBindVertexArray(m_vao);
     glGenTextures(1, &m_shape_texture);
     glActiveTexture(GL_TEXTURE4);
     glBindTexture(GL_TEXTURE_2D, m_shape_texture);
 
     //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, wid, hei, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2);
+//    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, wid, hei, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
