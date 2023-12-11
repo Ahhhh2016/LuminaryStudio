@@ -2,15 +2,17 @@
 
 namespace Fountain{
 
-    Fountain::Fountain()
+Fountain::Fountain()
     {
+    printf("haha!");
     }
 
     Fountain::~Fountain()
     {
     }
 
-    void Fountain::initialize() {
+    void Fountain::initialize(glm::vec3 pos) {
+         changeCenter(pos);
         mCurVBOIndex = 0;
         mCurTransformFeedbackIndex = 1;
         mFirst = true;
@@ -233,7 +235,9 @@ namespace Fountain{
         // float radius = 0.7f;//火焰地区半径
         for (int x = 0; x < nums; x++) {
             glm::vec3 record(0.0f);
+            record.x = center.x;
             record.y = center.y;
+            record.z = center.z;
             for (int y = 0; y < n; y++) {//生成高斯分布的粒子，中心多，外边少
                 record.x += (2.0f*float(rand()) / float(RAND_MAX) - 1.0f);
                 record.z += (2.0f*float(rand()) / float(RAND_MAX) - 1.0f);
@@ -252,6 +256,17 @@ namespace Fountain{
             float dist = sqrt(record.x*record.x + record.z*record.z);
             particles[x].life = particles[x].lifetimeMills;
         }
+    }
+
+    void Fountain::changeCenter(glm::vec3 pos) {
+        center.x = pos.x;
+        center.y = pos.y;
+        center.z = pos.z;
+
+//        InitFountain();
+        WaterParticle particles[MAX_PARTICLES];
+        memset(particles, 0, sizeof(particles));
+        GenInitLocation(particles, INIT_PARTICLES);
     }
 
 

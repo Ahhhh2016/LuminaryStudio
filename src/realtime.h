@@ -41,6 +41,8 @@ struct physics_shape {
     float m;
     std::vector<std::vector<float>> vertexData;
     std::vector<RenderShapeData> shape;
+    glm::vec3 bottom_center;
+    Fountain::Fountain *flame;
 };
 
 class Realtime : public QOpenGLWidget
@@ -81,7 +83,7 @@ private:
     // control parameters
     bool open_physics = true; // open physics for lantern
     int skybox_index = 3; // skybox index
-    int new_rand_num = 8; // newly random added lanterns
+    int new_rand_num = 1; // newly random added lanterns
 
     // Tick Related Variables
     int m_timer;                                        // Stores timer which attempts to run ~60 times per second
@@ -149,6 +151,7 @@ private:
 
     //lantern
     std::vector<physics_shape> phy_shapes;
+//    std::vector<Fountain::Fountain> flames;
     glm::vec3 wind = glm::vec3(0.3f, 0.0f, 0.4f);
     void ini_phy_shapes();
     std::vector<std::vector<float>> generate_vertex_data(RenderShapeData s);
@@ -167,7 +170,7 @@ private:
     GLuint fbo_tex_cube, fbo_rb_cube, fbo_cube;
 
     Floor m_floor;
-    Fountain::Fountain fountain;
+    Fountain::Fountain m_fountain[2];
 
     // normal Map
     GLuint m_vao_normal, m_normal_texture;

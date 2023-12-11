@@ -33,12 +33,13 @@ namespace Fountain {
 	#define MIN_SIZE 3.0f
 
 	const float ANGLE = 120.0f;
-    const int MAX_PARTICLES = 18000;//定义粒子发射系统最大的粒子数
+    const int MAX_PARTICLES = 2000;//定义粒子发射系统最大的粒子数
 
 	//初始发射器例子数量
-    const int INIT_PARTICLES = 10000;
-	//落雪中心
-	const glm::vec3 center(0.0f);
+    const int INIT_PARTICLES = 1000;
+
+    //落雪中心
+//    const glm::vec3 center(0.0f);
     const float radius = 0.3f;
 
 	struct WaterParticle
@@ -54,16 +55,20 @@ namespace Fountain {
 
 	class Fountain
 	{
-	public:
-		Fountain();
+    public:
+        Fountain();
 		~Fountain();
-        void initialize();
-		void Render(float frametimeMills, glm::mat4& worldMatrix, glm::mat4 viewMatrix, glm::mat4& projectMatrix);
-	private:
+        void initialize(glm::vec3 pos);
+        void Render(float frametimeMills, glm::mat4& worldMatrix, glm::mat4& viewMatrix, glm::mat4& projectMatrix, glm::vec3 ds);
+        void changeCenter(glm::vec3 pos);
+    private:
+        // flame center
+        glm::vec3 center;
+
 		bool InitFountain();
-		void UpdateParticles(float frametimeMills);//更新粒子的位置等
+        void UpdateParticles(float frametimeMills, glm::vec3 ds);//更新粒子的位置等
 		void InitRandomTexture(unsigned int size);//生成1维随机纹理
-		void RenderParticles(glm::mat4& worldMatrix, glm::mat4& viewMatrix, glm::mat4& projectMatrix);
+        void RenderParticles(glm::mat4& worldMatrix, glm::mat4& viewMatrix, glm::mat4& projectMatrix, glm::vec3 ds);
 		void GenInitLocation(WaterParticle partciles[], int nums);//生成初始粒子
 
 		unsigned int mCurVBOIndex, mCurTransformFeedbackIndex;

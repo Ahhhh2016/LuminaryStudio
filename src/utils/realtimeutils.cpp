@@ -275,6 +275,7 @@ void Realtime::paint_shapes(bool paint_all, Camera c) {
 
     for (auto& p_s : phy_shapes)
     {
+
         for (int i=0; i < p_s.shape.size(); i++)
         {
             if (!paint_all && p_s.apply_reflection)
@@ -359,19 +360,24 @@ void Realtime::paint_shapes(bool paint_all, Camera c) {
             glDeleteVertexArrays(1, &m_vao);
 
         }
+//        printf("hhh\n");
 
         // flame
         glm::mat4 model = glm::mat4(1.0f);
 
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)m_screen_width/(float)m_screen_height,0.1f,2000.f);
-        fountain.Render(deltaTime,model,camera.view_mat,projection);
+        p_s.flame->Render(deltaTime,model,camera.view_mat, projection);
+
+        m_fountain[0].Render(deltaTime,model,camera.view_mat, projection);
+
+        m_fountain[1].changeCenter(glm::vec3(15.0f));
+        m_fountain[1].Render(deltaTime,model,camera.view_mat, projection);
 
         //    GLfloat currentFrame = glfwGetTime();
         GLfloat currentFrame = (GLfloat)clock() / CLOCKS_PER_SEC;
         //    std::cout << currentFrame << endl;
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-
     }
 
 
