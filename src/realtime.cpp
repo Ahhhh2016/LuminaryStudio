@@ -209,6 +209,8 @@ void Realtime::initializeGL() {
 
     // clipping plane
     //glEnable(GL_CLIP_DISTANCE0);
+
+    fountain.initialize();
 }
 
 void Realtime::drawFboSide(Camera c)

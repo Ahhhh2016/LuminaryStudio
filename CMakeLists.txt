@@ -57,6 +57,15 @@ add_executable(${PROJECT_NAME}
     src/cameramove.cpp
     src/utils/realtimeutils.cpp
 
+#    src/stb_image.h
+
+    src/floor.cpp
+    src/floor.h
+    src/fountain.cpp
+    src/fountain.h
+    src/texture.cpp
+    src/texture.h
+#    src/stb_image.c
     src/stb_image.h
 )
 
@@ -97,6 +106,17 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
         resources/skybox/top.jpg
 
         resources/waterDUDV.png
+
+        resources/shaders/floor.frag
+        resources/shaders/floor.vert
+        resources/shaders/Update.vs
+        resources/shaders/Update.fs
+        resources/shaders/Update.gs
+        resources/shaders/Render.vs
+        resources/shaders/Render.fs
+        resources/water.bmp
+        resources/flame.bmp
+        resources/particle.bmp
 )
 
 # GLEW: this provides support for Windows (including 64-bit)

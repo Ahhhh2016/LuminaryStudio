@@ -9,6 +9,11 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+#include "glm/gtx/transform.hpp"
+
+GLfloat deltaTime = 0.0f;
+GLfloat lastFrame = 0.0f;
+
 bool Realtime::loadCubeMapSide(GLuint texture, GLenum side_target, std::string file_name) {
     int x, y, n;
     int force_channels = 4;
@@ -354,6 +359,19 @@ void Realtime::paint_shapes(bool paint_all, Camera c) {
             glDeleteVertexArrays(1, &m_vao);
 
         }
+
+        // flame
+        glm::mat4 model = glm::mat4(1.0f);
+
+        glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)m_screen_width/(float)m_screen_height,0.1f,2000.f);
+        fountain.Render(deltaTime,model,camera.view_mat,projection);
+
+        //    GLfloat currentFrame = glfwGetTime();
+        GLfloat currentFrame = (GLfloat)clock() / CLOCKS_PER_SEC;
+        //    std::cout << currentFrame << endl;
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
     }
 
 

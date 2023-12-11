@@ -23,9 +23,12 @@
 #include "shapes/Cylinder.h"
 #include "shapes/Sphere.h"
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
+#include "floor.h"
+#include "fountain.h"
+
+//#include <assimp/Importer.hpp>
+//#include <assimp/scene.h>
+//#include <assimp/postprocess.h>
 
 struct physics_shape {
     bool apply_physics;
@@ -163,6 +166,9 @@ private:
     Camera backCamera;
     void drawFboSide(Camera c);
     GLuint fbo_tex_cube, fbo_rb_cube, fbo_cube;
+
+    Floor m_floor;
+    Fountain::Fountain fountain;
 
     // normal Map
     GLuint m_vao_normal, m_normal_texture;

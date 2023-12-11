@@ -1,0 +1,18 @@
+#version 330 core
+layout (location = 0)in vec3 position;
+layout (location = 1)in float size;
+layout (location = 2)in float Alpha;
+
+out vec3 pos;
+out float alpha;
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
+void main()
+{
+	pos = position;
+        alpha = Alpha;
+	gl_PointSize = size;
+	gl_Position = projection * view * model * vec4(position,1.0f);
+
+}
