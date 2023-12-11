@@ -531,9 +531,9 @@ float Realtime::rand_float(float min_float, float max_float)
 
 std::vector<std::vector<float>> Realtime::generate_random_vertex_data(std::vector<std::vector<float>> vbos)
 {
-    float rndx = rand_float(-10.0f, 50.0f);
-    float rndy = rand_float(-50.0f, 10.0f);
-    float rndz = rand_float(-10.0f, 50.0f);
+    float rndx = rand_float(-200.0f, 200.0f);
+    float rndy = rand_float(-100.0f, 0.0f);
+    float rndz = rand_float(-200.0f, 200.0f);
     std::vector<float> res;
     for (std::vector<float>& vbo : vbos)
     {
@@ -542,9 +542,9 @@ std::vector<std::vector<float>> Realtime::generate_random_vertex_data(std::vecto
             res.push_back(vbo[i * 8 + 0] + rndx);
             res.push_back(vbo[i * 8 + 1] + rndy);
             res.push_back(vbo[i * 8 + 2] + rndz);
-            res.push_back(vbo[i * 8 + 3] + rndx);
-            res.push_back(vbo[i * 8 + 4] + rndy);
-            res.push_back(vbo[i * 8 + 5] + rndz);
+            res.push_back(vbo[i * 8 + 3]);
+            res.push_back(vbo[i * 8 + 4]);
+            res.push_back(vbo[i * 8 + 5]);
             res.push_back(vbo[i * 8 + 6]);
             res.push_back(vbo[i * 8 + 7]);
         }

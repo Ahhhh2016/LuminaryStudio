@@ -75,11 +75,10 @@ private:
     void mouseMoveEvent(QMouseEvent *event) override;
     void timerEvent(QTimerEvent *event) override;
 
-
     // control parameters
     bool open_physics = true; // open physics for lantern
     int skybox_index = 3; // skybox index
-    int new_rand_num = 0; // newly random added lanterns
+    int new_rand_num = 8; // newly random added lanterns
 
     // Tick Related Variables
     int m_timer;                                        // Stores timer which attempts to run ~60 times per second

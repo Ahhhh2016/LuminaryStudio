@@ -178,7 +178,7 @@
             },
         {
 	  "translate": [0.0, 0, 0],
-	  "scale": [100.0, 10, 100.0],
+	  "scale": [200.0, 5, 200.0],
           "primitives": [
             {
               "type": "cube",
