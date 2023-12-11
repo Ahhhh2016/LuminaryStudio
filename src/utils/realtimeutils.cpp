@@ -481,3 +481,90 @@ void Realtime::saveViewportImage(std::string filePath) {
     glDeleteRenderbuffers(1, &rbo);
     glDeleteFramebuffers(1, &fbo);
 }
+void Realtime::makeFullscreenVAO() {
+    std::vector<GLfloat> fullscreen_quad_data =
+        { //     POSITIONS    //
+         -1.f,  1.f, 0.0f,
+         0.0f, 1.f, 0.0f,
+         -1.f, -1.f, 0.0f,
+         0.0f, 0.0f, 0.0f,
+         1.f, -1.f, 0.0f,
+         1.f, 0.f, 0.f,
+         1.f, 1.f, 0.0f,
+         1.f, 1.f, 0.0f,
+         -1.f, 1.f, 0.0f,
+         0.f, 1.f, 0.0f,
+         1.f, -1.f, 0.0f,
+         1.f, 0.f, 0.f,
+         };
+    glGenBuffers(1, &m_fullscreen_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, m_fullscreen_vbo);
+    glBufferData(GL_ARRAY_BUFFER, fullscreen_quad_data.size()*sizeof(GLfloat), fullscreen_quad_data.data(), GL_STATIC_DRAW);
+
+    glGenVertexArrays(1, &m_fullscreen_vao);
+    glBindVertexArray(m_fullscreen_vao);
+    // Task 14: modify the code below to add a second attribute to the vertex attribute array
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), nullptr);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), reinterpret_cast<void*>(3 * sizeof(GLfloat)));
+
+    // Unbind the fullscreen quad's VBO and VAO
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+}
+void Realtime::makePingpong() {
+
+    glGenFramebuffers(2, pingpongFBO);
+    glGenTextures(2, pingpongTexture);
+    for (unsigned int i = 0; i < 2; i++)
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[i]);
+        glBindTexture(GL_TEXTURE_2D, pingpongTexture[i]);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_screen_width, m_screen_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pingpongTexture[i], 0);
+
+        GLuint fboStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+        if (fboStatus != GL_FRAMEBUFFER_COMPLETE)
+            std::cout << "Ping-Pong Framebuffer error: " << fboStatus << std::endl;
+    }
+}
+// this is the fbo&texture&renderbuffer that used to keep the result of phong ,as the last step before transfer all these data to postprocess shader
+void Realtime::makePhongFBO() {
+    // Task 18: Generate and bind an FBO
+    glGenFramebuffers(1, &m_phong_fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_phong_fbo);
+
+    glGenTextures(1, &basicTexture);
+    glBindTexture(GL_TEXTURE_2D, basicTexture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_fbo_width, m_fbo_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, basicTexture, 0);
+
+
+    glGenTextures(1, &bloomTexture);
+    glBindTexture(GL_TEXTURE_2D, bloomTexture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_fbo_width, m_fbo_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, bloomTexture, 0);
+
+    GLuint attachments[2] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
+    glDrawBuffers(2, attachments);
+    // Task 20: Generate and bind a renderbuffer of the right size, set its format, then unbind
+    glGenRenderbuffers(1, &m_phong_renderbuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, m_phong_renderbuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_fbo_width, m_fbo_height);
+    glBindRenderbuffer(GL_FRAMEBUFFER, 0);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_phong_renderbuffer);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}

@@ -76,6 +76,19 @@ void Realtime::finish() {
     glDeleteBuffers(1, &skyboxVBO);
     glDeleteVertexArrays(1, &skyboxVAO);
 
+
+    //blur
+    glDeleteProgram(m_blur_shader);
+    glDeleteFramebuffers(2, pingpongFBO);
+    glDeleteTextures(2, pingpongTexture);
+
+
+    //phong result
+    glDeleteFramebuffers(1, &m_phong_fbo);
+    glDeleteTextures(1, &basicTexture);
+    glDeleteTextures(1, &bloomTexture);
+    glDeleteRenderbuffers(1, &m_phong_renderbuffer);
+
     this->doneCurrent();
 }
 
@@ -105,9 +118,10 @@ void Realtime::initializeGL() {
     glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
     m_phong_shader = ShaderLoader::createShaderProgram(":/resources/shaders/phong.vert", ":/resources/shaders/phong.frag");
     m_postprocess_shader = ShaderLoader::createShaderProgram(":/resources/shaders/postprocess.vert", ":/resources/shaders/postprocess.frag");
+    m_blur_shader = ShaderLoader::createShaderProgram(":/resources/shaders/postprocess.vert", ":/resources/shaders/blur.frag");
 
     //==============project 6================
-    m_defaultFBO = 2;
+    m_defaultFBO = 4;//2;
     m_screen_width = size().width() * m_devicePixelRatio;
     m_screen_height = size().height() * m_devicePixelRatio;
     m_fbo_width = m_screen_width;
@@ -197,7 +211,8 @@ void Realtime::initializeGL() {
     // attach buffer & tex to fbo
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, fbo_rb_cube);
     glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, fbo_tex_cube, 0);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
+    //    glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     topCamera.initialize(SceneCameraData{   glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), glm::vec4(0.0f, 1.0f, 0.0f, 0.0f),  glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), 3.1f / 2.0f, 0.0f, 0.0f});
     bottomCamera.initialize(SceneCameraData{glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), glm::vec4(0.0f, -1.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.0f, -1.0f, 0.0f), 3.1f / 2.0f, 0.0f, 0.0f});
@@ -209,6 +224,21 @@ void Realtime::initializeGL() {
 
     // clipping plane
     //glEnable(GL_CLIP_DISTANCE0);
+
+
+    // add texture for blur, screen Texture = basicTextue
+    glUseProgram(m_blur_shader);
+    glUniform1i(glGetUniformLocation(m_blur_shader, "screenTexture"), 0); //
+    glUseProgram(0);
+    //add texture for final postprocess
+    glUseProgram(m_postprocess_shader);
+    glUniform1i(glGetUniformLocation(m_postprocess_shader, "basic_Texture"), 0); //
+    glUniform1i(glGetUniformLocation(m_postprocess_shader, "bloom_Texture"), 1); //
+    glUseProgram(0);
+    //add postprocessing FBO and texture
+    makeFullscreenVAO();
+    makePhongFBO();
+    makePingpong();
 }
 
 void Realtime::drawFboSide(Camera c)

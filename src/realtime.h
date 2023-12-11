@@ -294,4 +294,15 @@ private:
             "./resources/skybox/bkg/red/bkg3_front5.png",
         }
     };
+
+    // add for postprocess
+    GLuint m_blur_shader;
+    void makeFullscreenVAO();
+    void makePhongFBO();
+    void makePingpong();
+
+    //add for blurring, keep the blur result
+    GLuint pingpongFBO[2], pingpongTexture[2];
+    //add for store phong result
+    GLuint m_phong_fbo, basicTexture, bloomTexture, m_phong_renderbuffer;
 };
