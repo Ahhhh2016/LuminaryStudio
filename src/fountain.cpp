@@ -45,6 +45,7 @@ Fountain::Fountain()
         //WaterParticle particles = new WaterParticle[MAX_PARTICLES];
         memset(particles, 0, sizeof(particles));
         GenInitLocation(particles, INIT_PARTICLES);
+
         glGenTransformFeedbacks(2, mTransformFeedbacks);
         glGenBuffers(2, mParticleBuffers);
         glGenVertexArrays(2, mParticleArrays);
@@ -70,16 +71,16 @@ Fountain::Fountain()
     }
 
     void Fountain::Render(float frametimeMills, glm::mat4& worldMatrix,
-        glm::mat4 viewMatrix, glm::mat4& projectMatrix)
+                          glm::mat4& viewMatrix, glm::mat4& projectMatrix, glm::vec3& ds)
     {
         mTimer += frametimeMills*1000.0f;
-        UpdateParticles(frametimeMills*1000.0f);
-        RenderParticles(worldMatrix, viewMatrix, projectMatrix);
+        UpdateParticles(frametimeMills*1000.0f, ds);
+        RenderParticles(worldMatrix, viewMatrix, projectMatrix, ds);
         mCurVBOIndex = mCurTransformFeedbackIndex;
         mCurTransformFeedbackIndex = (mCurTransformFeedbackIndex + 1) & 0x1;
     }
 
-    void Fountain::UpdateParticles(float frametimeMills)
+    void Fountain::UpdateParticles(float frametimeMills, glm::vec3& ds)
     {
         glUseProgram(mUpdateShader);
 //        mUpdateShader->use();
@@ -102,6 +103,9 @@ Fountain::Fountain()
         glUniform1f(glGetUniformLocation(mUpdateShader, "MIN_LAUNCH"), MIN_LAUNCH);
         glUniform1f(glGetUniformLocation(mUpdateShader, "angle"), ANGLE);
         glUniform1f(glGetUniformLocation(mUpdateShader, "R"), radius);
+
+        glUniform3fv(glGetUniformLocation(mUpdateShader, "dsUniform"), 1, &ds[0]);
+
 
 
         glm::vec3 normal = glm::vec3(0.f, 1.f, 0.f);
@@ -155,7 +159,7 @@ Fountain::Fountain()
     }
 
     void Fountain::RenderParticles(glm::mat4& worldMatrix,
-        glm::mat4& viewMatrix, glm::mat4& projectMatrix)
+        glm::mat4& viewMatrix, glm::mat4& projectMatrix, glm::vec3& ds)
     {
         glEnable(GL_POINT_SPRITE);
         glEnable(GL_PROGRAM_POINT_SIZE);
@@ -170,6 +174,9 @@ Fountain::Fountain()
         glUniformMatrix4fv(glGetUniformLocation(mRenderShader, "model"), 1, GL_FALSE, &worldMatrix[0][0]);
         glUniformMatrix4fv(glGetUniformLocation(mRenderShader, "view"), 1, GL_FALSE, &viewMatrix[0][0]);
         glUniformMatrix4fv(glGetUniformLocation(mRenderShader, "projection"), 1, GL_FALSE, &projectMatrix[0][0]);
+
+        glUniform3fv(glGetUniformLocation(mUpdateShader, "dsUniform"), 1, &ds[0]);
+
         //glBindVertexArray(mParticleArrays[mCurTransformFeedbackIndex]);
         //glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER,0,mParticleBuffers[mCurTransformFeedbackIndex]);
         glBindBuffer(GL_ARRAY_BUFFER, mParticleBuffers[mCurTransformFeedbackIndex]);
@@ -264,9 +271,9 @@ Fountain::Fountain()
         center.z = pos.z;
 
 //        InitFountain();
-        WaterParticle particles[MAX_PARTICLES];
-        memset(particles, 0, sizeof(particles));
-        GenInitLocation(particles, INIT_PARTICLES);
+//        WaterParticle particles[MAX_PARTICLES];
+//        memset(particles, 0, sizeof(particles));
+//        GenInitLocation(particles, INIT_PARTICLES);
     }
 
 

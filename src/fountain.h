@@ -59,16 +59,16 @@ namespace Fountain {
         Fountain();
 		~Fountain();
         void initialize(glm::vec3 pos);
-        void Render(float frametimeMills, glm::mat4& worldMatrix, glm::mat4& viewMatrix, glm::mat4& projectMatrix, glm::vec3 ds);
+        void Render(float frametimeMills, glm::mat4& worldMatrix, glm::mat4& viewMatrix, glm::mat4& projectMatrix, glm::vec3& ds);
         void changeCenter(glm::vec3 pos);
     private:
         // flame center
         glm::vec3 center;
 
 		bool InitFountain();
-        void UpdateParticles(float frametimeMills, glm::vec3 ds);//更新粒子的位置等
+        void UpdateParticles(float frametimeMills, glm::vec3& ds);//更新粒子的位置等
 		void InitRandomTexture(unsigned int size);//生成1维随机纹理
-        void RenderParticles(glm::mat4& worldMatrix, glm::mat4& viewMatrix, glm::mat4& projectMatrix, glm::vec3 ds);
+        void RenderParticles(glm::mat4& worldMatrix, glm::mat4& viewMatrix, glm::mat4& projectMatrix, glm::vec3& ds);
 		void GenInitLocation(WaterParticle partciles[], int nums);//生成初始粒子
 
 		unsigned int mCurVBOIndex, mCurTransformFeedbackIndex;

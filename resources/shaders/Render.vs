@@ -8,9 +8,14 @@ out float alpha;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+
+uniform vec3 dsUniform;
 void main()
 {
-	pos = position;
+
+        pos[0] = position[0] + dsUniform[0];
+        pos[1] = position[1] + dsUniform[1];
+        pos[2] = position[2] + dsUniform[2];
         alpha = Alpha;
 	gl_PointSize = size;
 	gl_Position = projection * view * model * vec4(position,1.0f);

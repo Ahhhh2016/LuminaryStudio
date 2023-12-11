@@ -366,12 +366,12 @@ void Realtime::paint_shapes(bool paint_all, Camera c) {
         glm::mat4 model = glm::mat4(1.0f);
 
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)m_screen_width/(float)m_screen_height,0.1f,2000.f);
-        p_s.flame->Render(deltaTime,model,camera.view_mat, projection);
+        // p_s.flame->Render(deltaTime,model,camera.view_mat, projection);
 
-        m_fountain[0].Render(deltaTime,model,camera.view_mat, projection);
-
+        glm::vec3 delta(0.1f);
+        m_fountain[0].Render(deltaTime,model,camera.view_mat, projection, delta);
         m_fountain[1].changeCenter(glm::vec3(15.0f));
-        m_fountain[1].Render(deltaTime,model,camera.view_mat, projection);
+        m_fountain[1].Render(deltaTime,model,camera.view_mat, projection, delta);
 
         //    GLfloat currentFrame = glfwGetTime();
         GLfloat currentFrame = (GLfloat)clock() / CLOCKS_PER_SEC;

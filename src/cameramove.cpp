@@ -9,6 +9,7 @@
 
 #include "glm/gtx/transform.hpp"
 
+
 // ================== Project 6: Action!
 
 void Realtime::keyPressEvent(QKeyEvent *event) {
@@ -76,8 +77,26 @@ void Realtime::update_phy_shape(float dt)
 
             s.bottom_center += ds;
 
+//            glm::mat4 model = glm::mat4(1.0f);
+
+//            glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)m_screen_width/(float)m_screen_height,0.1f,2000.f);
+//            // p_s.flame->Render(deltaTime,model,camera.view_mat, projection);
+
+//            m_fountain[0].Render(dt,model,camera.view_mat, projection, ds);
+
+//            // m_fountain[1].changeCenter(glm::vec3(15.0f));
+//            m_fountain[1].Render(dt,model,camera.view_mat, projection, ds);
+
+            //    GLfloat currentFrame = glfwGetTime();
+            // GLfloat currentFrame = (GLfloat)clock() / CLOCKS_PER_SEC;
+            //    std::cout << currentFrame << endl;
+            // deltaTime = currentFrame - lastFrame;
+            // lastFrame = currentFrame;
+
         }
         // s.flame.changeCenter(s.bottom_center);
+
+
     }
 }
 
