@@ -97,7 +97,7 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
         resources/skybox/top.jpg
 
         resources/waterDUDV.png
-        resources/paper3.jpg
+        resources/paper03.jpg
         resources/shaders/blur.frag
 )
 

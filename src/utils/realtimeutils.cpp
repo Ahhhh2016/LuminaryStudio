@@ -240,7 +240,7 @@ void Realtime::init_shapes()
     int wid2, hei2, nrComponents2;
 
     //unsigned char *data = stbi_load(("./resources/lanternTextures/Flame_BottomPNG/Flame_Bottom." + ss.str() + ".png").c_str(), &wid, &hei, &nrComponents, 0);
-    QString paper_filepath = QString(":/resources/paper3.jpg");
+    QString paper_filepath = QString(":/resources/paper03.jpg");
     m_image = QImage(paper_filepath);
     m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
 
@@ -562,10 +562,9 @@ void Realtime::makePhongFBO() {
     // Task 20: Generate and bind a renderbuffer of the right size, set its format, then unbind
     glGenRenderbuffers(1, &m_phong_renderbuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, m_phong_renderbuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_fbo_width, m_fbo_height);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_fbo_width, m_fbo_height);    
     glBindRenderbuffer(GL_FRAMEBUFFER, 0);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_phong_renderbuffer);
-
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -611,14 +610,11 @@ void Realtime::paintBlur() {
 }
 
 void Realtime::paintPost() {
-    //    makeCurrent();
-//    glEnable(GL_BLEND);
-//    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
     glViewport(0, 0, m_screen_width , m_screen_height);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_DEPTH_TEST | GL_CULL_FACE);
     glClearColor(0.0, 0.0, 0.0, 0.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(m_postprocess_shader);
     glBindVertexArray(m_fullscreen_vao);
@@ -631,6 +627,25 @@ void Realtime::paintPost() {
     glBindVertexArray(0);
     glUseProgram(0);
 
+
+/*
+    // CUBEMAP ---------------------------------------------------------
+    glDepthFunc(GL_LEQUAL);
+    glUseProgram(m_skybox_shader);
+    glm::mat4 view1 = glm::mat4(glm::mat3(camera.view_mat));
+    glUniformMatrix4fv(glGetUniformLocation(m_skybox_shader, "view"), 1, GL_FALSE, &view1[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(m_skybox_shader, "projection"), 1, GL_FALSE, &camera.proj_mat[0][0]);
+    glUniform1i(glGetUniformLocation(m_skybox_shader, "skybox"), 1);
+    glBindVertexArray(skyboxVAO);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+    glBindVertexArray(0);
+    glUseProgram(0);
+    glDepthFunc(GL_LESS); // set depth function back to default
+    // CUBEMAP ---------------------------------------------------------
+*/
+
     glBindFramebuffer(GL_FRAMEBUFFER, 0); //!!!!!!!!must be 0, if it's m_default_fbo, show nothing
-    //    doneCurrent();
 }
