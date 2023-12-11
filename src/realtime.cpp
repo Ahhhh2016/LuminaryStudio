@@ -232,8 +232,8 @@ void Realtime::initializeGL() {
     glUseProgram(0);
     //add texture for final postprocess
     glUseProgram(m_postprocess_shader);
-    glUniform1i(glGetUniformLocation(m_postprocess_shader, "basic_Texture"), 5); //
-    glUniform1i(glGetUniformLocation(m_postprocess_shader, "bloom_Texture"), 6); //
+    glUniform1i(glGetUniformLocation(m_postprocess_shader, "basic_Texture"), 0); //
+    glUniform1i(glGetUniformLocation(m_postprocess_shader, "bloom_Texture"), 1); //
     glUseProgram(0);
     //add postprocessing FBO and texture
     makeFullscreenVAO();

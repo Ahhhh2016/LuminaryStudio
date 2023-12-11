@@ -13,12 +13,13 @@ vec4 bloomColor;
 void main()
 {
     fragColor = texture(basic_Texture, uv_coordinate);
-    bloomColor = texture(bloom_Texture, uv_coordinate);
-    fragColor += bloomColor;
-    const float gamma = 1.8;
-    float exposure = 1.0f;
-     // tone mapping
-    vec3 result = vec3(1.0) - exp(-fragColor.rbg * exposure);
-    // also gamma correct while we're at it
-    fragColor.rbg = pow(result, vec3(1.0 / gamma));
+//    bloomColor = texture(bloom_Texture, uv_coordinate);
+//    fragColor = bloomColor;
+//    fragColor += bloomColor;
+//    const float gamma = 1.8;
+//    float exposure = 1.0f;
+//     // tone mapping
+//    vec3 result = vec3(1.0) - exp(-fragColor.rbg * exposure);
+//    // also gamma correct while we're at it
+//    fragColor.rbg = pow(result, vec3(1.0 / gamma));
 }

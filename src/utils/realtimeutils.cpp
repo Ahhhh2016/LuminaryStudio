@@ -612,8 +612,8 @@ void Realtime::paintBlur() {
 
 void Realtime::paintPost() {
     //    makeCurrent();
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//    glEnable(GL_BLEND);
+//    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
     glViewport(0, 0, m_screen_width , m_screen_height);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -622,10 +622,10 @@ void Realtime::paintPost() {
 
     glUseProgram(m_postprocess_shader);
     glBindVertexArray(m_fullscreen_vao);
-    glActiveTexture(GL_TEXTURE5);
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, basicTexture);
-    glActiveTexture(GL_TEXTURE6);
-    glBindTexture(GL_TEXTURE_2D, pingpongTexture[!horizontal]);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, bloomTexture/*pingpongTexture[!horizontal]*/);
     glDrawArrays(GL_TRIANGLES, 0, 6);// modify here
     glBindTexture(GL_TEXTURE_2D, 0);
     glBindVertexArray(0);
