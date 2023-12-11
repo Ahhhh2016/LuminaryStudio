@@ -13,8 +13,7 @@ vec4 bloomColor;
 void main()
 {
     fragColor = texture(basic_Texture, uv_coordinate);
-//    bloomColor = texture(bloom_Texture, uv_coordinate);
-//    fragColor = bloomColor;
+    bloomColor = texture(bloom_Texture, uv_coordinate);
 //    fragColor += bloomColor;
 //    const float gamma = 1.8;
 //    float exposure = 1.0f;

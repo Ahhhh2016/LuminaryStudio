@@ -618,7 +618,7 @@ void Realtime::paintPost() {
     glViewport(0, 0, m_screen_width , m_screen_height);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST | GL_CULL_FACE);
-    glClearColor(1.0, 0.0, 0.0, 1.0);
+    glClearColor(0.0, 0.0, 0.0, 0.0);
 
     glUseProgram(m_postprocess_shader);
     glBindVertexArray(m_fullscreen_vao);
