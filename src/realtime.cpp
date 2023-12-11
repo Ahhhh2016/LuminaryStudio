@@ -334,6 +334,8 @@ void Realtime::paintGL() {
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0); //set here or before skybox shader
 
+
+
     // CUBEMAP ---------------------------------------------------------
     glDepthFunc(GL_LEQUAL);
     glUseProgram(m_skybox_shader);
@@ -352,9 +354,9 @@ void Realtime::paintGL() {
     // CUBEMAP ---------------------------------------------------------
 
 
-
     paintBlur();
     paintPost();
+
 
 
 }
