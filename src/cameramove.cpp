@@ -9,6 +9,8 @@
 
 #include "glm/gtx/transform.hpp"
 
+
+
 // ================== Project 6: Action!
 
 void Realtime::keyPressEvent(QKeyEvent *event) {
@@ -73,7 +75,13 @@ void Realtime::update_phy_shape(float dt)
                     s.vertexData[j][i * 8 + 5] = s.vertexData[j][i * 8 + 5] + ds[2];
                 }
             }
+
+            s.bottom_center = ds;
+
         }
+
+
+
     }
 }
 
@@ -122,7 +130,7 @@ void Realtime::timerEvent(QTimerEvent *event) {
 
     if (move_dir != glm::vec4(0.0f))
     {
-        cameraData.pos += glm::normalize(move_dir) * deltaTime * 10.0f;
+        cameraData.pos += glm::normalize(move_dir) * deltaTime * 20.0f;
         camera.initialize(cameraData);
 
         // std::cout << camera.pos[0] << " " << camera.pos[1] << " " << camera.pos[2] << " " << camera.pos[3] << std::endl;

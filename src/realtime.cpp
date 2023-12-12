@@ -15,6 +15,7 @@
 #include <vector>
 #include <string>
 
+glm::vec3 rand_vec3;
 
 // ================== Project 5: Lights, Camera
 
@@ -102,7 +103,7 @@ void Realtime::initializeGL() {
     glViewport(0, 0, size().width() * m_devicePixelRatio, size().height() * m_devicePixelRatio);
 
     // Students: anything requiring OpenGL calls when the program starts should be done here
-    glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     m_phong_shader = ShaderLoader::createShaderProgram(":/resources/shaders/phong.vert", ":/resources/shaders/phong.frag");
     m_postprocess_shader = ShaderLoader::createShaderProgram(":/resources/shaders/postprocess.vert", ":/resources/shaders/postprocess.frag");
 
@@ -206,8 +207,42 @@ void Realtime::initializeGL() {
     frontCamera.initialize(SceneCameraData{ glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), glm::vec4(0.0f, 0.0f, -1.0f, 0.0f), glm::vec4(0.0f, -1.0f, 0.0f, 0.0f), 3.1f / 2.0f, 0.0f, 0.0f});
     backCamera.initialize(SceneCameraData{  glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), glm::vec4(0.0f, 0.0f, 1.0f, 0.0f),  glm::vec4(0.0f, -1.0f, 0.0f, 0.0f), 3.1f / 2.0f, 0.0f, 0.0f});
 
-    // clipping plane
-    //glEnable(GL_CLIP_DISTANCE0);
+
+    settings.sceneFilePath = json_path;
+
+    RenderData metaData;
+    bool success = SceneParser::parse(settings.sceneFilePath, metaData);
+    //std::cout << settings.sceneFilePath << std::endl;
+    if (!success) {
+        std::cerr << "Error loading scene: \"" << settings.sceneFilePath << "\"" << std::endl;
+    }
+    shapes = metaData.shapes;
+    lights = metaData.lights;
+    globalData = metaData.globalData;
+    cameraData = metaData.cameraData;
+    camera.initialize(cameraData);
+
+    //update shapes
+    settings.shapeParameter1 = 10;
+    settings.shapeParameter2 = 10;
+    parameter1 = settings.shapeParameter1;
+    parameter2 = settings.shapeParameter2;
+    use_texture = settings.use_texture;
+    adaptive_detail = settings.adaptive_detail;
+    cone.updateParams(parameter1, parameter2, 1.0f, 1.0f);
+    cube.updateParams(parameter1, 1.0f, 1.0f);
+    cylinder.updateParams(parameter1, parameter2, 1.0f, 1.0f);
+    sphere.updateParams(parameter1, parameter2, 1.0f, 1.0f);
+
+    settings.nearPlane = 0.1f;
+    settings.farPlane = 1000.0f;
+
+    //generate phy shapes
+    ini_phy_shapes();
+
+    init_shapes();
+
+
 }
 
 void Realtime::drawFboSide(Camera c)
@@ -218,7 +253,7 @@ void Realtime::drawFboSide(Camera c)
     else
         c.initialize(SceneCameraData{   glm::vec4(pos1[0], -pos1[1], pos1[2], pos1[3]), c.look,  c.up, 3.1f / 2.0f, 0.0f, 0.0f});
     c.update(0.1f, 1000.0f);
-    glClearColor(0.1f, 1.0f, 0.1f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glActiveTexture(GL_TEXTURE0);
@@ -289,7 +324,7 @@ void Realtime::paintGL() {
     glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
     glViewport(0, 0, m_screen_width * this->devicePixelRatio(), m_screen_height * this->devicePixelRatio());
 
-    glClearColor(0.1f, 1.0f, 0.1f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glActiveTexture(GL_TEXTURE0);
@@ -352,6 +387,7 @@ void Realtime::sceneChanged()
 {
     RenderData metaData;
     bool success = SceneParser::parse(settings.sceneFilePath, metaData);
+    //std::cout << settings.sceneFilePath << std::endl;
     if (!success) {
         std::cerr << "Error loading scene: \"" << settings.sceneFilePath << "\"" << std::endl;
     }
@@ -393,6 +429,8 @@ std::vector<float> generateMeshVertexData(const std::string& filePath) {
 
     std::vector<float> vertices, uvs, normals, vertexData;
 
+    float sum = 0;
+
     if (objFile.is_open()) {
         while (getline(objFile, line)) {
             std::stringstream ss(line);
@@ -426,6 +464,12 @@ std::vector<float> generateMeshVertexData(const std::string& filePath) {
 
                 if (vIdx[3] == -1)
                 {
+                    sum += vertices[vIdx[0] * 3];
+                    sum += vertices[vIdx[1] * 3];
+                    sum += vertices[vIdx[2] * 3];
+                    // std::cout << vertices[vIdx[0] * 3] << " 0 " <<  vertices[vIdx[0] * 3 + 1] << " " << vertices[vIdx[0] * 3 + 2] << std::endl;
+                    // std::cout << vertices[vIdx[1] * 3] << " 1 " <<  vertices[vIdx[1] * 3 + 1] << " " << vertices[vIdx[1] * 3 + 2] << std::endl;
+                    // std::cout << vertices[vIdx[2] * 3] << " 2 " <<  vertices[vIdx[2] * 3 + 1] << " " << vertices[vIdx[2] * 3 + 2] << std::endl;
                     // Convert quad to two triangles
                     int quadToTri[3] = {0, 1, 2}; // Indices to form two triangles from a quad
                     for (int i = 0; i < 3; ++i) {
@@ -452,6 +496,7 @@ std::vector<float> generateMeshVertexData(const std::string& filePath) {
         objFile.close();
     }
 
+    //std::cout << sum / 12.0f << std::endl;
     return vertexData;
 }
 
@@ -483,7 +528,7 @@ std::vector<std::vector<float>> Realtime::generate_vertex_data(RenderShapeData s
     else if (s.primitive.type == PrimitiveType::PRIMITIVE_MESH)
     {
         temp.push_back(generateMeshVertexData(s.primitive.meshfile + "_main"));
-        temp.push_back(generateMeshVertexData(s.primitive.meshfile + "_bottom"));
+        //temp.push_back(generateMeshVertexData(s.primitive.meshfile + "_bottom"));
     }
 
     for (int j=0; j<temp.size(); j++)
@@ -515,11 +560,47 @@ float Realtime::rand_float(float min_float, float max_float)
     return dis(gen);
 }
 
+// struct physics_shape {
+//     bool apply_physics;
+//     bool apply_reflection;
+//     bool is_water;
+//     float b = 0.35;
+//     float lift_force = 5.5f;
+//     glm::vec3 v;
+//     glm::vec3 f;
+//     float m;
+//     std::vector<float> vertexData;
+//     RenderShapeData shape;
+// };
+
+glm::vec3 calculate_bottom_center(std::vector<float> vbo_data, RenderShapeData s)
+{
+    // //return glm::vec3(s.ctm * glm::vec4(0.0401f, 4.0f, 0.0447f, 1.0f));
+
+    // glm::vec3 res = glm::vec3(0.0f, 0.0f, 0.0f);
+
+    // for (int i = 0; i < vbo_data.size() / 8; i++)
+    // {
+    //     res += glm::vec3(s.ctm * glm::vec4(vbo_data[i * 8], vbo_data[i * 8 + 1], vbo_data[i * 8 + 2], 1.0f));
+    // }
+
+    // res = res / float(vbo_data.size()) * 8.0f;
+    // return res;
+
+    return glm::vec3(0.0f, 0.0f, 0.0f);
+}
+
 std::vector<std::vector<float>> Realtime::generate_random_vertex_data(std::vector<std::vector<float>> vbos)
 {
-    float rndx = rand_float(-150.0f, 150.0f);
+    float rndx = rand_float(-100.0f, 100.0f);
     float rndy = rand_float(-100.0f, 0.0f);
-    float rndz = rand_float(-150.0f, 150.0f);
+    float rndz = rand_float(-100.0f, 100.0f);
+
+    rndx = 0.0f;
+    rndy = 0.0f;
+    rndz = 0.0f;
+
+    rand_vec3 = glm::vec3(rndx, rndy, rndz);
     std::vector<float> res;
     for (std::vector<float>& vbo : vbos)
     {
@@ -558,7 +639,11 @@ void Realtime::ini_phy_shapes()
             for (int i = 0; i < new_rand_num; i++)
             {
                 auto ini_vertex_data = generate_vertex_data(s);
-                phy_shapes.push_back(physics_shape{open_physics, false, false, 0.35f, 5.5f, glm::vec3(0.0f), glm::vec3(0.0f), rand_float(0.4f, 0.5f), generate_random_vertex_data(ini_vertex_data), std::vector<RenderShapeData>{s}});
+                phy_shapes.push_back(physics_shape{open_physics, false, false, 0.35f, 5.5f, glm::vec3(0.0f), glm::vec3(0.0f), rand_float(0.4f, 0.5f), generate_random_vertex_data(ini_vertex_data), std::vector<RenderShapeData>{s},
+                                                   glm::vec3(0.0f), flame_count, rand_vec3});
+
+                m_fountain[flame_count].initialize(calculate_bottom_center(generateMeshVertexData(s.primitive.meshfile + "_pipe"), s));
+                flame_count += 1;
             }
         }
         else
@@ -567,6 +652,14 @@ void Realtime::ini_phy_shapes()
         }
         index++;
     }
+
+    // for (auto &s : phy_shapes)
+    // {
+    //     if (s.shape[0].primitive.type == PrimitiveType::PRIMITIVE_MESH)
+    //     {
+
+    //     }
+    // }
 }
 
 void Realtime::settingsChanged()

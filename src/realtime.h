@@ -23,6 +23,13 @@
 #include "shapes/Cylinder.h"
 #include "shapes/Sphere.h"
 
+#include "floor.h"
+#include "fountain.h"
+
+//#include <assimp/Importer.hpp>
+//#include <assimp/scene.h>
+//#include <assimp/postprocess.h>
+
 struct physics_shape {
     bool apply_physics;
     bool apply_reflection;
@@ -34,6 +41,9 @@ struct physics_shape {
     float m;
     std::vector<std::vector<float>> vertexData;
     std::vector<RenderShapeData> shape;
+    glm::vec3 bottom_center;
+    int flame_index;
+    glm::vec3 shape_rand_vec;
 };
 
 class Realtime : public QOpenGLWidget
@@ -74,7 +84,8 @@ private:
     // control parameters
     bool open_physics = true; // open physics for lantern
     int skybox_index = 3; // skybox index
-    int new_rand_num = 10; // newly random added lanterns
+    int new_rand_num = 1; // newly random added lanterns
+    string json_path = "C:/Users/Chengfan Li/Desktop/LuminaryStudio/scenefiles/action/required/lightsTest.json";
 
     // Tick Related Variables
     int m_timer;                                        // Stores timer which attempts to run ~60 times per second
@@ -138,13 +149,17 @@ private:
     GLuint m_shape_texture;
     bool use_texture = false;
 
-    bool stop = false;
+    bool stop = true;
+
     float radius_light = 0.12f;
     glm::vec2 offset = glm::vec2(0, 0);
 
     //lantern
     std::vector<physics_shape> phy_shapes;
     glm::vec3 wind = glm::vec3(0.4f, 0.5f, 0.8f);
+
+    glm::vec3 pre_ds = glm::vec3(0.0001f, 0.0001f, 0.0001f);
+
     void ini_phy_shapes();
     std::vector<std::vector<float>> generate_vertex_data(RenderShapeData s);
     void update_phy_shape(float dt);
@@ -160,6 +175,10 @@ private:
     Camera backCamera;
     void drawFboSide(Camera c);
     GLuint fbo_tex_cube, fbo_rb_cube, fbo_cube;
+
+    Floor m_floor;
+    Fountain::Fountain m_fountain[100];
+    int flame_count = 0;
 
     // normal Map
     GLuint m_vao_normal, m_normal_texture;

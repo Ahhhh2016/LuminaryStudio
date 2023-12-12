@@ -9,6 +9,13 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+#include "glm/gtx/transform.hpp"
+
+GLfloat deltaTime = 0.0f;
+GLfloat lastFrame = 0.0f;
+GLfloat dTime = 0.0f;
+GLfloat lFrame = 0.0f;
+
 bool Realtime::loadCubeMapSide(GLuint texture, GLenum side_target, std::string file_name) {
     int x, y, n;
     int force_channels = 4;
@@ -152,6 +159,7 @@ void Realtime::paint_shapes(bool paint_all, Camera c) {
 
     for (auto& p_s : phy_shapes)
     {
+
         for (int i=0; i < p_s.shape.size(); i++)
         {
             if (!paint_all && p_s.apply_reflection)
@@ -239,8 +247,30 @@ void Realtime::paint_shapes(bool paint_all, Camera c) {
             glDeleteVertexArrays(1, &m_vao);
 
         }
+//        printf("hhh\n");
+
     }
 
+    for (auto& p_s : phy_shapes)
+    {
+        if (!(p_s.shape[0].primitive.type == PrimitiveType::PRIMITIVE_MESH))
+            continue;
+
+        for (int i=0; i < p_s.shape.size(); i++)
+        {
+            glm::vec3 delta(p_s.bottom_center / 1.72f);
+
+            glm::mat4 ctm  = glm::translate(glm::vec3(0.0f, 2.0f, 0.0f) + p_s.shape_rand_vec) * glm::scale(glm::vec3(0.5f, 0.5f, 0.5f)) * p_s.shape[0].ctm;
+
+            m_fountain[p_s.flame_index].Render(dTime, ctm, camera.view_mat, camera.proj_mat, delta);
+        }
+    }
+
+    //    GLfloat currentFrame = glfwGetTime();
+    GLfloat currentFrame = (GLfloat)clock() / CLOCKS_PER_SEC;
+    //    std::cout << currentFrame << endl;
+    dTime = currentFrame - lFrame;
+    lFrame = currentFrame;
 
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
