@@ -262,7 +262,7 @@ void Realtime::paint_shapes(bool paint_all, Camera c) {
 
             glm::mat4 ctm  = glm::translate(glm::vec3(0.0f, 2.0f, 0.0f) + p_s.shape_rand_vec) * glm::scale(glm::vec3(0.5f, 0.5f, 0.5f)) * p_s.shape[0].ctm;
 
-            m_fountain[p_s.flame_index].Render(dTime, ctm, camera.view_mat, camera.proj_mat, delta);
+            m_fountain[p_s.flame_index].Render(dTime, ctm, c.view_mat, c.proj_mat, delta);
         }
     }
 

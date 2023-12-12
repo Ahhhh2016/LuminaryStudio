@@ -252,6 +252,7 @@ void Realtime::drawFboSide(Camera c)
         c.initialize(SceneCameraData{   glm::vec4(0.0f, 0.1f, 0.0f, 0.0f), c.look,  c.up, 3.1f / 2.0f, 0.0f, 0.0f});//glm::vec4(pos1[0], -pos1[1], pos1[2], pos1[3]), c.look,  c.up, 3.1f / 2.0f, 0.0f, 0.0f});
     else
         c.initialize(SceneCameraData{   glm::vec4(pos1[0], -pos1[1], pos1[2], pos1[3]), c.look,  c.up, 3.1f / 2.0f, 0.0f, 0.0f});
+
     c.update(0.1f, 1000.0f);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

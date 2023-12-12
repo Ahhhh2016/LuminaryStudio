@@ -149,7 +149,7 @@ private:
     GLuint m_shape_texture;
     bool use_texture = false;
 
-    bool stop = true;
+    bool stop = false;
 
     float radius_light = 0.12f;
     glm::vec2 offset = glm::vec2(0, 0);
