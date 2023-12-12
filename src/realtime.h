@@ -73,8 +73,8 @@ private:
 
     // control parameters
     bool open_physics = true; // open physics for lantern
-    int skybox_index = 0; // skybox index
-    int new_rand_num = 3; // newly random added lanterns
+    int skybox_index = 3; // skybox index
+    int new_rand_num = 2; // newly random added lanterns
 
     // Tick Related Variables
     int m_timer;                                        // Stores timer which attempts to run ~60 times per second
@@ -138,7 +138,7 @@ private:
     GLuint m_shape_texture;
     bool use_texture = false;
 
-    bool stop = false;
+    bool stop = true;
 
     //lantern
     std::vector<physics_shape> phy_shapes;

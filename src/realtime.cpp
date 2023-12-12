@@ -538,6 +538,7 @@ std::vector<std::vector<float>> Realtime::generate_random_vertex_data(std::vecto
     return std::vector<std::vector<float>> {res};
 }
 
+
 void Realtime::ini_phy_shapes()
 {
     phy_shapes.clear();
@@ -557,6 +558,8 @@ void Realtime::ini_phy_shapes()
             //phy_shapes.push_back(physics_shape{open_physics, false, false, 0.35f, 5.5f, glm::vec3(0.0f), glm::vec3(0.0f), rand_float(0.4f, 0.5f), generate_vertex_data(s), std::vector<RenderShapeData>{s}});
             for (int i = 0; i < new_rand_num; i++)
             {
+                glm::mat4 temp_ctm = s.ctm * glm::translate(glm::vec3(0.0f, 16.5f, 0.0f)) * glm::scale(glm::vec3(2.0f, 0.1f, 2.0f));
+                RenderShapeData temp_cone{ScenePrimitive{PrimitiveType::PRIMITIVE_CYLINDER, s.primitive.material, ""}, temp_ctm, glm::inverse(temp_ctm)};
                 auto ini_vertex_data = generate_vertex_data(s);
                 phy_shapes.push_back(physics_shape{open_physics, false, false, 0.35f, 5.5f, glm::vec3(0.0f), glm::vec3(0.0f), rand_float(0.4f, 0.5f), generate_random_vertex_data(ini_vertex_data), std::vector<RenderShapeData>{s}});
             }
