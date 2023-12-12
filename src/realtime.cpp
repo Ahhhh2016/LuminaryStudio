@@ -386,37 +386,37 @@ void Realtime::resizeGL(int w, int h) {
 
 void Realtime::sceneChanged()
 {
-    RenderData metaData;
-    bool success = SceneParser::parse(settings.sceneFilePath, metaData);
-    //std::cout << settings.sceneFilePath << std::endl;
-    if (!success) {
-        std::cerr << "Error loading scene: \"" << settings.sceneFilePath << "\"" << std::endl;
-    }
-    shapes = metaData.shapes;
-    lights = metaData.lights;
-    globalData = metaData.globalData;
-    cameraData = metaData.cameraData;
-    camera.initialize(cameraData);
+    // RenderData metaData;
+    // bool success = SceneParser::parse(settings.sceneFilePath, metaData);
+    // //std::cout << settings.sceneFilePath << std::endl;
+    // if (!success) {
+    //     std::cerr << "Error loading scene: \"" << settings.sceneFilePath << "\"" << std::endl;
+    // }
+    // shapes = metaData.shapes;
+    // lights = metaData.lights;
+    // globalData = metaData.globalData;
+    // cameraData = metaData.cameraData;
+    // camera.initialize(cameraData);
 
-    //camera.initialize(SceneCameraData{   glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), glm::vec4(0.0f, 10.0f, 0.0f, 0.0f),  glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), 3.1f / 2.0f, 0.0f, 0.0f});
+    // //camera.initialize(SceneCameraData{   glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), glm::vec4(0.0f, 10.0f, 0.0f, 0.0f),  glm::vec4(0.0f, 0.0f, 1.0f, 0.0f), 3.1f / 2.0f, 0.0f, 0.0f});
 
-    //update shapes
-    settings.shapeParameter1 = 10;
-    settings.shapeParameter2 = 10;
-    parameter1 = settings.shapeParameter1;
-    parameter2 = settings.shapeParameter2;
-    use_texture = settings.use_texture;
-    adaptive_detail = settings.adaptive_detail;
-    cone.updateParams(parameter1, parameter2, 1.0f, 1.0f);
-    cube.updateParams(parameter1, 1.0f, 1.0f);
-    cylinder.updateParams(parameter1, parameter2, 1.0f, 1.0f);
-    sphere.updateParams(parameter1, parameter2, 1.0f, 1.0f);
+    // //update shapes
+    // settings.shapeParameter1 = 10;
+    // settings.shapeParameter2 = 10;
+    // parameter1 = settings.shapeParameter1;
+    // parameter2 = settings.shapeParameter2;
+    // use_texture = settings.use_texture;
+    // adaptive_detail = settings.adaptive_detail;
+    // cone.updateParams(parameter1, parameter2, 1.0f, 1.0f);
+    // cube.updateParams(parameter1, 1.0f, 1.0f);
+    // cylinder.updateParams(parameter1, parameter2, 1.0f, 1.0f);
+    // sphere.updateParams(parameter1, parameter2, 1.0f, 1.0f);
 
-    settings.nearPlane = 0.1f;
-    settings.farPlane = 1000.0f;
+    // settings.nearPlane = 0.1f;
+    // settings.farPlane = 1000.0f;
 
-    //generate phy shapes
-    ini_phy_shapes();
+    // //generate phy shapes
+    // ini_phy_shapes();
 
 
     init_shapes();

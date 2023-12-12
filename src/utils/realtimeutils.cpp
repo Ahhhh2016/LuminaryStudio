@@ -125,18 +125,18 @@ void Realtime::init_shapes()
     int wid2, hei2, nrComponents2;
 
     //unsigned char *data = stbi_load(("./resources/lanternTextures/Flame_BottomPNG/Flame_Bottom." + ss.str() + ".png").c_str(), &wid, &hei, &nrComponents, 0);
-    unsigned char *data2 = stbi_load(("./resources/paper.png"), &wid2, &hei2, &nrComponents2, 0);
-    // QString paper_filepath = QString(":/resources/SelectedPaper/paper3.jpg");
-    // m_image = QImage(paper_filepath);
-    // m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
+    //unsigned char *data2 = stbi_load(("./resources/paper.png"), &wid2, &hei2, &nrComponents2, 0);
+    QString paper_filepath = QString(":/resources/SelectedPaper/paper3.jpg");
+    m_image = QImage(paper_filepath);
+    m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
     //glBindVertexArray(m_vao);
     glGenTextures(1, &m_shape_texture);
     glActiveTexture(GL_TEXTURE4);
     glBindTexture(GL_TEXTURE_2D, m_shape_texture);
 
     //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, wid2, hei2, 0, GL_RGB, GL_UNSIGNED_BYTE, data2);
-    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, wid2, hei2, 0, GL_RGB, GL_UNSIGNED_BYTE, data2);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -208,9 +208,6 @@ void Realtime::paint_shapes(bool paint_all, Camera c) {
             // -------------- texture -----------------
             if (p_s.shape[0].primitive.type == PrimitiveType::PRIMITIVE_MESH)
             {
-                //std::stringstream ss;
-                //ss << std::setw(5) << std::setfill('0') << fire_image_num;
-
                 glUniform1i(glGetUniformLocation(m_phong_shader, "object_texture"), 4);
                 glUniform1f(glGetUniformLocation(m_phong_shader, "blend"), 1.0);
                 glUniform1i(glGetUniformLocation(m_phong_shader, "use_texture"), true);
