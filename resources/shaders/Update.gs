@@ -32,6 +32,8 @@ uniform float R;
 uniform vec3 NORMAL;
 uniform vec3 dsUniform;
 
+uniform float dis_factor;
+
 #define PARTICLE_TYPE_LAUNCHER 0.0f
 #define PARTICLE_TYPE_SHELL 1.0f
 
@@ -169,7 +171,7 @@ void main()
 //            float alphaCurve = lifeRatio * (1.0 - lifeRatio); // 二次方程形成的曲线
 //            Alpha1 = clamp(alphaCurve, 0.0, 1.0); // 限制alpha值在0到1之间
 
-            Size1 = 100.0*factor;
+            Size1 = dis_factor*factor;
 //            Age1 = Age;
             EmitVertex();
             EndPrimitive();

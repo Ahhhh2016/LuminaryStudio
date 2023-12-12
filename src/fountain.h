@@ -25,9 +25,9 @@ namespace Fountain {
     #define PARTICLE_TYPE_LAUNCHER 0.0f
     #define PARTICLE_TYPE_SHELL 1.0f
         //最大速度
-    #define MAX_VELOC glm::vec3(0.0,10.0,0.0)
+    #define MAX_VELOC glm::vec3(0.0,7.0,0.0)
         //最小速度
-    #define MIN_VELOC glm::vec3(0.0,7.0,0.0)
+    #define MIN_VELOC glm::vec3(0.0,4.0,0.0)
     //最大最小速度差距
     #define DEL_VELOC glm::vec3(0.0,3.0,0.0)
         //发射粒子最大周期
@@ -40,14 +40,14 @@ namespace Fountain {
     #define MIN_SIZE 1.0f
 
     const float ANGLE = 120.0f;
-    const int MAX_PARTICLES = 2000;//定义粒子发射系统最大的粒子数
+    const int MAX_PARTICLES = 10000;//定义粒子发射系统最大的粒子数
 
     //初始发射器例子数量
     const int INIT_PARTICLES = 1000;
 
     //落雪中心
 //    const glm::vec3 center(0.0f);
-    const float radius = 0.3f;
+    const float radius = 0.5f;
 
     struct WaterParticle
     {
@@ -66,7 +66,7 @@ namespace Fountain {
         Fountain();
         ~Fountain();
         void initialize(glm::vec3 pos);
-        void Render(float frametimeMills, glm::mat4& worldMatrix, glm::mat4& viewMatrix, glm::mat4& projectMatrix, glm::vec3& ds);
+        void Render(float frametimeMills, glm::mat4& worldMatrix, glm::mat4& viewMatrix, glm::mat4& projectMatrix, glm::vec3& ds, float dis_factor);
         void changeCenter(glm::vec3 pos);
     private:
         // flame center

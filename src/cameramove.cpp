@@ -73,7 +73,8 @@ void Realtime::update_phy_shape(float dt)
                     s.vertexData[j][i * 8 + 3] = s.vertexData[j][i * 8 + 3] + ds[0];
                     s.vertexData[j][i * 8 + 4] = s.vertexData[j][i * 8 + 4] + ds[1];
                     s.vertexData[j][i * 8 + 5] = s.vertexData[j][i * 8 + 5] + ds[2];
-                }
+
+                                    }
             }
 
             s.bottom_center = ds;

@@ -27,7 +27,7 @@ Fountain::Fountain()
         mRenderShader = ShaderLoader::createShaderProgram(":/resources/shaders/Render.vs", ":/resources/shaders/Render.fs");
         //ÉèÖÃËæ»úÎÆÀí
         InitRandomTexture(512);
-        mSparkTexture.loadTexture("./resources/flame.bmp");
+        mSparkTexture.loadTexture("./resources/particle.bmp");
 
         glUseProgram(mRenderShader);
         // mRenderShader->use();
@@ -71,8 +71,12 @@ Fountain::Fountain()
     }
 
     void Fountain::Render(float frametimeMills, glm::mat4& worldMatrix,
-                          glm::mat4& viewMatrix, glm::mat4& projectMatrix, glm::vec3& ds)
+                          glm::mat4& viewMatrix, glm::mat4& projectMatrix, glm::vec3& ds, float dis_factor)
     {
+        glUseProgram(mUpdateShader);
+        glUniform1f(glGetUniformLocation(mUpdateShader, "dis_factor"), dis_factor);
+        glUseProgram(0);
+
         mTimer += frametimeMills*1000.0f;
         UpdateParticles(frametimeMills*1000.0f, ds);
         RenderParticles(worldMatrix, viewMatrix, projectMatrix, ds);

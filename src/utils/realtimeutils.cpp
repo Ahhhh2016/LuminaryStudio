@@ -125,18 +125,18 @@ void Realtime::init_shapes()
     int wid2, hei2, nrComponents2;
 
     //unsigned char *data = stbi_load(("./resources/lanternTextures/Flame_BottomPNG/Flame_Bottom." + ss.str() + ".png").c_str(), &wid, &hei, &nrComponents, 0);
-//    unsigned char *data2 = stbi_load(("./resources/SelectedPaper/paper1.jpg"), &wid, &hei, &nrComponents, 0);
-    QString paper_filepath = QString(":/resources/SelectedPaper/paper3.jpg");
-    m_image = QImage(paper_filepath);
-    m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
+    unsigned char *data2 = stbi_load(("./resources/paper.png"), &wid2, &hei2, &nrComponents2, 0);
+    // QString paper_filepath = QString(":/resources/SelectedPaper/paper3.jpg");
+    // m_image = QImage(paper_filepath);
+    // m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
     //glBindVertexArray(m_vao);
     glGenTextures(1, &m_shape_texture);
     glActiveTexture(GL_TEXTURE4);
     glBindTexture(GL_TEXTURE_2D, m_shape_texture);
 
     //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
-//    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, wid, hei, 0, GL_RGBA, GL_UNSIGNED_BYTE, data2);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, wid2, hei2, 0, GL_RGB, GL_UNSIGNED_BYTE, data2);
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -206,14 +206,14 @@ void Realtime::paint_shapes(bool paint_all, Camera c) {
             glUniform1i(glGetUniformLocation(m_phong_shader, "shininess"), material.shininess);
 
             // -------------- texture -----------------
-            if (p_s.shape[0].primitive.type == PrimitiveType::PRIMITIVE_MESH && i == 0)
+            if (p_s.shape[0].primitive.type == PrimitiveType::PRIMITIVE_MESH)
             {
                 //std::stringstream ss;
                 //ss << std::setw(5) << std::setfill('0') << fire_image_num;
 
                 glUniform1i(glGetUniformLocation(m_phong_shader, "object_texture"), 4);
                 glUniform1f(glGetUniformLocation(m_phong_shader, "blend"), 1.0);
-                glUniform1i(glGetUniformLocation(m_phong_shader, "use_texture"), true);;
+                glUniform1i(glGetUniformLocation(m_phong_shader, "use_texture"), true);
                 glUniform1f(glGetUniformLocation(m_phong_shader, "radius_light"), radius_light);
                 glUniform2fv(glGetUniformLocation(m_phong_shader, "light_offset"), 1, &offset[0]);
 
@@ -258,11 +258,13 @@ void Realtime::paint_shapes(bool paint_all, Camera c) {
 
         for (int i=0; i < p_s.shape.size(); i++)
         {
-            glm::vec3 delta(p_s.bottom_center / 1.72f);
+            glm::vec3 delta(p_s.bottom_center / 1.74f);
 
-            glm::mat4 ctm  = glm::translate(glm::vec3(0.0f, 2.0f, 0.0f) + p_s.shape_rand_vec) * glm::scale(glm::vec3(0.5f, 0.5f, 0.5f)) * p_s.shape[0].ctm;
+            glm::mat4 ctm  = glm::translate(glm::vec3(0.0f, 2.3f, 0.0f) + p_s.shape_rand_vec) * glm::scale(glm::vec3(0.5f, 0.5f, 0.5f)) * p_s.shape[0].ctm;
 
-            m_fountain[p_s.flame_index].Render(dTime, ctm, c.view_mat, c.proj_mat, delta);
+            glm::vec3 sample_p = glm::vec3(p_s.vertexData[0][0], p_s.vertexData[0][1], p_s.vertexData[0][2]);
+            float dis_factor = clamp(-1.0f * glm::distance(sample_p, glm::vec3(camera.pos)) + 70.0f, 10.0f, 70.0f);
+            m_fountain[p_s.flame_index].Render(dTime, ctm, c.view_mat, c.proj_mat, delta, dis_factor);
         }
     }
 
