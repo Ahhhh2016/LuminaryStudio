@@ -43,6 +43,7 @@ struct physics_shape {
     std::vector<RenderShapeData> shape;
     glm::vec3 bottom_center;
     int flame_index;
+    glm::vec3 shape_rand_vec;
 };
 
 class Realtime : public QOpenGLWidget
@@ -83,7 +84,7 @@ private:
     // control parameters
     bool open_physics = true; // open physics for lantern
     int skybox_index = 3; // skybox index
-    int new_rand_num = 1; // newly random added lanterns
+    int new_rand_num = 5; // newly random added lanterns
 
     // Tick Related Variables
     int m_timer;                                        // Stores timer which attempts to run ~60 times per second

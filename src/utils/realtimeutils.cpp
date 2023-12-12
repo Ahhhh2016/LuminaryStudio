@@ -361,32 +361,33 @@ void Realtime::paint_shapes(bool paint_all, Camera c) {
             glDeleteBuffers(1, &m_vbo);
             glDeleteVertexArrays(1, &m_vao);
 
-            if (paint_all)
-            {
-                pre_ds = p_s.bottom_center;
-                glm::vec3 delta(p_s.bottom_center / 33.0f);
-                //m_fountain[0].Render(deltaTime,model,camera.view_mat, projection, delta);
-                //m_fountain[p_s.flame_index].changeCenter(p_s.bottom_center);
-                //m_fountain[1].Render(deltaTime,model,camera.view_mat, projection, delta);
-
-                glm::mat4 ctm  = glm::translate(glm::vec3(0.0f, 40.0f, 0.0f)) * glm::scale(glm::vec3(0.5f, 0.5f, 0.5f)) * p_s.shape[0].ctm;
-
-                m_fountain[p_s.flame_index].Render(dTime, ctm, camera.view_mat, camera.proj_mat, delta);
-
-
-                //    GLfloat currentFrame = glfwGetTime();
-                GLfloat currentFrame = (GLfloat)clock() / CLOCKS_PER_SEC;
-                //    std::cout << currentFrame << endl;
-                dTime = currentFrame - lFrame;
-                lFrame = currentFrame;
-            }
-
         }
 //        printf("hhh\n");
 
 
     }
 
+    for (auto& p_s : phy_shapes)
+    {
+        if (!(p_s.shape[0].primitive.type == PrimitiveType::PRIMITIVE_MESH))
+            continue;
+
+        for (int i=0; i < p_s.shape.size(); i++)
+        {
+            glm::vec3 delta(p_s.bottom_center / 33.0f);
+
+            glm::mat4 ctm  = glm::translate(glm::vec3(0.0f, 40.0f, 0.0f) + p_s.shape_rand_vec) * glm::scale(glm::vec3(0.5f, 0.5f, 0.5f)) * p_s.shape[0].ctm;
+
+            m_fountain[p_s.flame_index].Render(dTime, ctm, camera.view_mat, camera.proj_mat, delta);
+        }
+
+    }
+
+    //    GLfloat currentFrame = glfwGetTime();
+    GLfloat currentFrame = (GLfloat)clock() / CLOCKS_PER_SEC;
+    //    std::cout << currentFrame << endl;
+    dTime = currentFrame - lFrame;
+    lFrame = currentFrame;
 
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);

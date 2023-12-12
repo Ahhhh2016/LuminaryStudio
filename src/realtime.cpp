@@ -208,7 +208,7 @@ void Realtime::initializeGL() {
     backCamera.initialize(SceneCameraData{  glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), glm::vec4(0.0f, 0.0f, 1.0f, 0.0f),  glm::vec4(0.0f, -1.0f, 0.0f, 0.0f), 3.1f / 2.0f, 0.0f, 0.0f});
 
 
-    settings.sceneFilePath = "C:/Users/Chengfan Li/Desktop/LuminaryStudio-phy_sim/scenefiles/action/required/lightsTest.json";
+    settings.sceneFilePath = "C:/Users/Chengfan Li/Desktop/LuminaryStudio/scenefiles/action/required/lightsTest.json";
 
     RenderData metaData;
     bool success = SceneParser::parse(settings.sceneFilePath, metaData);
@@ -239,7 +239,6 @@ void Realtime::initializeGL() {
 
     //generate phy shapes
     ini_phy_shapes();
-
 
     init_shapes();
 
@@ -593,13 +592,13 @@ glm::vec3 calculate_bottom_center(std::vector<float> vbo_data, RenderShapeData s
 
 std::vector<std::vector<float>> Realtime::generate_random_vertex_data(std::vector<std::vector<float>> vbos)
 {
-    // float rndx = rand_float(-200.0f, 200.0f);
-    // float rndy = rand_float(-100.0f, 0.0f);
-    // float rndz = rand_float(-200.0f, 200.0f);
+    float rndx = rand_float(-200.0f, 200.0f);
+    float rndy = rand_float(-100.0f, 0.0f);
+    float rndz = rand_float(-200.0f, 200.0f);
 
-    float rndx = 0.0f;
-    float rndy = 0.0f;
-    float rndz = 0.0f;
+    // float rndx = 0.0f;
+    // float rndy = 0.0f;
+    // float rndz = 0.0f;
 
     rand_vec3 = glm::vec3(rndx, rndy, rndz);
 
@@ -642,7 +641,7 @@ void Realtime::ini_phy_shapes()
             {
                 auto ini_vertex_data = generate_vertex_data(s);
                 phy_shapes.push_back(physics_shape{open_physics, false, false, 0.35f, 5.5f, glm::vec3(0.0f), glm::vec3(0.0f), rand_float(0.4f, 0.5f), generate_random_vertex_data(ini_vertex_data), std::vector<RenderShapeData>{s},
-                                                   glm::vec3(0.0f), flame_count});
+                                                   glm::vec3(0.0f), flame_count, rand_vec3});
 
                 m_fountain[flame_count].initialize(calculate_bottom_center(generateMeshVertexData(s.primitive.meshfile + "_pipe"), s));
                 flame_count += 1;
