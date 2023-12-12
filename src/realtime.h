@@ -42,7 +42,7 @@ struct physics_shape {
     std::vector<std::vector<float>> vertexData;
     std::vector<RenderShapeData> shape;
     glm::vec3 bottom_center;
-    Fountain::Fountain *flame;
+    int flame_index;
 };
 
 class Realtime : public QOpenGLWidget
@@ -148,6 +148,7 @@ private:
     bool use_texture = false;
 
     bool stop = false;
+    glm::vec3 pre_ds = glm::vec3(0.0001f, 0.0001f, 0.0001f);
 
     //lantern
     std::vector<physics_shape> phy_shapes;
@@ -170,7 +171,8 @@ private:
     GLuint fbo_tex_cube, fbo_rb_cube, fbo_cube;
 
     Floor m_floor;
-    Fountain::Fountain m_fountain[2];
+    Fountain::Fountain m_fountain[30];
+    int flame_count = 0;
 
     // normal Map
     GLuint m_vao_normal, m_normal_texture;

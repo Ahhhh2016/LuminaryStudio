@@ -118,7 +118,7 @@ void main()
         if(Age <= 0 ){
             //发射第二级粒子
             Type1 = PARTICLE_TYPE_SHELL;
-            Position1 = Position0[0] + 0.01f;
+            Position1 = Position0[0] + dsUniform;
             //与初始发射器一样，在最大和最小速度之间随机
             Velocity1 = (MAX_VELOC-MIN_VELOC)*Rand(Age0[0]).x+MIN_VELOC;
                         //寿命同上
@@ -137,7 +137,7 @@ void main()
             Age = (MAX_LAUNCH-MIN_LAUNCH)*Rand(Age0[0]).z + MIN_LAUNCH;
         }
         Type1 = PARTICLE_TYPE_LAUNCHER;
-        Position1 = Position0[0] + 0.01f;
+        Position1 = Position0[0] + dsUniform;
         Velocity1 = Velocity0[0];
         Age1 = Age;
         Alpha1 = Alpha0[0];
@@ -155,7 +155,7 @@ void main()
             vec3 DeltaP = Velocity0[0] *DeltaTimeSecs;
             vec3 DeltaV = DeltaTimeSecs*vec3(0.0,3.0,0.0);
             Type1 = PARTICLE_TYPE_SHELL;
-            Position1 = Position0[0] + 0.01f + DeltaP;
+            Position1 = Position0[0] + dsUniform + DeltaP;
             Velocity1 = Velocity0[0] + DeltaV;
              Age1 = Age;
              Life1 = Life0[0];

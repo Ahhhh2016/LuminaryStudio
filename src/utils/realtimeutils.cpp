@@ -13,6 +13,8 @@
 
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
+GLfloat dTime = 0.0f;
+GLfloat lFrame = 0.0f;
 
 bool Realtime::loadCubeMapSide(GLuint texture, GLenum side_target, std::string file_name) {
     int x, y, n;
@@ -359,25 +361,30 @@ void Realtime::paint_shapes(bool paint_all, Camera c) {
             glDeleteBuffers(1, &m_vbo);
             glDeleteVertexArrays(1, &m_vao);
 
+            if (paint_all)
+            {
+                pre_ds = p_s.bottom_center;
+                glm::vec3 delta(p_s.bottom_center / 33.0f);
+                //m_fountain[0].Render(deltaTime,model,camera.view_mat, projection, delta);
+                //m_fountain[p_s.flame_index].changeCenter(p_s.bottom_center);
+                //m_fountain[1].Render(deltaTime,model,camera.view_mat, projection, delta);
+
+                glm::mat4 ctm  = glm::translate(glm::vec3(0.0f, 40.0f, 0.0f)) * glm::scale(glm::vec3(0.5f, 0.5f, 0.5f)) * p_s.shape[0].ctm;
+
+                m_fountain[p_s.flame_index].Render(dTime, ctm, camera.view_mat, camera.proj_mat, delta);
+
+
+                //    GLfloat currentFrame = glfwGetTime();
+                GLfloat currentFrame = (GLfloat)clock() / CLOCKS_PER_SEC;
+                //    std::cout << currentFrame << endl;
+                dTime = currentFrame - lFrame;
+                lFrame = currentFrame;
+            }
+
         }
 //        printf("hhh\n");
 
-        // flame
-        glm::mat4 model = glm::mat4(1.0f);
 
-        glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)m_screen_width/(float)m_screen_height,0.1f,2000.f);
-        // p_s.flame->Render(deltaTime,model,camera.view_mat, projection);
-
-        glm::vec3 delta(0.1f);
-        m_fountain[0].Render(deltaTime,model,camera.view_mat, projection, delta);
-//        m_fountain[1].changeCenter(glm::vec3(15.0f));
-        m_fountain[1].Render(deltaTime,model,camera.view_mat, projection, delta);
-
-        //    GLfloat currentFrame = glfwGetTime();
-        GLfloat currentFrame = (GLfloat)clock() / CLOCKS_PER_SEC;
-        //    std::cout << currentFrame << endl;
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
     }
 
 

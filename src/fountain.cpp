@@ -1,5 +1,6 @@
 #include "fountain.h"
 
+
 namespace Fountain{
 
 Fountain::Fountain()
@@ -12,7 +13,7 @@ Fountain::Fountain()
     }
 
     void Fountain::initialize(glm::vec3 pos) {
-         changeCenter(pos);
+        changeCenter(pos);
         mCurVBOIndex = 0;
         mCurTransformFeedbackIndex = 1;
         mFirst = true;
@@ -27,12 +28,12 @@ Fountain::Fountain()
         mRenderShader = ShaderLoader::createShaderProgram(":/resources/shaders/Render.vs", ":/resources/shaders/Render.fs");
         //设置随机纹理
         InitRandomTexture(512);
-        mSparkTexture.loadTexture("./resources/particle.bmp");
+        mSparkTexture.loadTexture("./resources/flame.bmp");
 
         glUseProgram(mRenderShader);
         // mRenderShader->use();
         // mRenderShader->sextInt("water", 0);
-        glUniform1i(glGetUniformLocation(mRenderShader, "water"), 0);
+        glUniform1i(glGetUniformLocation(mRenderShader, "water"), 8);
 
         InitFountain();
 
@@ -64,7 +65,7 @@ Fountain::Fountain()
         glUseProgram(mUpdateShader);
         glBindTexture(GL_TEXTURE_1D, mRandomTexture);
 //        mUpdateShader->setInt("gRandomTexture", 0);
-        glUniform1i(glGetUniformLocation(mUpdateShader, "gRandomTexture"), 0);
+        glUniform1i(glGetUniformLocation(mUpdateShader, "gRandomTexture"), 8);
         //delete[] particles;
         glUseProgram(0);
         return true;
@@ -107,13 +108,11 @@ Fountain::Fountain()
         glUniform3fv(glGetUniformLocation(mUpdateShader, "dsUniform"), 1, &ds[0]);
 
 
-
         glm::vec3 normal = glm::vec3(0.f, 1.f, 0.f);
         glUniform3fv(glGetUniformLocation(mUpdateShader, "NORMAL"), 1, &normal[0]);
 
-
         //绑定纹理
-        glActiveTexture(GL_TEXTURE0);
+        glActiveTexture(GL_TEXTURE8);
         glBindTexture(GL_TEXTURE_1D, mRandomTexture);
 
         glEnable(GL_RASTERIZER_DISCARD);//我们渲染到TransformFeedback缓存中去，并不需要光栅化
@@ -153,7 +152,7 @@ Fountain::Fountain()
         glDisableVertexAttribArray(5);
         glDisableVertexAttribArray(6);
         glDisable(GL_RASTERIZER_DISCARD);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        //glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         glUseProgram(0);
     }
@@ -187,7 +186,7 @@ Fountain::Fountain()
         glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(WaterParticle), (void*)offsetof(WaterParticle, size));
         glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(WaterParticle), (void*)offsetof(WaterParticle, alpha));
 
-        glActiveTexture(GL_TEXTURE0);
+        glActiveTexture(GL_TEXTURE8);
         glBindTexture(GL_TEXTURE_2D, mSparkTexture.textureID);
         glDrawTransformFeedback(GL_POINTS, mTransformFeedbacks[mCurTransformFeedbackIndex]);
         glDisableVertexAttribArray(0);
