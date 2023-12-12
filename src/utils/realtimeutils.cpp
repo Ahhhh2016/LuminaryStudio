@@ -327,7 +327,7 @@ void Realtime::paint_shapes(bool paint_all, Camera c) {
 
                 glUniform1i(glGetUniformLocation(m_phong_shader, "object_texture"), 4);
                 glUniform1f(glGetUniformLocation(m_phong_shader, "blend"), 1.0);
-                glUniform1i(glGetUniformLocation(m_phong_shader, "use_texture"), true);;
+                glUniform1i(glGetUniformLocation(m_phong_shader, "use_texture"), true);
                 glUniform1f(glGetUniformLocation(m_phong_shader, "radius_light"), radius_light);
                 glUniform2fv(glGetUniformLocation(m_phong_shader, "light_offset"), 1, &offset[0]);
 

@@ -115,17 +115,15 @@ void main() {
             //vec2 tex_offset = 1.0 / textureSize(screenTexture, 0);
             vec4 color = texture(object_texture, texture_uv_coordinate);
 
-//            vec2 center[3] = vec2[3](vec2(0.2, 0.1), vec2(0.5, 0.1), vec2(0.9, 0.1));
-            vec2 center[4] = vec2[4](vec2(0.5, 0.1), vec2(0.8, 0.1), vec2(0.4, 0.15), vec2(0.6, 0.1));
-            // make sure: vec2(0.2, 0.1) vec2(0.5, 0.15)
-            //vec2(0.6, 0.1)
-            for(int j = 0; j < 4; j++) {
-                if(j % 2 == 1) center[j] += light_offset;
-                else center[j] -= light_offset;
-                float dis = distance(center[j], texture_uv_coordinate);
-                if(dis > radius_light) continue;
+//            vec2 center[4] = vec2[4](vec2(0.5, 0.1), vec2(0.8, 0.1), vec2(0.4, 0.15), vec2(0.6, 0.1));
+            vec2 center[3] = vec2[3](vec2(0.5, 0.1), /*vec2(0.8, 0.1),*/ vec2(0.4, 0.15), vec2(0.6, 0.1));
+            int rand = int(light_offset.x * 100) % 3;
+//            for(int j = 0; j < 3; j++) {
+            center[rand] += light_offset;
+            float dis = distance(center[rand], texture_uv_coordinate);
+            if(dis < radius_light)
                 color += (radius_light - dis) / radius_light * 1.5;
-            }
+//            }
             diffuse = (1.0f - blend) * diffuse + blend * color;
         }
 

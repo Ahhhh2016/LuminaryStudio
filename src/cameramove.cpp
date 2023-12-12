@@ -94,8 +94,7 @@ void Realtime::timerEvent(QTimerEvent *event) {
         if(radius_light >= 0.12) radius_light = 0.09;
         else radius_light = 0.12;
     }
-    offset = glm::vec2(rand_float(0.0, 0.03), rand_float(0.0, 0.02));
-
+    offset = glm::vec2(rand_float(-0.03, 0.03), rand_float(-0.02, 0.02));
 
     if (d_time > 1.0f)
         d_time = 0.0f;
