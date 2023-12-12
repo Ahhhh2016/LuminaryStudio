@@ -241,7 +241,7 @@ void Realtime::init_shapes()
 
     //unsigned char *data = stbi_load(("./resources/lanternTextures/Flame_BottomPNG/Flame_Bottom." + ss.str() + ".png").c_str(), &wid, &hei, &nrComponents, 0);
 //    unsigned char *data2 = stbi_load(("./resources/SelectedPaper/paper1.jpg"), &wid, &hei, &nrComponents, 0);
-    QString paper_filepath = QString(":/resources/SelectedPaper/paper1.jpg");
+    QString paper_filepath = QString(":/resources/SelectedPaper/paper3.jpg");
     m_image = QImage(paper_filepath);
     m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
     //glBindVertexArray(m_vao);
@@ -327,7 +327,10 @@ void Realtime::paint_shapes(bool paint_all, Camera c) {
 
                 glUniform1i(glGetUniformLocation(m_phong_shader, "object_texture"), 4);
                 glUniform1f(glGetUniformLocation(m_phong_shader, "blend"), 1.0);
-                glUniform1i(glGetUniformLocation(m_phong_shader, "use_texture"), true);
+                glUniform1i(glGetUniformLocation(m_phong_shader, "use_texture"), true);;
+                glUniform1f(glGetUniformLocation(m_phong_shader, "radius_light"), radius_light);
+                glUniform2fv(glGetUniformLocation(m_phong_shader, "light_offset"), 1, &offset[0]);
+
             }
             else
             {

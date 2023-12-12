@@ -139,6 +139,8 @@ private:
     bool use_texture = false;
 
     bool stop = false;
+    float radius_light = 0.12f;
+    glm::vec2 offset = glm::vec2(0, 0);
 
     //lantern
     std::vector<physics_shape> phy_shapes;

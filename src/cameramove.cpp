@@ -88,6 +88,15 @@ void Realtime::timerEvent(QTimerEvent *event) {
 
     float moveSpeed = 0.03f;
     d_time += moveSpeed * deltaTime;
+
+
+    if (d_time > 1.0f) {
+        if(radius_light >= 0.12) radius_light = 0.09;
+        else radius_light = 0.12;
+    }
+    offset = glm::vec2(rand_float(0.0, 0.03), rand_float(0.0, 0.02));
+
+
     if (d_time > 1.0f)
         d_time = 0.0f;
 
@@ -118,6 +127,8 @@ void Realtime::timerEvent(QTimerEvent *event) {
 
         // std::cout << camera.pos[0] << " " << camera.pos[1] << " " << camera.pos[2] << " " << camera.pos[3] << std::endl;
     }
+
+
 
     update(); // asks for a PaintGL() call to occur
 }
