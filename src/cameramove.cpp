@@ -145,7 +145,7 @@ void Realtime::timerEvent(QTimerEvent *event) {
 
     if (move_dir != glm::vec4(0.0f))
     {
-        cameraData.pos += glm::normalize(move_dir) * deltaTime * 20.0f;
+        cameraData.pos += glm::normalize(move_dir) * deltaTime * 5.0f;
         camera.initialize(cameraData);
 
         std::cout << "Camera pos" << camera.pos[0] << " " << camera.pos[1] << " " << camera.pos[2] << " " << camera.pos[3] << std::endl;
@@ -154,13 +154,20 @@ void Realtime::timerEvent(QTimerEvent *event) {
     }
 
     if (m_keyMap[Qt::Key_U])
-        show_lantern = !show_lantern;
+        show_cube = true;
     if (m_keyMap[Qt::Key_I])
-        show_texture = !show_texture;
+    {
+        show_dudv = true;
+        init_shapes();
+    }
     if (m_keyMap[Qt::Key_O])
-        stop = !stop;
+        stop = false;
     if (m_keyMap[Qt::Key_P])
-        show_skybox = !show_skybox;
+    {
+        show_normal = true;
+        init_shapes();
+    }
+
 
 
 

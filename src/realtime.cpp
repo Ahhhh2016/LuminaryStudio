@@ -249,7 +249,7 @@ void Realtime::initializeGL() {
 void Realtime::drawFboSide(Camera c)
 {
     glm::vec4 pos1 = camera.pos;
-    if (phy_shapes.size() > 5 && phy_shapes[5].shape[0].primitive.type == PrimitiveType::PRIMITIVE_SPHERE)
+    if (!show_cube)
         c.initialize(SceneCameraData{   glm::vec4(0.0f, 0.1f, 0.0f, 0.0f), c.look,  c.up, 3.1f / 2.0f, 0.0f, 0.0f});//glm::vec4(pos1[0], -pos1[1], pos1[2], pos1[3]), c.look,  c.up, 3.1f / 2.0f, 0.0f, 0.0f});
     else
         c.initialize(SceneCameraData{   glm::vec4(pos1[0], -pos1[1], pos1[2], pos1[3]), c.look,  c.up, 3.1f / 2.0f, 0.0f, 0.0f});
@@ -608,9 +608,9 @@ glm::vec3 calculate_bottom_center(std::vector<float> vbo_data, RenderShapeData s
 
 std::vector<std::vector<float>> Realtime::generate_random_vertex_data(std::vector<std::vector<float>> vbos)
 {
-    float rndx = rand_float(-100.0f, 100.0f);
-    float rndy = rand_float(-100.0f, 0.0f);
-    float rndz = rand_float(-100.0f, 100.0f);
+    float rndx = rand_float(-40.0f, 40.0f);
+    float rndy = rand_float(-40.0f, -20.0f);
+    float rndz = rand_float(-40.0f, 40.0f);
 
     // rndx = -4.0f;
     // rndy = -8.0f;

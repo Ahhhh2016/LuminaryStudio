@@ -92,7 +92,27 @@
                   "shininess": 30.0
                 }
               ]
+            },
+{
+	  "translate": [0, 0, 0],
+	  "scale": [20, 20, 20],
+          "primitives": [
+            {
+              "type": "sphere",
+              "diffuse": [0.1, 0.4, 0.8]
             }
+          ]
+        },
+{
+	  "translate": [0.0, 0, 0],
+	  "scale": [100.0, 1, 100.0],
+          "primitives": [
+            {
+              "type": "cube",
+              "diffuse": [0.1, 0.4, 0.8]
+            }
+          ]
+        }
       ]
     }
   ]

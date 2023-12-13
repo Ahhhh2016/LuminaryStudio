@@ -169,7 +169,7 @@ void main() {
         vec3 specularHighlights = lightColour * m_specular * reflectivity;
 
         // final color
-        frag_color = mix(reflection_color, refraction_color, clamp(refractiveFactor, 0.6f, 1.0f));
+        frag_color = mix(reflection_color, refraction_color, refractiveFactor);//clamp(refractiveFactor, 0.6f, 1.0f));
         frag_color = mix(frag_color, vec4(0.0f, 0.3f, 0.5f, 1.0f), 0.2) + vec4(specularHighlights * 1.2f, 0.0f);
     }
     else if (apply_reflection)

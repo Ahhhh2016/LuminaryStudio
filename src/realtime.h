@@ -87,10 +87,14 @@ private:
     bool show_fly = false;
     bool show_skybox = true;
 
+    bool show_cube = false;
+    bool show_dudv = false;
+    bool show_normal = false;
+
     // control parameters
     bool open_physics = true; // open physics for lantern
     int skybox_index = 3; // skybox index
-    int new_rand_num = 50; // newly random added lanterns
+    int new_rand_num = 10; // newly random added lanterns
     string json_path = "C:/Users/Chengfan Li/Desktop/LuminaryStudio/scenefiles/action/required/video_fire.json";
 
 
@@ -166,7 +170,7 @@ private:
 
     //lantern
     std::vector<physics_shape> phy_shapes;
-    glm::vec3 wind = glm::vec3(0.4f, 0.5f, 0.8f);
+    glm::vec3 wind = glm::vec3(0.3f, 0.0f, 0.5f);
 
     glm::vec3 pre_ds = glm::vec3(0.0001f, 0.0001f, 0.0001f);
 
