@@ -81,11 +81,17 @@ private:
     void mouseMoveEvent(QMouseEvent *event) override;
     void timerEvent(QTimerEvent *event) override;
 
+    // for video
+    bool show_lantern = true;
+    bool show_texture = true;
+    bool show_fly = false;
+    bool show_skybox = true;
+
     // control parameters
     bool open_physics = true; // open physics for lantern
     int skybox_index = 3; // skybox index
-    int new_rand_num = 20; // newly random added lanterns
-    string json_path = "C:/Users/Chengfan Li/Desktop/LuminaryStudio/scenefiles/action/required/lantern_water.json";
+    int new_rand_num = 50; // newly random added lanterns
+    string json_path = "C:/Users/Chengfan Li/Desktop/LuminaryStudio/scenefiles/action/required/video_fire.json";
 
 
     // fix bug

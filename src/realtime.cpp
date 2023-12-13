@@ -100,7 +100,8 @@ void Realtime::initializeGL() {
     // Tells OpenGL to only draw the front face
     glEnable(GL_CULL_FACE);
     // Tells OpenGL how big the screen is
-    glViewport(0, 0, size().width() * m_devicePixelRatio, size().height() * m_devicePixelRatio);
+    //glViewport(0, 0, size().width() * m_devicePixelRatio, size().height() * m_devicePixelRatio);
+    glViewport(0,0,1920,1080);
 
     // Students: anything requiring OpenGL calls when the program starts should be done here
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -264,25 +265,29 @@ void Realtime::drawFboSide(Camera c)
     //---------------------------------------------------------------------
     glBindVertexArray(0);
 
-    // CUBEMAP ---------------------------------------------------------
-    glDepthFunc(GL_LEQUAL);
-    glUseProgram(m_skybox_shader);
+    if (show_skybox)
+    {
+        // CUBEMAP ---------------------------------------------------------
+        glDepthFunc(GL_LEQUAL);
+        glUseProgram(m_skybox_shader);
 
-    glm::mat4 view = glm::mat4(glm::mat3(c.view_mat));
-    glUniformMatrix4fv(glGetUniformLocation(m_skybox_shader, "view"), 1, GL_FALSE, &view[0][0]);
-    glUniformMatrix4fv(glGetUniformLocation(m_skybox_shader, "projection"), 1, GL_FALSE, &c.proj_mat[0][0]);
-    glUniform1i(glGetUniformLocation(m_skybox_shader, "skybox"), 0);
-    // skybox cube
-    glBindVertexArray(skyboxVAO);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-    glBindVertexArray(0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+        glm::mat4 view = glm::mat4(glm::mat3(c.view_mat));
+        glUniformMatrix4fv(glGetUniformLocation(m_skybox_shader, "view"), 1, GL_FALSE, &view[0][0]);
+        glUniformMatrix4fv(glGetUniformLocation(m_skybox_shader, "projection"), 1, GL_FALSE, &c.proj_mat[0][0]);
+        glUniform1i(glGetUniformLocation(m_skybox_shader, "skybox"), 0);
+        // skybox cube
+        glBindVertexArray(skyboxVAO);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glBindVertexArray(0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
-    glUseProgram(0);
-    glDepthFunc(GL_LESS); // set depth function back to default
-    // CUBEMAP ---------------------------------------------------------
+        glUseProgram(0);
+        glDepthFunc(GL_LESS); // set depth function back to default
+        // CUBEMAP ---------------------------------------------------------
+    }
+
 }
 
 void Realtime::paintGL() {
@@ -324,8 +329,8 @@ void Realtime::paintGL() {
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
-    glViewport(0, 0, m_screen_width * this->devicePixelRatio(), m_screen_height * this->devicePixelRatio());
-
+    //glViewport(0, 0, m_screen_width * this->devicePixelRatio(), m_screen_height * this->devicePixelRatio());
+glViewport(0,0,1920,1080);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -337,22 +342,26 @@ void Realtime::paintGL() {
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
     glBindVertexArray(0);
 
-    // CUBEMAP ---------------------------------------------------------
-    glDepthFunc(GL_LEQUAL);
-    glUseProgram(m_skybox_shader);
-    glm::mat4 view1 = glm::mat4(glm::mat3(camera.view_mat));
-    glUniformMatrix4fv(glGetUniformLocation(m_skybox_shader, "view"), 1, GL_FALSE, &view1[0][0]);
-    glUniformMatrix4fv(glGetUniformLocation(m_skybox_shader, "projection"), 1, GL_FALSE, &camera.proj_mat[0][0]);
-    glUniform1i(glGetUniformLocation(m_skybox_shader, "skybox"), 1);
-    glBindVertexArray(skyboxVAO);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-    glBindVertexArray(0);
-    glUseProgram(0);
-    glDepthFunc(GL_LESS); // set depth function back to default
-    // CUBEMAP ---------------------------------------------------------
+    if (show_skybox)
+    {
+        // CUBEMAP ---------------------------------------------------------
+        glDepthFunc(GL_LEQUAL);
+        glUseProgram(m_skybox_shader);
+        glm::mat4 view1 = glm::mat4(glm::mat3(camera.view_mat));
+        glUniformMatrix4fv(glGetUniformLocation(m_skybox_shader, "view"), 1, GL_FALSE, &view1[0][0]);
+        glUniformMatrix4fv(glGetUniformLocation(m_skybox_shader, "projection"), 1, GL_FALSE, &camera.proj_mat[0][0]);
+        glUniform1i(glGetUniformLocation(m_skybox_shader, "skybox"), 1);
+        glBindVertexArray(skyboxVAO);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+        glBindVertexArray(0);
+        glUseProgram(0);
+        glDepthFunc(GL_LESS); // set depth function back to default
+        // CUBEMAP ---------------------------------------------------------
+    }
+
 
     if (first_paint)
     {
@@ -363,8 +372,8 @@ void Realtime::paintGL() {
 
 void Realtime::resizeGL(int w, int h) {
     // Tells OpenGL how big the screen is
-    glViewport(0, 0, size().width() * m_devicePixelRatio, size().height() * m_devicePixelRatio);
-
+    //glViewport(0, 0, size().width() * m_devicePixelRatio, size().height() * m_devicePixelRatio);
+glViewport(0,0,1920,1080);
     // Students: anything requiring OpenGL calls when the program starts should be done here
     camera.aspect_ratio = float(w) / float(h);
     camera.update(settings.nearPlane, settings.farPlane);
@@ -554,7 +563,6 @@ std::vector<std::vector<float>> Realtime::generate_vertex_data(RenderShapeData s
         }
     }
 
-
     return temp;
 }
 
@@ -604,9 +612,11 @@ std::vector<std::vector<float>> Realtime::generate_random_vertex_data(std::vecto
     float rndy = rand_float(-100.0f, 0.0f);
     float rndz = rand_float(-100.0f, 100.0f);
 
-    // rndx = 0.0f;
-    // rndy = 0.0f;
-    // rndz = 0.0f;
+    // rndx = -4.0f;
+    // rndy = -8.0f;
+    // rndz = -4.0f;
+
+    //-3.89312 13.0583 3.38144
 
     rand_vec3 = glm::vec3(rndx, rndy, rndz);
     std::vector<float> res;

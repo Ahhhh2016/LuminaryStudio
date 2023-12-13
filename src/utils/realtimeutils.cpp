@@ -162,7 +162,7 @@ void Realtime::paint_shapes(bool paint_all, Camera c) {
 
         for (int i=0; i < p_s.shape.size(); i++)
         {
-            if (!paint_all && p_s.apply_reflection)
+            if (!paint_all && p_s.apply_reflection || !show_lantern)
                 continue;
 
             if (p_s.apply_reflection)
@@ -206,7 +206,7 @@ void Realtime::paint_shapes(bool paint_all, Camera c) {
             glUniform1i(glGetUniformLocation(m_phong_shader, "shininess"), material.shininess);
 
             // -------------- texture -----------------
-            if (p_s.shape[0].primitive.type == PrimitiveType::PRIMITIVE_MESH)
+            if (p_s.shape[0].primitive.type == PrimitiveType::PRIMITIVE_MESH && show_texture)
             {
                 glUniform1i(glGetUniformLocation(m_phong_shader, "object_texture"), 4);
                 glUniform1f(glGetUniformLocation(m_phong_shader, "blend"), 1.0);
@@ -255,7 +255,7 @@ void Realtime::paint_shapes(bool paint_all, Camera c) {
 
         for (int i=0; i < p_s.shape.size(); i++)
         {
-            glm::vec3 delta(p_s.bottom_center / 1.72f);
+            glm::vec3 delta(p_s.bottom_center / 1.635f);
 
             glm::mat4 ctm  = glm::translate(glm::vec3(0.0f, 2.2f, 0.0f) + p_s.shape_rand_vec) * glm::scale(glm::vec3(0.5f, 0.5f, 0.5f)) * p_s.shape[0].ctm;
 

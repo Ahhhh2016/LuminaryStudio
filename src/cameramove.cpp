@@ -92,6 +92,20 @@ void Realtime::timerEvent(QTimerEvent *event) {
 
     if (!stop)
         update_phy_shape(deltaTime);
+    else
+    {
+        for (auto &s : phy_shapes)
+        {
+            if (s.apply_physics)
+            {
+                s.bottom_center = glm::vec3(0.0f, 0.0f, 0.0f);
+
+            }
+
+
+
+        }
+    }
 
     m_elapsedTimer.restart();
 
@@ -134,8 +148,19 @@ void Realtime::timerEvent(QTimerEvent *event) {
         cameraData.pos += glm::normalize(move_dir) * deltaTime * 20.0f;
         camera.initialize(cameraData);
 
-        // std::cout << camera.pos[0] << " " << camera.pos[1] << " " << camera.pos[2] << " " << camera.pos[3] << std::endl;
+        std::cout << "Camera pos" << camera.pos[0] << " " << camera.pos[1] << " " << camera.pos[2] << " " << camera.pos[3] << std::endl;
+        std::cout << "Camera look" << camera.look[0] << " " << camera.look[1] << " " << camera.look[2] << " " << camera.look[3] << std::endl;
+        std::cout << "Camera up" << camera.up[0] << " " << camera.up[1] << " " << camera.up[2] << " " << camera.up[3] << std::endl;
     }
+
+    if (m_keyMap[Qt::Key_U])
+        show_lantern = !show_lantern;
+    if (m_keyMap[Qt::Key_I])
+        show_texture = !show_texture;
+    if (m_keyMap[Qt::Key_O])
+        stop = !stop;
+    if (m_keyMap[Qt::Key_P])
+        show_skybox = !show_skybox;
 
 
 

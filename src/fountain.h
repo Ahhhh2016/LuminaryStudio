@@ -22,32 +22,59 @@
 
 namespace Fountain {
 
-    #define PARTICLE_TYPE_LAUNCHER 0.0f
-    #define PARTICLE_TYPE_SHELL 1.0f
-        //最大速度
-    #define MAX_VELOC glm::vec3(0.0,7.0,0.0)
-        //最小速度
-    #define MIN_VELOC glm::vec3(0.0,4.0,0.0)
-    //最大最小速度差距
-    #define DEL_VELOC glm::vec3(0.0,3.0,0.0)
-        //发射粒子最大周期
-    #define MAX_LAUNCH 0.3f*1000.0f
-        //发射粒子最小周期
-    #define MIN_LAUNCH 0.05f*1000.0f
-        //初始点精灵大小
-    #define INIT_SIZE 1.0f
-    #define MAX_SIZE 1.0f
-    #define MIN_SIZE 1.0f
+//     #define PARTICLE_TYPE_LAUNCHER 0.0f
+//     #define PARTICLE_TYPE_SHELL 1.0f
+//         //最大速度
+//     #define MAX_VELOC glm::vec3(0.0,6.0,0.0)
+//         //最小速度
+//     #define MIN_VELOC glm::vec3(0.0,4.0,0.0)
+//     //最大最小速度差距
+//     #define DEL_VELOC glm::vec3(0.0,2.0,0.0)
+//         //发射粒子最大周期
+//     #define MAX_LAUNCH 1.3f*1000.0f
+//         //发射粒子最小周期
+//     #define MIN_LAUNCH 0.7f*1000.0f
+//         //初始点精灵大小
+//     #define INIT_SIZE 30.0f
+//     #define MAX_SIZE 1.0f
+//     #define MIN_SIZE 1.0f
 
-    const float ANGLE = 120.0f;
-    const int MAX_PARTICLES = 10000;//定义粒子发射系统最大的粒子数
+//     const float ANGLE = 90.0f;
+//     const int MAX_PARTICLES = 40000;//定义粒子发射系统最大的粒子数
 
-    //初始发射器例子数量
-    const int INIT_PARTICLES = 1000;
+//     //初始发射器例子数量
+//     const int INIT_PARTICLES = 20000;
 
-    //落雪中心
+//     //落雪中心
+// //    const glm::vec3 center(0.0f);
+//     const float radius = 0.5f;
+
+#define PARTICLE_TYPE_LAUNCHER 0.0f
+#define PARTICLE_TYPE_SHELL 1.0f
+//????
+#define MAX_VELOC glm::vec3(0.0,7.0,0.0)
+//????
+#define MIN_VELOC glm::vec3(0.0,4.0,0.0)
+//????????
+#define DEL_VELOC glm::vec3(0.0,3.0,0.0)
+//????????
+#define MAX_LAUNCH 0.3f*1000.0f
+//????????
+#define MIN_LAUNCH 0.05f*1000.0f
+//???????
+#define INIT_SIZE 1.0f
+#define MAX_SIZE 1.0f
+#define MIN_SIZE 1.0f
+
+const float ANGLE = 120.0f;
+const int MAX_PARTICLES = 10000;//??????????????
+
+//?????????
+const int INIT_PARTICLES = 1000;
+
+//????
 //    const glm::vec3 center(0.0f);
-    const float radius = 0.5f;
+const float radius = 0.5f;
 
     struct WaterParticle
     {

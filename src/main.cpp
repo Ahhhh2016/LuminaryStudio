@@ -12,6 +12,8 @@ int main(int argc, char *argv[]) {
     QCoreApplication::setOrganizationName("CS 1230");
     QCoreApplication::setApplicationVersion(QT_VERSION_STR);
 
+
+
     QSurfaceFormat fmt;
     fmt.setVersion(4, 1);
     fmt.setProfile(QSurfaceFormat::CoreProfile);
@@ -19,7 +21,9 @@ int main(int argc, char *argv[]) {
 
     MainWindow w;
     w.initialize();
-    w.resize(800, 600);
+    //w.resize(800, 600);
+    w.setWindowFlags(Qt::FramelessWindowHint);
+    w.showFullScreen();
     w.show();
 
     int return_val = a.exec();
