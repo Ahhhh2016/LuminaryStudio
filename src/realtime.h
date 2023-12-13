@@ -93,7 +93,7 @@ private:
 
     // fix bug
     bool first_paint = true;
-    float fire_factor = 1.71f;
+    float fire_factor = 1.72f;
 
     // Tick Related Variables
     int m_timer;                                        // Stores timer which attempts to run ~60 times per second
@@ -193,10 +193,10 @@ private:
 
     float d_time = 0.0f;
 
-    // skybox
+    // skyboxS
     GLuint m_skybox_shader;
     GLuint skyboxVAO, skyboxVBO;
-    GLuint cubemapTexture;
+    GLuint cubemapTexture[4];
     void ini_skybox();
     GLuint loadCubemap(std::vector<std::string> faces);
     int cubemap_size;

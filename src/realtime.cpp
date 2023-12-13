@@ -144,31 +144,34 @@ void Realtime::initializeGL() {
     // load textures
     // -------------
 
-    auto faces = all_skybox[skybox_index];
+    for(int i = 0; i < 4; i++){
+        auto faces = all_skybox[i];
 
 
-    //cubemapTexture = loadCubemap(faces);
-    glGenTextures(1, &cubemapTexture);
-    // binding
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+        //cubemapTexture = loadCubemap(faces);
+        glGenTextures(1, &cubemapTexture[i]);
+        // binding
+        glActiveTexture(GL_TEXTURE0 + i);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture[i]);
 
-    // load each image and copy into a side of the cube-map texture
-    loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, faces[4]);
-    loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_POSITIVE_Z, faces[5]);
-    loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_POSITIVE_Y, faces[2]);
-    loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, faces[3]);
-    loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_NEGATIVE_X, faces[1]);
-    loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_POSITIVE_X, faces[0]);
-    // format cube map texture
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        // load each image and copy into a side of the cube-map texture
+        loadCubeMapSide(cubemapTexture[i], GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, faces[4]);
+        loadCubeMapSide(cubemapTexture[i], GL_TEXTURE_CUBE_MAP_POSITIVE_Z, faces[5]);
+        loadCubeMapSide(cubemapTexture[i], GL_TEXTURE_CUBE_MAP_POSITIVE_Y, faces[2]);
+        loadCubeMapSide(cubemapTexture[i], GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, faces[3]);
+        loadCubeMapSide(cubemapTexture[i], GL_TEXTURE_CUBE_MAP_NEGATIVE_X, faces[1]);
+        loadCubeMapSide(cubemapTexture[i], GL_TEXTURE_CUBE_MAP_POSITIVE_X, faces[0]);
+        // format cube map texture
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-    // unbinding
-    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+        // unbinding
+        glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+    }
+
 
     // init dynamic cubemap
     // depth buffer
@@ -276,7 +279,7 @@ void Realtime::drawFboSide(Camera c)
     // skybox cube
     glBindVertexArray(skyboxVAO);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture[skybox_index]);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
@@ -347,7 +350,7 @@ void Realtime::paintGL() {
     glUniform1i(glGetUniformLocation(m_skybox_shader, "skybox"), 1);
     glBindVertexArray(skyboxVAO);
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture[skybox_index]);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
     glBindVertexArray(0);
