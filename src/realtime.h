@@ -83,10 +83,10 @@ private:
 
     // control parameters
     bool open_physics = true; // open physics for lantern
-    int skybox_index = 2; // skybox index
+    int skybox_index = 0; // skybox index
     int new_rand_num = 20; // newly random added lanterns
-    string json_path = "C:/Users/Chengfan Li/Desktop/LuminaryStudio/scenefiles/action/required/lantern_water.json";
-
+    //string json_path = "C:/Users/Chengfan Li/Desktop/LuminaryStudio/scenefiles/action/required/lantern_water.json";
+    string json_path = "E:/Qtprograms/LuminaryStudio/scenefiles/action/required/display-yellow.json";
 
     // fix bug
     bool first_paint = true;
@@ -247,31 +247,15 @@ private:
 
     std::vector<std::vector<std::string>> all_skybox
     {
-        {
-            "./resources/skybox/right.jpg",
-            "./resources/skybox/left.jpg",
-            "./resources/skybox/top.jpg",
-            "./resources/skybox/bottom.jpg",
-            "./resources/skybox/back.jpg",
-            "./resources/skybox/front.jpg",
-        },
-        {
-            "./resources/skybox/skyboxes/distant_sunset/front.jpg",
-            "./resources/skybox/skyboxes/distant_sunset/back.jpg",
-            "./resources/skybox/skyboxes/distant_sunset/top.jpg",
-            "./resources/skybox/skyboxes/distant_sunset/bottom.jpg",
-            "./resources/skybox/skyboxes/distant_sunset/left.jpg",
-            "./resources/skybox/skyboxes/distant_sunset/right.jpg",
-        },
-        {
-            "./resources/skybox/skyboxes/exosystem2/front.jpg",
-            "./resources/skybox/skyboxes/exosystem2/back.jpg",
-            "./resources/skybox/skyboxes/exosystem2/top.jpg",
-            "./resources/skybox/skyboxes/exosystem2/bottom.jpg",
-            "./resources/skybox/skyboxes/exosystem2/left.jpg",
-            "./resources/skybox/skyboxes/exosystem2/right.jpg",
-        },
-        {
+//        {
+//            "./resources/skybox/skyboxes/exosystem2/front.jpg",
+//            "./resources/skybox/skyboxes/exosystem2/back.jpg",
+//            "./resources/skybox/skyboxes/exosystem2/top.jpg",
+//            "./resources/skybox/skyboxes/exosystem2/bottom.jpg",
+//            "./resources/skybox/skyboxes/exosystem2/left.jpg",
+//            "./resources/skybox/skyboxes/exosystem2/right.jpg",
+//        },
+        {//3
             "./resources/skybox/skyboxes/polluted_earth/front.jpg",
             "./resources/skybox/skyboxes/polluted_earth/back.jpg",
             "./resources/skybox/skyboxes/polluted_earth/top.jpg",
@@ -279,38 +263,54 @@ private:
             "./resources/skybox/skyboxes/polluted_earth/left.jpg",
             "./resources/skybox/skyboxes/polluted_earth/right.jpg",
         },
-        {
-            "./resources/skybox/night-skyboxes/HornstullsStrand/right.jpg",
-            "./resources/skybox/night-skyboxes/HornstullsStrand/left.jpg",
-            "./resources/skybox/night-skyboxes/HornstullsStrand/top.jpg",
-            "./resources/skybox/night-skyboxes/HornstullsStrand/bottom.jpg",
-            "./resources/skybox/night-skyboxes/HornstullsStrand/front.jpg",
-            "./resources/skybox/night-skyboxes/HornstullsStrand/back.jpg",
-        },
-        {
-            "./resources/skybox/night-skyboxes/SwedishRoyalCastle/right.jpg",
-            "./resources/skybox/night-skyboxes/SwedishRoyalCastle/left.jpg",
-            "./resources/skybox/night-skyboxes/SwedishRoyalCastle/top.jpg",
-            "./resources/skybox/night-skyboxes/SwedishRoyalCastle/bottom.jpg",
-            "./resources/skybox/night-skyboxes/SwedishRoyalCastle/front.jpg",
-            "./resources/skybox/night-skyboxes/SwedishRoyalCastle/back.jpg",
-        },
-        {
-            "./resources/skybox/bkg/lightblue/right.png",
-            "./resources/skybox/bkg/lightblue/left.png",
-            "./resources/skybox/bkg/lightblue/top.png",
-            "./resources/skybox/bkg/lightblue/bot.png",
-            "./resources/skybox/bkg/lightblue/back.png",
-            "./resources/skybox/bkg/lightblue/front.png",
-        },
-        {
+        {//0
+         "./resources/skybox/right.jpg",
+         "./resources/skybox/left.jpg",
+         "./resources/skybox/top.jpg",
+         "./resources/skybox/bottom.jpg",
+         "./resources/skybox/back.jpg",
+         "./resources/skybox/front.jpg",
+         },
+//        {
+//            "./resources/skybox/night-skyboxes/HornstullsStrand/right.jpg",
+//            "./resources/skybox/night-skyboxes/HornstullsStrand/left.jpg",
+//            "./resources/skybox/night-skyboxes/HornstullsStrand/top.jpg",
+//            "./resources/skybox/night-skyboxes/HornstullsStrand/bottom.jpg",
+//            "./resources/skybox/night-skyboxes/HornstullsStrand/front.jpg",
+//            "./resources/skybox/night-skyboxes/HornstullsStrand/back.jpg",
+//        },
+//        {
+//            "./resources/skybox/night-skyboxes/SwedishRoyalCastle/right.jpg",
+//            "./resources/skybox/night-skyboxes/SwedishRoyalCastle/left.jpg",
+//            "./resources/skybox/night-skyboxes/SwedishRoyalCastle/top.jpg",
+//            "./resources/skybox/night-skyboxes/SwedishRoyalCastle/bottom.jpg",
+//            "./resources/skybox/night-skyboxes/SwedishRoyalCastle/front.jpg",
+//            "./resources/skybox/night-skyboxes/SwedishRoyalCastle/back.jpg",
+//        },
+//        {
+//            "./resources/skybox/bkg/lightblue/right.png",
+//            "./resources/skybox/bkg/lightblue/left.png",
+//            "./resources/skybox/bkg/lightblue/top.png",
+//            "./resources/skybox/bkg/lightblue/bot.png",
+//            "./resources/skybox/bkg/lightblue/back.png",
+//            "./resources/skybox/bkg/lightblue/front.png",
+//        },
+        {//7
             "./resources/skybox/bkg/red/bkg3_right1.png",
             "./resources/skybox/bkg/red/bkg3_left2.png",
             "./resources/skybox/bkg/red/bkg3_top3.png",
             "./resources/skybox/bkg/red/bkg3_bottom4.png",
             "./resources/skybox/bkg/red/bkg3_back6.png",
             "./resources/skybox/bkg/red/bkg3_front5.png",
-        }
+        },
+        {//1
+         "./resources/skybox/skyboxes/distant_sunset/front.jpg",
+         "./resources/skybox/skyboxes/distant_sunset/back.jpg",
+         "./resources/skybox/skyboxes/distant_sunset/top.jpg",
+         "./resources/skybox/skyboxes/distant_sunset/bottom.jpg",
+         "./resources/skybox/skyboxes/distant_sunset/left.jpg",
+         "./resources/skybox/skyboxes/distant_sunset/right.jpg",
+         }
     };
     //camera move
     bool auto_camera = true;

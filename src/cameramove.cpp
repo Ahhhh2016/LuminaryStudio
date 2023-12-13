@@ -104,13 +104,14 @@ void Realtime::timerEvent(QTimerEvent *event) {
         camera.initialize(cameraData);
 
     }
-    if(accumulate_time > 5.f) {
-        std::cout<<"look: "<<cameraData.look[0]<<" "<<cameraData.look[1]<<" "<<cameraData.look[2]<<std::endl;
-        std::cout<<"pos: "<<cameraData.pos[0]<<" "<<cameraData.pos[1]<<" "<<cameraData.pos[2]<<std::endl;
-        std::cout<<"up: "<<cameraData.up[0]<<" "<<cameraData.up[1]<<" "<<cameraData.up[2]<<std::endl;
-        skybox_index = (skybox_index + 1) % 8;
+    if(accumulate_time > 10.f) {
+//        std::cout<<"look: "<<cameraData.look[0]<<" "<<cameraData.look[1]<<" "<<cameraData.look[2]<<std::endl;
+//        std::cout<<"pos: "<<cameraData.pos[0]<<" "<<cameraData.pos[1]<<" "<<cameraData.pos[2]<<std::endl;
+//        std::cout<<"up: "<<cameraData.up[0]<<" "<<cameraData.up[1]<<" "<<cameraData.up[2]<<std::endl;
+
 //        if(skybox_index != 2)
         auto faces = all_skybox[skybox_index];
+        skybox_index = (skybox_index + 1) % 4;
         accumulate_time = 0.f;
         glGenTextures(1, &cubemapTexture);
         // binding
