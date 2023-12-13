@@ -7,9 +7,9 @@
     "transparentCoeff": 0
   },
   "cameraData": {
-    "position": [-10, 10, 10],
+    "position": [0, 10, 0],
     "up": [0.0, 1.0, 0.0],
-    "focus": [0, 0, 0],
+    "focus": [6.91061, 3.36127, 16.1697],
     "heightAngle": 90.0
   },
   "groups": [
@@ -18,87 +18,84 @@
       "lights": [
         {
           "type": "point",
-          "color": [0.5, 0.5, 0.8],
-          "attenuationCoeff": [0.8, 0.2, 0.0]
+          "color": [0.6, 0.6, 0.6],
+          "attenuationCoeff": [0.2, 0.2, 0.0]
         }
       ]
     },{
-      "translate": [20, 60, -10],
+      "translate": [0, 10, 0],
       "lights": [
         {
           "type": "point",
-          "color": [0.3, 0.3, 0.7],
-          "attenuationCoeff": [0.8, 0.2, 0.0]
+          "color": [0.6, 0.6, 0.6],
+          "attenuationCoeff": [0.2, 0.2, 0.0]
         }
       ]
     },{
-      "translate": [22, 30, 10],
+      "translate": [100, 10, 100],
       "lights": [
         {
           "type": "point",
-          "color": [1.0, 1.0, 1.0],
-          "attenuationCoeff": [0.8, 0.2, 0.0]
-        }
-      ]
-    },{
-      "translate": [-20, 5, 22],
-      "lights": [
-        {
-          "type": "point",
-          "color": [0.7, 0.5, 0.8],
+          "color": [0.6, 0.6, 0.6],
           "attenuationCoeff": [0.1, 0.0, 0.0]
         }
       ]
     },{
-      "translate": [-20, 500, -22],
+      "translate": [-100, 7, 100],
       "lights": [
         {
           "type": "point",
-          "color": [0.3, 0.3, 0.7],
+          "color": [0.6, 0.6, 0.6],
           "attenuationCoeff": [0.1, 0.0, 0.0]
         }
       ]
     },{
-      "translate": [0.0, 140.0, 0.0],
+      "translate": [-100, 5, -100],
       "lights": [
         {
-          "type": "spot",
+          "type": "point",
+          "color": [0.6, 0.6, 0.6],
+          "attenuationCoeff": [0.1, 0.0, 0.0]
+        }
+      ]
+    },{
+      "translate": [100, 8, -100],
+      "lights": [
+        {
+          "type": "point",
+          "color": [0.6, 0.6, 0.6],
+          "attenuationCoeff": [0.1, 0.0, 0.0]
+        }
+      ]
+    },    
+    {
+      "lights": [
+        {
+          "type": "directional",
           "color": [1.0, 1.0, 1.0],
-          "direction": [0.0, -1.0, 0.0],
-          "angle": 30.0,
-          "penumbra": 20.0,
-          "attenuationCoeff": [0.8, 0.05, 0.0]
-        }
-      ]
-    },
-    {
-      "lights": [
-        {
-          "type": "directional",
-          "color": [0.8, 0.8, 0.3],
-          "direction": [0.0, -1.0, -1.0]
-        }
-      ]
-    },
-    {
-      "lights": [
-        {
-          "type": "directional",
-          "color": [0.5, 0.3, 0.8],
           "direction": [0.0, -1.0, 1.0]
+        }
+      ]
+    },
+    {
+      "lights": [
+        {
+          "type": "directional",
+          "color": [0.4, 0.4, 0.4],
+          "direction": [0.0, -1.0, -1.0]
         }
       ]
     },
     {
       "groups": [
 
-{
-	"translate": [-8, 1, 6],
+     {
+	"translate": [-50, 1, 50],
 	"scale": [0.5, 0.5, 0.5],
               "primitives": [
                 {
                   "type": "mesh",
-                  "ambient": [0.2, 0.2, 0.7],
+                  "ambient": [0.45, 0.45, 0.2],
                   "meshFile": "meshes/lantern.obj",
                   "diffuse": [0.23, 0.33, 0.99],
                   "specular": [1.0, 1.0, 1.0],
@@ -106,13 +103,13 @@
                 }
               ]
             },
-{
-	"translate": [15, 1, -4],
+     {
+	"translate": [50, 1, -50],
 	"scale": [0.5, 0.5, 0.5],
               "primitives": [
                 {
                   "type": "mesh",
-                  "ambient": [0.2, 0.2, 0.7],
+                  "ambient": [0.45, 0.45, 0.2],
                   "meshFile": "meshes/lantern.obj",
                   "diffuse": [0.23, 0.33, 0.99],
                   "specular": [1.0, 1.0, 1.0],
@@ -120,27 +117,12 @@
                 }
               ]
             },
- {
-	"translate": [-9, 1, -11],
+     {
 	"scale": [0.5, 0.5, 0.5],
               "primitives": [
                 {
                   "type": "mesh",
-                  "ambient": [0.2, 0.2, 0.7],
-                  "meshFile": "meshes/lantern.obj",
-                  "diffuse": [0.23, 0.33, 0.99],
-                  "specular": [1.0, 1.0, 1.0],
-                  "shininess": 30.0
-                }
-              ]
-            },
-	{
-	"translate": [0.0, 1, 0],
-	"scale": [0.5, 0.5, 0.5],
-              "primitives": [
-                {
-                  "type": "mesh",
-                  "ambient": [0.2, 0.2, 0.7],
+                  "ambient": [0.45, 0.45, 0.2],
                   "meshFile": "meshes/lantern.obj",
                   "diffuse": [0.23, 0.33, 0.99],
                   "specular": [1.0, 1.0, 1.0],

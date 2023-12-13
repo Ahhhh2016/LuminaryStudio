@@ -600,15 +600,15 @@ glm::vec3 calculate_bottom_center(std::vector<float> vbo_data, RenderShapeData s
 
 std::vector<std::vector<float>> Realtime::generate_random_vertex_data(std::vector<std::vector<float>> vbos)
 {
-    float rndx = rand_float(-100.0f, 100.0f);
+    float rndx = rand_float(-300.0f, 300.0f);
     float rndy = rand_float(-100.0f, 0.0f);
-    float rndz = rand_float(-100.0f, 100.0f);
-
+    float rndz = rand_float(-300.0f, 300.0f);
     // rndx = 0.0f;
     // rndy = 0.0f;
     // rndz = 0.0f;
 
     rand_vec3 = glm::vec3(rndx, rndy, rndz);
+
     std::vector<float> res;
     for (std::vector<float>& vbo : vbos)
     {

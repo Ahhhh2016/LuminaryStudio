@@ -14,11 +14,60 @@
   },
   "groups": [
     {
+      "translate": [-30, 10, 30],
       "lights": [
         {
-          "type": "directional",
-          "color": [0.4, 0.4, 0.9],
-          "direction": [0.0, -1.0, 0.0]
+          "type": "point",
+          "color": [0.5, 0.5, 0.8],
+          "attenuationCoeff": [0.8, 0.2, 0.0]
+        }
+      ]
+    },{
+      "translate": [20, 60, -10],
+      "lights": [
+        {
+          "type": "point",
+          "color": [0.3, 0.3, 0.7],
+          "attenuationCoeff": [0.8, 0.2, 0.0]
+        }
+      ]
+    },{
+      "translate": [22, 30, 10],
+      "lights": [
+        {
+          "type": "point",
+          "color": [1.0, 1.0, 1.0],
+          "attenuationCoeff": [0.8, 0.2, 0.0]
+        }
+      ]
+    },{
+      "translate": [-20, 5, 22],
+      "lights": [
+        {
+          "type": "point",
+          "color": [0.7, 0.5, 0.8],
+          "attenuationCoeff": [0.1, 0.0, 0.0]
+        }
+      ]
+    },{
+      "translate": [-20, 500, -22],
+      "lights": [
+        {
+          "type": "point",
+          "color": [0.3, 0.3, 0.7],
+          "attenuationCoeff": [0.1, 0.0, 0.0]
+        }
+      ]
+    },{
+      "translate": [0.0, 140.0, 0.0],
+      "lights": [
+        {
+          "type": "spot",
+          "color": [1.0, 1.0, 1.0],
+          "direction": [0.0, -1.0, 0.0],
+          "angle": 30.0,
+          "penumbra": 20.0,
+          "attenuationCoeff": [0.8, 0.05, 0.0]
         }
       ]
     },
@@ -33,64 +82,6 @@
     },
     {
       "lights": [
-        {
-          "type": "directional",
-          "color": [0.7, 0.3, 0.8],
-          "direction": [0.0, -1.0, 1.0]
-        }
-      ]
-    },
-    {
-      "groups": [
-{
-      "translate": [0, 5, 0],
-      "lights": [
-        {
-          "type": "point",
-          "color": [0.5, 0.5, 0.8],
-          "attenuationCoeff": [0.8, 0.2, 0.0]
-        }
-      ]
-    },{
-      "translate": [0, 10, 0],
-      "lights": [
-        {
-          "type": "point",
-          "color": [0.3, 0.3, 0.7],
-          "attenuationCoeff": [0.8, 0.2, 0.0]
-        }
-      ]
-    },{
-      "translate": [-22, -1, 0],
-      "lights": [
-        {
-          "type": "point",
-          "color": [1.0, 1.0, 1.0],
-          "attenuationCoeff": [0.8, 0.2, 0.0]
-        }
-      ]
-    },{
-      "translate": [0, -1, 22],
-      "lights": [
-        {
-          "type": "point",
-          "color": [0.7, 0.5, 0.8],
-          "attenuationCoeff": [0.1, 0.0, 0.0]
-        }
-      ]
-    },{
-      "translate": [0.0, 4.0, 0.0],
-      "lights": [
-        {
-          "type": "spot",
-          "color": [1.0, 1.0, 1.0],
-          "direction": [0.0, -1.0, 0.0],
-          "angle": 30.0,
-          "penumbra": 20.0,
-          "attenuationCoeff": [0.8, 0.05, 0.0]
-        }
-      ]
-    },
         {
 	"scale": [0.5, 0.5, 0.5],
               "primitives": [
