@@ -119,7 +119,7 @@ void main() {
                 else center[j] -= light_offset;
                 float dis = distance(center[j], texture_uv_coordinate);
                 if(dis > radius_light) continue;
-                color += (radius_light - dis) / radius_light * vec4(1.5, 1.5, 0.0, 1.0) * (1 - color);
+                color += (radius_light - dis) / radius_light * vec4(3.0, 1.5, 0.0, 1.0) * (1 - color);//vec4(1.5, 0.75, 0.0, 1.0) * (1 - color);
             }
             diffuse = (1.0f - blend) * diffuse + blend * color;
         }
