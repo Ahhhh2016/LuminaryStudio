@@ -80,7 +80,6 @@ void Realtime::update_phy_shape(float dt)
 void Realtime::timerEvent(QTimerEvent *event) {
     int elapsedms   = m_elapsedTimer.elapsed();
     float deltaTime = elapsedms * 0.001f;
-
     if (!stop)
         update_phy_shape(deltaTime);
 
@@ -88,8 +87,45 @@ void Realtime::timerEvent(QTimerEvent *event) {
 
     float moveSpeed = 0.03f;
     d_time += moveSpeed * deltaTime;
+    accumulate_time += deltaTime;
+    if(auto_camera) {
+        glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(deltaTime * 5.0f), glm::vec3(0, 1, 0));
+        cameraData.look = rotationMatrix * cameraData.look;
+        cameraData.pos += glm::vec4(0, 1.0f, 0, 0) * deltaTime;
+        camera.initialize(cameraData);
 
+    }
+    if(accumulate_time > 10.f) {
+        std::cout<<"look: "<<cameraData.look[0]<<" "<<cameraData.look[1]<<" "<<cameraData.look[2]<<std::endl;
+        std::cout<<"pos: "<<cameraData.pos[0]<<" "<<cameraData.pos[1]<<" "<<cameraData.pos[2]<<std::endl;
+        std::cout<<"up: "<<cameraData.up[0]<<" "<<cameraData.up[1]<<" "<<cameraData.up[2]<<std::endl;
+        skybox_index = (skybox_index + 1) % 8;
+//        if(skybox_index != 2)
+        auto faces = all_skybox[skybox_index];
+        accumulate_time = 0.f;
+        glGenTextures(1, &cubemapTexture);
+        // binding
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
 
+        // load each image and copy into a side of the cube-map texture
+        loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, faces[4]);
+        loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_POSITIVE_Z, faces[5]);
+        loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_POSITIVE_Y, faces[2]);
+        loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, faces[3]);
+        loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_NEGATIVE_X, faces[1]);
+        loadCubeMapSide(cubemapTexture, GL_TEXTURE_CUBE_MAP_POSITIVE_X, faces[0]);
+        // format cube map texture
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+        // unbinding
+        glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+    }
     if (d_time > 1.0f) {
         if(radius_light >= 0.12) radius_light = 0.09;
         else radius_light = 0.12;
@@ -127,7 +163,6 @@ void Realtime::timerEvent(QTimerEvent *event) {
 
         // std::cout << camera.pos[0] << " " << camera.pos[1] << " " << camera.pos[2] << " " << camera.pos[3] << std::endl;
     }
-
 
 
     update(); // asks for a PaintGL() call to occur

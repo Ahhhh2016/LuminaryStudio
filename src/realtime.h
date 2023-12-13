@@ -73,7 +73,7 @@ private:
 
     // control parameters
     bool open_physics = true; // open physics for lantern
-    int skybox_index = 3; // skybox index
+    int skybox_index = 2; // skybox index
     int new_rand_num = 20; // newly random added lanterns
 
     // Tick Related Variables
@@ -291,4 +291,7 @@ private:
             "./resources/skybox/bkg/red/bkg3_front5.png",
         }
     };
+    //camera move
+    bool auto_camera = true;
+    float accumulate_time = 0.f;
 };
