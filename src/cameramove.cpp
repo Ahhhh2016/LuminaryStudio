@@ -89,13 +89,13 @@ void Realtime::timerEvent(QTimerEvent *event) {
     d_time += moveSpeed * deltaTime;
     accumulate_time += deltaTime;
     if(auto_camera) {
-        glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(deltaTime * 5.0f), glm::vec3(0, 1, 0));
+        glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(deltaTime * 9.0f), glm::vec3(0, 1, 0));
         cameraData.look = rotationMatrix * cameraData.look;
-        cameraData.pos += glm::vec4(0, 1.0f, 0, 0) * deltaTime;
+        cameraData.pos += glm::vec4(0, 0.5f, 0, 0) * deltaTime;
         camera.initialize(cameraData);
 
     }
-    if(accumulate_time > 10.f) {
+    if(accumulate_time > 5.f) {
         std::cout<<"look: "<<cameraData.look[0]<<" "<<cameraData.look[1]<<" "<<cameraData.look[2]<<std::endl;
         std::cout<<"pos: "<<cameraData.pos[0]<<" "<<cameraData.pos[1]<<" "<<cameraData.pos[2]<<std::endl;
         std::cout<<"up: "<<cameraData.up[0]<<" "<<cameraData.up[1]<<" "<<cameraData.up[2]<<std::endl;

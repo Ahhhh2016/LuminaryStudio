@@ -518,9 +518,9 @@ float Realtime::rand_float(float min_float, float max_float)
 
 std::vector<std::vector<float>> Realtime::generate_random_vertex_data(std::vector<std::vector<float>> vbos)
 {
-    float rndx = rand_float(-150.0f, 150.0f);
+    float rndx = rand_float(-300.0f, 300.0f);
     float rndy = rand_float(-100.0f, 0.0f);
-    float rndz = rand_float(-150.0f, 150.0f);
+    float rndz = rand_float(-300.0f, 300.0f);
     std::vector<float> res;
     for (std::vector<float>& vbo : vbos)
     {
