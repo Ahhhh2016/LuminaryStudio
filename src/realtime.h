@@ -85,7 +85,11 @@ private:
     bool open_physics = true; // open physics for lantern
     int skybox_index = 3; // skybox index
     int new_rand_num = 20; // newly random added lanterns
-    string json_path = "C:/Users/Chengfan Li/Desktop/LuminaryStudio/scenefiles/action/required/lightsTest.json";
+    string json_path = "C:/Users/Chengfan Li/Desktop/LuminaryStudio/scenefiles/action/required/lantern_water.json";
+
+
+    // fix bug
+    bool first_paint = true;
 
     // Tick Related Variables
     int m_timer;                                        // Stores timer which attempts to run ~60 times per second
@@ -149,7 +153,7 @@ private:
     GLuint m_shape_texture;
     bool use_texture = false;
 
-    bool stop = false;
+    bool stop = true;
 
     float radius_light = 0.12f;
     glm::vec2 offset = glm::vec2(0, 0);

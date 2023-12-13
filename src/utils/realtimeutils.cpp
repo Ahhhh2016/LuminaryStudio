@@ -255,9 +255,9 @@ void Realtime::paint_shapes(bool paint_all, Camera c) {
 
         for (int i=0; i < p_s.shape.size(); i++)
         {
-            glm::vec3 delta(p_s.bottom_center / 1.74f);
+            glm::vec3 delta(p_s.bottom_center / 1.72f);
 
-            glm::mat4 ctm  = glm::translate(glm::vec3(0.0f, 2.3f, 0.0f) + p_s.shape_rand_vec) * glm::scale(glm::vec3(0.5f, 0.5f, 0.5f)) * p_s.shape[0].ctm;
+            glm::mat4 ctm  = glm::translate(glm::vec3(0.0f, 2.2f, 0.0f) + p_s.shape_rand_vec) * glm::scale(glm::vec3(0.5f, 0.5f, 0.5f)) * p_s.shape[0].ctm;
 
             glm::vec3 sample_p = glm::vec3(p_s.vertexData[0][0], p_s.vertexData[0][1], p_s.vertexData[0][2]);
             float dis_factor = clamp(-1.0f * glm::distance(sample_p, glm::vec3(camera.pos)) + 70.0f, 10.0f, 70.0f);
