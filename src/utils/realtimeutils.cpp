@@ -255,7 +255,23 @@ void Realtime::paint_shapes(bool paint_all, Camera c) {
 
         for (int i=0; i < p_s.shape.size(); i++)
         {
-            glm::vec3 delta(p_s.bottom_center / 1.72f);
+            glm::vec3 delta(p_s.bottom_center / fire_factor);
+
+            if (skybox_index == 1 && p_s.first_enter1)
+            {
+                p_s.first_enter1 = false;
+                delta = 20.0f * delta;
+            }
+            if (skybox_index == 2 && p_s.first_enter2)
+            {
+                p_s.first_enter2 = false;
+                delta = 20.0f * delta;
+            }
+            if (skybox_index == 3 && p_s.first_enter3)
+            {
+                p_s.first_enter3 = false;
+                delta = 20.0f * delta;
+            }
 
             glm::mat4 ctm  = glm::translate(glm::vec3(0.0f, 2.2f, 0.0f) + p_s.shape_rand_vec) * glm::scale(glm::vec3(0.5f, 0.5f, 0.5f)) * p_s.shape[0].ctm;
 

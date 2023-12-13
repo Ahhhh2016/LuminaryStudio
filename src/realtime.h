@@ -44,6 +44,9 @@ struct physics_shape {
     glm::vec3 bottom_center;
     int flame_index;
     glm::vec3 shape_rand_vec;
+    bool first_enter1 = true;
+    bool first_enter2 = true;
+    bool first_enter3 = true;
 };
 
 class Realtime : public QOpenGLWidget
@@ -84,12 +87,13 @@ private:
     // control parameters
     bool open_physics = true; // open physics for lantern
     int skybox_index = 0; // skybox index
-    int new_rand_num = 20; // newly random added lanterns
-    //string json_path = "C:/Users/Chengfan Li/Desktop/LuminaryStudio/scenefiles/action/required/lantern_water.json";
-    string json_path = "E:/Qtprograms/LuminaryStudio/scenefiles/action/required/display-yellow.json";
+    int new_rand_num = 15; // newly random added lanterns
+    string json_path = "C:/Users/Chengfan Li/Desktop/LuminaryStudio/scenefiles/action/required/display-yellow.json";
+    //string json_path = "E:/Qtprograms/LuminaryStudio/scenefiles/action/required/display-yellow.json";
 
     // fix bug
     bool first_paint = true;
+    float fire_factor = 1.71f;
 
     // Tick Related Variables
     int m_timer;                                        // Stores timer which attempts to run ~60 times per second
@@ -153,14 +157,14 @@ private:
     GLuint m_shape_texture;
     bool use_texture = false;
 
-    bool stop = true;
+    bool stop = false;
 
     float radius_light = 0.12f;
     glm::vec2 offset = glm::vec2(0, 0);
 
     //lantern
     std::vector<physics_shape> phy_shapes;
-    glm::vec3 wind = glm::vec3(0.4f, 0.5f, 0.8f);
+    glm::vec3 wind = glm::vec3(0.2f, 0.2f, 0.5f);
 
     glm::vec3 pre_ds = glm::vec3(0.0001f, 0.0001f, 0.0001f);
 

@@ -100,7 +100,8 @@ void Realtime::initializeGL() {
     // Tells OpenGL to only draw the front face
     glEnable(GL_CULL_FACE);
     // Tells OpenGL how big the screen is
-    glViewport(0, 0, size().width() * m_devicePixelRatio, size().height() * m_devicePixelRatio);
+    //glViewport(0, 0, size().width() * m_devicePixelRatio, size().height() * m_devicePixelRatio);
+    glViewport(0,0,1920,1080);
 
     // Students: anything requiring OpenGL calls when the program starts should be done here
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -324,8 +325,8 @@ void Realtime::paintGL() {
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
-    glViewport(0, 0, m_screen_width * this->devicePixelRatio(), m_screen_height * this->devicePixelRatio());
-
+    //glViewport(0, 0, m_screen_width * this->devicePixelRatio(), m_screen_height * this->devicePixelRatio());
+    glViewport(0,0,1920,1080);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -363,7 +364,9 @@ void Realtime::paintGL() {
 
 void Realtime::resizeGL(int w, int h) {
     // Tells OpenGL how big the screen is
-    glViewport(0, 0, size().width() * m_devicePixelRatio, size().height() * m_devicePixelRatio);
+    //glViewport(0, 0, size().width() * m_devicePixelRatio, size().height() * m_devicePixelRatio);
+
+    glViewport(0,0,1920,1080);
 
     // Students: anything requiring OpenGL calls when the program starts should be done here
     camera.aspect_ratio = float(w) / float(h);
@@ -600,9 +603,9 @@ glm::vec3 calculate_bottom_center(std::vector<float> vbo_data, RenderShapeData s
 
 std::vector<std::vector<float>> Realtime::generate_random_vertex_data(std::vector<std::vector<float>> vbos)
 {
-    float rndx = rand_float(-300.0f, 300.0f);
-    float rndy = rand_float(-100.0f, 0.0f);
-    float rndz = rand_float(-300.0f, 300.0f);
+    float rndx = rand_float(-200.0f, 200.0f);
+    float rndy = rand_float(-150.0f, -100.0f);
+    float rndz = rand_float(-200.0f, 200.0f);
     // rndx = 0.0f;
     // rndy = 0.0f;
     // rndz = 0.0f;

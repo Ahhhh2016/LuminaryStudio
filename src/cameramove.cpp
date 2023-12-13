@@ -112,6 +112,16 @@ void Realtime::timerEvent(QTimerEvent *event) {
 //        if(skybox_index != 2)
         auto faces = all_skybox[skybox_index];
         skybox_index = (skybox_index + 1) % 4;
+
+        // if (skybox_index == 1)
+        //     fire_factor = 1.66f;
+
+        // if (skybox_index == 2)
+        //     fire_factor = 1.63f;
+
+        // if (skybox_index == 3)
+        //     fire_factor = 1.62f;
+
         accumulate_time = 0.f;
         glGenTextures(1, &cubemapTexture);
         // binding
