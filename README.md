@@ -39,6 +39,8 @@ stb_image.h
 
 
 ## Project Showcase
+<img width="733" alt="image" src="https://github.com/Ahhhh2016/LuminaryStudio/assets/23431333/1a7a83b5-6ffe-46ff-901e-306df8c2b2c3">
+
 <img width="1506" alt="image" src="https://github.com/Ahhhh2016/LuminaryStudio/assets/23431333/18363e4a-ea63-48aa-bbc0-dfb1ee8d89a2">
 
 
